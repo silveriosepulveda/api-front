@@ -92,19 +92,10 @@
         }
 
         /**
-         * Alterna expansão de um menu
+         * Alterna expansão de um menu (permite múltiplos menus expandidos)
          */
         function toggleMenuExpansion(menuKey, menu) {
-            // Fechar outros menus se necessário
-            angular.forEach(vm.menuPainel, function(otherMenu, otherKey) {
-                if (otherKey !== menuKey && otherMenu.expanded) {
-                    otherMenu.expanded = false;
-                    otherMenu.active = false;
-                    localStorage.setItem('menu_expanded_' + otherKey, 'false');
-                }
-            });
-
-            // Alternar o menu atual
+            // Alternar apenas o menu atual (removida lógica de fechar outros menus)
             menu.expanded = !menu.expanded;
             menu.active = menu.expanded;
             

@@ -5,21 +5,29 @@
  */
 
 /* ========================================
-   VARIÁVEIS CSS
+   VARIÁVEIS CSS - TEMA LIMPO E MODERNO
    ======================================== */
 :root {
     --menu-width: 350px;
-    --menu-bg: #f8f9fa;
-    --menu-border: #dee2e6;
-    --menu-text: #495057;
-    --menu-text-muted: #6c757d;
-    --menu-hover: #e9ecef;
-    --menu-accent: #007bff;
-    --menu-accent-hover: #0056b3;
-    --favorito-color: #f39c12;
-    --favorito-bg: #fff9e6;
-    --favorito-hover: #fff3cd;
-    --transition: 0.3s ease;
+    --menu-bg: #ffffff;
+    --menu-bg-secondary: #fafbfc;
+    --menu-border: #e1e5e9;
+    --menu-border-light: #f1f3f4;
+    --menu-text: #344563;
+    --menu-text-muted: #7c8db5;
+    --menu-hover: #f8f9fb;
+    --menu-hover-accent: #eef4ff;
+    --menu-accent: #4f8ef7;
+    --menu-accent-hover: #3b82f6;
+    --favorito-color: #ff9500;
+    --favorito-bg: #fff8f0;
+    --favorito-hover: #fff3e0;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --submenu-indent: 40px; /* Espaçamento aumentado para sub-menus */
 }
 
 /* ========================================
@@ -28,24 +36,31 @@
 
 .menuPainel {
     position: relative;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    background: var(--menu-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
 }
 
-/* Cores padronizadas para menus */
+/* Cores padronizadas para menus - tema limpo */
 .menu.dropdown > a {
     color: var(--menu-text) !important;
-    font-weight: 600;
-    padding: 12px 16px;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 14px 18px;
     display: block;
     text-decoration: none;
     transition: all var(--transition);
     background: transparent;
+    border-bottom: 1px solid var(--menu-border-light);
 }
 
 .menu.dropdown > a:hover {
     color: var(--menu-accent) !important;
-    background-color: var(--menu-hover);
+    background-color: var(--menu-hover-accent);
     text-decoration: none;
+    transform: translateX(2px);
 }
 
 .menu.dropdown > a:focus,
@@ -220,11 +235,11 @@
    SISTEMA DE FAVORITOS - PRINCIPAL
    ======================================== */
 
-/* Seção de favoritos no topo */
+/* Seção de favoritos no topo com espaçamento reduzido */
 .favoritos-section {
     border-bottom: 2px solid var(--favorito-color);
-    margin-bottom: 10px;
-    padding-bottom: 8px;
+    margin-bottom: 3px;
+    padding-bottom: 2px;
     background: linear-gradient(135deg, var(--favorito-bg), #fff);
 }
 
@@ -287,15 +302,15 @@
     50% { transform: scale(1.1); }
 }
 
-/* Separador visual */
+/* Separador visual com espaçamento reduzido */
 .menu-separator {
-    height: 2px;
+    height: 1px;
     background: linear-gradient(90deg, var(--favorito-color), transparent);
-    margin: 10px 16px;
+    margin: 3px 16px;
     border: none;
     padding: 0;
     list-style: none;
-    opacity: 0.6;
+    opacity: 0.4;
 }
 
 /* Items de favoritos */
@@ -559,20 +574,24 @@
     outline: none;
 }
 
-/* Submenu items */
+/* Submenu items - tema limpo com padding reduzido */
 .submenu li a {
     color: var(--menu-text-muted) !important;
-    padding: 8px 32px;
-    font-size: 13px;
-    transition: all var(--transition);
+    padding: 6px var(--submenu-indent) !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    transition: all var(--transition) !important;
     background: transparent !important;
+    border-radius: var(--radius-sm) !important;
 }
 
 .submenu li a:hover {
     color: var(--menu-accent) !important;
-    background-color: var(--menu-hover) !important;
-    text-decoration: none;
-    padding-left: 36px;
+    background-color: var(--menu-hover-accent) !important;
+    text-decoration: none !important;
+    padding-left: calc(var(--submenu-indent) + 8px) !important;
+    transform: translateX(4px) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 
 /* Estados ativos */
@@ -950,59 +969,66 @@ body {
    PRECEDÊNCIA SOBRE MENU-MODERNO.CSS
    ======================================== */
 
-/* FORÇA: Definições de submenu com alta especificidade */
+/* FORÇA: Definições de submenu com tema limpo e padding reduzido */
 .menuPainel .submenu,
 #menuPainel .submenu,
 nav.sidebar .submenu {
     list-style: none !important;
-    border-bottom: 1px solid #f1f3f4 !important;
-    transition: background-color var(--transition) !important;
-    margin: 0 !important;
+    border-bottom: 1px solid var(--menu-border-light) !important;
+    transition: all var(--transition) !important;
+    margin: 1px 8px !important;
     position: relative !important;
     display: flex !important;
     align-items: center !important;
     min-height: 36px !important;
-    padding: 4px 0 !important;
+    padding: 2px 0 !important;
     clear: both !important;
     border: none !important;
-    border-bottom: 1px solid rgba(222, 226, 230, 0.5) !important;
+    border-bottom: 1px solid var(--menu-border-light) !important;
+    background: var(--menu-bg-secondary) !important;
+    border-radius: var(--radius-sm) !important;
 }
 
-/* FORÇA: Links dos sub-itens com espaçamento correto */
+/* FORÇA: Links dos sub-itens com espaçamento ajustado para estrela */
 .menuPainel .submenu .linkSubMenu,
 #menuPainel .submenu .linkSubMenu,
 nav.sidebar .submenu .linkSubMenu {
     flex: 1 !important;
-    margin-left: 22px !important; /* Espaço otimizado para estrela */
+    margin-left: calc(var(--submenu-indent) + 14px) !important; /* +14px para compensar a estrela movida */
     color: var(--menu-text-muted) !important;
     font-size: 14px !important;
-    padding: 8px 8px !important;
+    font-weight: 400 !important;
+    padding: 6px 12px !important;
     text-decoration: none !important;
-    transition: color var(--transition) !important;
+    transition: all var(--transition) !important;
     display: block !important;
     width: auto !important;
     border-left: none !important;
     background: transparent !important;
+    border-radius: var(--radius-sm) !important;
 }
 
-/* FORÇA: Hover dos links */
+/* FORÇA: Hover dos links com padding ajustado */
 .menuPainel .submenu .linkSubMenu:hover,
 #menuPainel .submenu .linkSubMenu:hover,
 nav.sidebar .submenu .linkSubMenu:hover {
     color: var(--menu-accent) !important;
-    background: rgba(0, 123, 255, 0.1) !important;
+    background: var(--menu-hover-accent) !important;
     text-decoration: none !important;
     border-left: none !important;
+    transform: translateX(4px) !important;
+    box-shadow: var(--shadow-sm) !important;
+    padding: 6px 12px !important;
 }
 
-/* FORÇA: Estrelas de favorito com posicionamento absoluto */
+/* FORÇA: Estrelas de favorito com posicionamento ajustado */
 .menuPainel .favorito-star,
 #menuPainel .favorito-star,
 nav.sidebar .favorito-star {
     width: 18px !important;
     height: 18px !important;
     position: absolute !important;
-    left: 6px !important;
+    left: 30px !important; /* Movido mais para a direita para acompanhar o texto */
     top: 50% !important;
     transform: translateY(-50%) !important;
     cursor: pointer !important;
@@ -1016,6 +1042,20 @@ nav.sidebar .favorito-star {
     align-items: center !important;
     justify-content: center !important;
     margin: 0 !important;
+}
+
+/* FORÇA: Padding compacto para sub-menus */
+.menuPainel .submenu,
+#menuPainel .submenu,
+nav.sidebar .submenu {
+    padding: 2px 0 !important; /* Padding top/bottom reduzido */
+}
+
+/* FORÇA: Compensação do margin-left para textos dos sub-menus */
+.menuPainel .submenu .linkSubMenu,
+#menuPainel .submenu .linkSubMenu,
+nav.sidebar .submenu .linkSubMenu {
+    margin-left: calc(var(--submenu-indent) + 14px) !important; /* Compensação do reposicionamento da estrela */
 }
 
 /* FORÇA: Hover das estrelas */
@@ -1090,6 +1130,31 @@ nav.sidebar .menu.dropdown > a::after {
 }
 
 /* ======================================== */
+
+/* AJUSTES FINAIS: Espaçamento compacto entre favoritos e menus */
+.favoritos-section {
+    margin-bottom: 3px !important; /* Reduzido de 5px para 3px */
+    padding-bottom: 2px !important; /* Reduzido de 4px para 2px */
+}
+
+.menu-separator {
+    margin: 3px 16px !important; /* Reduzido de 5px para 3px verticalmente */
+    height: 1px;
+    background-color: var(--menu-border-light);
+}
+
+/* MELHORIA: Suporte para múltiplos menus expandidos simultaneamente */
+.menu.dropdown .dropdown-menu {
+    max-height: 0 !important;
+    overflow: hidden !important;
+    transition: max-height 0.3s ease-in-out !important;
+}
+
+.menu.dropdown.expanded .dropdown-menu,
+.menu.dropdown.active .dropdown-menu {
+    max-height: 1000px !important; /* Altura suficiente para todos os itens */
+    overflow: visible !important;
+}
 
 /* CORREÇÃO: Impedir que regras genéricas de menu afetem favoritos */
 .favoritos-section.expanded .favoritos-lista,
