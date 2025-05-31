@@ -222,12 +222,15 @@
             if (favoritosSalvos) {
                 try {
                     vm.favoritos = JSON.parse(favoritosSalvos);
+                    // Garantir que não há duplicatas no carregamento inicial
+                    removerDuplicatasFavoritos();
                     console.log('Favoritos carregados:', vm.favoritos);
                 } catch (e) {
                     console.error('Erro ao carregar favoritos:', e);
                     vm.favoritos = [];
                 }
             } else {
+                vm.favoritos = [];
                 console.log('Nenhum favorito salvo encontrado');
             }
         }
@@ -257,29 +260,43 @@
          * Alterna favorito
          */
         function toggleFavorito(item) {
+            if (!item) return;
+            
+            // Normalizar subacao para evitar undefined vs ""
+            var itemNormalizado = {
+                item: item.item,
+                pagina: item.pagina,
+                acao: item.acao,
+                subacao: item.subacao || "",
+                target: item.target || ""
+            };
+            
             var index = vm.favoritos.findIndex(function(fav) {
-                return fav.pagina === item.pagina && 
-                       fav.acao === item.acao && 
-                       fav.subacao === item.subacao;
+                return fav.pagina === itemNormalizado.pagina && 
+                       fav.acao === itemNormalizado.acao && 
+                       (fav.subacao || "") === itemNormalizado.subacao;
             });
             
             if (index > -1) {
                 // Remover dos favoritos
                 vm.favoritos.splice(index, 1);
-                console.log('Item removido dos favoritos:', item.item);
+                console.log('Item removido dos favoritos:', itemNormalizado.item);
             } else {
-                // Adicionar aos favoritos
-                var novoFavorito = {
-                    item: item.item,
-                    pagina: item.pagina,
-                    acao: item.acao,
-                    subacao: item.subacao,
-                    target: item.target
-                };
-                vm.favoritos.push(novoFavorito);
-                console.log('Item adicionado aos favoritos:', item.item);
+                // Verificar se já existe antes de adicionar (segurança extra)
+                var jaExiste = vm.favoritos.some(function(fav) {
+                    return fav.pagina === itemNormalizado.pagina && 
+                           fav.acao === itemNormalizado.acao && 
+                           (fav.subacao || "") === itemNormalizado.subacao;
+                });
+                
+                if (!jaExiste) {
+                    vm.favoritos.push(itemNormalizado);
+                    console.log('Item adicionado aos favoritos:', itemNormalizado.item);
+                }
             }
             
+            // Limpar duplicatas como precaução
+            removerDuplicatasFavoritos();
             salvarFavoritos();
             
             // Não é necessário fazer $apply aqui pois já estamos dentro de um evento Angular
@@ -301,6 +318,45 @@
             var estadoSalvo = localStorage.getItem('favoritos_expanded');
             if (estadoSalvo !== null) {
                 vm.favoritosExpanded = JSON.parse(estadoSalvo);
+            }
+        }
+
+        /**
+         * Remove duplicatas dos favoritos
+         */
+        function removerDuplicatasFavoritos() {
+            if (!vm.favoritos || vm.favoritos.length === 0) return;
+            
+            var favoritosUnicos = [];
+            var chaves = new Set();
+            
+            vm.favoritos.forEach(function(favorito) {
+                // Validar se o favorito tem as propriedades necessárias
+                if (!favorito || !favorito.pagina || !favorito.acao || !favorito.item) {
+                    console.warn('Favorito inválido ignorado:', favorito);
+                    return;
+                }
+                
+                var chave = favorito.pagina + '|' + favorito.acao + '|' + (favorito.subacao || "");
+                if (!chaves.has(chave)) {
+                    chaves.add(chave);
+                    favoritosUnicos.push({
+                        item: favorito.item,
+                        pagina: favorito.pagina,
+                        acao: favorito.acao,
+                        subacao: favorito.subacao || "",
+                        target: favorito.target || ""
+                    });
+                } else {
+                    console.log('Duplicata removida:', favorito.item);
+                }
+            });
+            
+            if (favoritosUnicos.length !== vm.favoritos.length) {
+                console.log('Duplicatas removidas. Antes:', vm.favoritos.length, 'Depois:', favoritosUnicos.length);
+                vm.favoritos = favoritosUnicos;
+                // Salvar estado limpo
+                salvarFavoritos();
             }
         }
 

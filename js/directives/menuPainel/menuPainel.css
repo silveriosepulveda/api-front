@@ -71,22 +71,7 @@
     color: var(--menu-text-muted) !important;
 }
 
-.submenu {
-    list-style: none;
-    border-bottom: 1px solid #f1f3f4;
-    transition: background-color var(--transition);
-    margin: 0;
-    position: relative;
-    display: flex;
-    align-items: center;
-    min-height: 36px;
-    padding: 4px 0;
-    clear: both;
-}
-
-.submenu:hover {
-    background-color: var(--menu-hover) !important;
-}
+/* Submenu styles consolidated in override section below for better specificity */
 
 .menu {
     margin-left: 0;
@@ -124,10 +109,7 @@
         box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     }
     
-    .submenu {
-        margin-left: 0;
-        padding-left: 15px; /* Alinhamento consistente em mobile */
-    }
+    /* Submenu mobile adjustments moved to consolidated definition below */
     
     .dropdown {
         width: var(--menu-width);
@@ -283,21 +265,21 @@
     transform: rotate(0deg);
 }
 
-/* Lista de favoritos com animação */
+/* Lista de favoritos com animação - PRIORIDADE SOBRE MENU GENÉRICO */
 .favoritos-section .favoritos-lista {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    background: var(--favorito-bg);
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    border-top: 1px solid var(--favorito-color);
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--favorito-bg) !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    transition: max-height 0.3s ease-out !important;
+    border-top: 1px solid var(--favorito-color) !important;
 }
 
 .favoritos-section.expanded .favoritos-lista {
-    max-height: 1000px;
-    transition: max-height 0.3s ease-in;
+    max-height: 1000px !important;
+    transition: max-height 0.3s ease-in !important;
 }
 
 @keyframes starPulse {
@@ -370,54 +352,9 @@
     text-decoration: none;
 }
 
-/* Estrelas de favorito nos menus normais */
-.favorito-star {
-    width: 18px;
-    height: 18px;
-    position: absolute;
-    left: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #ddd;
-    font-size: 14px;
-    transition: all var(--transition);
-    text-align: center;
-    line-height: 18px;
-    z-index: 10;
-}
+/* Favorito star styles consolidated in override section below for better specificity */
 
-.favorito-star:hover {
-    color: var(--favorito-color);
-    transform: translateY(-50%) scale(1.2);
-}
-
-.favorito-star.active {
-    color: var(--favorito-color);
-    text-shadow: 0 0 8px rgba(243, 156, 18, 0.5);
-}
-
-.favorito-star.active:hover {
-    transform: translateY(-50%) scale(1.1);
-}
-
-/* Ajustes para menus com estrelas */
-.submenu .linkSubMenu {
-    flex: 1;
-    margin-left: 22px; /* Espaço reduzido para estrela */
-    color: var(--menu-text-muted);
-    font-size: 14px;
-    padding: 8px 8px;
-    text-decoration: none;
-    transition: color var(--transition);
-    display: block;
-    width: auto;
-}
-
-.submenu .linkSubMenu:hover {
-    color: var(--menu-accent);
-    text-decoration: none;
-}
+/* Link sub-menu styles consolidated in override section below */
 
 .submenu .addSubMenu {
     width: 32px;
@@ -438,13 +375,6 @@
     background-color: #d4edda;
     border-radius: 3px;
 }
-
-/* ========================================
-   CAMPO DE BUSCA (INTEGRADO AOS CONTROLES)
-   ======================================== */
-
-/* Estilos já incluídos na seção de controles reorganizados acima */
-/* #procuramenu agora é .busca-input */
 
 /* ========================================
    CONTROLES REORGANIZADOS DO MENU
@@ -761,21 +691,7 @@
     display: none !important;
 }
 
-/* Garantir que estrelas sejam sempre visíveis */
-.favorito-star {
-    display: inline-block !important;
-    visibility: visible !important;
-}
-
-/* Melhorar o contrast ratio */
-.favorito-item .favorito-link {
-    color: #704209 !important;
-}
-
-.favorito-item .favorito-link:hover {
-    color: var(--favorito-color) !important;
-    background: rgba(243, 156, 18, 0.15) !important;
-}
+/* Star visibility and link contrast managed in consolidated section below */
 
 /* Debug - para identificar problemas */
 .favoritos-section:empty::after {
@@ -946,4 +862,250 @@ body {
     display: none !important;
 }
 
+/* ========================================
+   INTEGRAÇÃO MENU-MODERNO.CSS - CONTROLADA
+   Elementos necessários do menu-moderno sem conflitos
+   ======================================== */
+
+/* Pseudo-elementos do menu-moderno.css - DESABILITADOS para evitar conflitos */
+.menu.dropdown > a::before,
+.menu.dropdown > a::after {
+    content: none !important;
+    display: none !important;
+}
+
+.submenu a.linkSubMenu::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* Mantemos apenas as variáveis compatíveis do menu-moderno */
+:root {
+    /* Variáveis do menu-moderno compatíveis */
+    --menu-collapsed-width: 70px;
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* Reset específico para elementos do menu-moderno */
+#menuPainel * {
+    box-sizing: border-box;
+}
+
+/* Estrutura de dropdown do menu-moderno - ADAPTADA (NÃO APLICAR EM FAVORITOS) */
+.menu.dropdown:not(.favoritos-section) ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--menu-hover);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    border-top: 1px solid var(--menu-border);
+}
+
+.menu.dropdown.expanded:not(.favoritos-section) ul {
+    max-height: 1000px;
+    transition: max-height 0.3s ease-in;
+}
+
+/* Estados de colapso do menu-moderno - ADAPTADOS (NÃO APLICAR EM FAVORITOS) */
+.menu.dropdown.collapsed:not(.favoritos-section) ul {
+    max-height: 0;
+    transition: max-height 0.3s ease-out;
+}
+
+/* Scrollbar do menu-moderno - MANTIDA */
+#menuPainel::-webkit-scrollbar {
+    width: 6px;
+}
+
+#menuPainel::-webkit-scrollbar-track {
+    background: var(--menu-hover);
+}
+
+#menuPainel::-webkit-scrollbar-thumb {
+    background: var(--menu-border);
+    border-radius: 3px;
+}
+
+#menuPainel::-webkit-scrollbar-thumb:hover {
+    background: var(--menu-text-muted);
+}
+
+/* Firefox scrollbar */
+#menuPainel {
+    scrollbar-width: thin;
+    scrollbar-color: var(--menu-border) var(--menu-hover);
+}
+
+/* ========================================
+   ESTILOS CONSOLIDADOS - DEFINIÇÕES PRINCIPAIS
+   Esta seção contém todas as definições consolidadas:
+   - .submenu (removidas duplicações das linhas ~74-85 e ~127-129)
+   - .linkSubMenu (removidas duplicações das linhas ~359-372 e ~405-417)
+   - .favorito-star (removidas duplicações das linhas ~374-401 e ~765-767)
+   - .favorito-item .favorito-link (consolidado contrast ratio)
+   PRECEDÊNCIA SOBRE MENU-MODERNO.CSS
+   ======================================== */
+
+/* FORÇA: Definições de submenu com alta especificidade */
+.menuPainel .submenu,
+#menuPainel .submenu,
+nav.sidebar .submenu {
+    list-style: none !important;
+    border-bottom: 1px solid #f1f3f4 !important;
+    transition: background-color var(--transition) !important;
+    margin: 0 !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 36px !important;
+    padding: 4px 0 !important;
+    clear: both !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(222, 226, 230, 0.5) !important;
+}
+
+/* FORÇA: Links dos sub-itens com espaçamento correto */
+.menuPainel .submenu .linkSubMenu,
+#menuPainel .submenu .linkSubMenu,
+nav.sidebar .submenu .linkSubMenu {
+    flex: 1 !important;
+    margin-left: 22px !important; /* Espaço otimizado para estrela */
+    color: var(--menu-text-muted) !important;
+    font-size: 14px !important;
+    padding: 8px 8px !important;
+    text-decoration: none !important;
+    transition: color var(--transition) !important;
+    display: block !important;
+    width: auto !important;
+    border-left: none !important;
+    background: transparent !important;
+}
+
+/* FORÇA: Hover dos links */
+.menuPainel .submenu .linkSubMenu:hover,
+#menuPainel .submenu .linkSubMenu:hover,
+nav.sidebar .submenu .linkSubMenu:hover {
+    color: var(--menu-accent) !important;
+    background: rgba(0, 123, 255, 0.1) !important;
+    text-decoration: none !important;
+    border-left: none !important;
+}
+
+/* FORÇA: Estrelas de favorito com posicionamento absoluto */
+.menuPainel .favorito-star,
+#menuPainel .favorito-star,
+nav.sidebar .favorito-star {
+    width: 18px !important;
+    height: 18px !important;
+    position: absolute !important;
+    left: 6px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    cursor: pointer !important;
+    color: #ddd !important;
+    font-size: 14px !important;
+    transition: all var(--transition) !important;
+    text-align: center !important;
+    line-height: 18px !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+}
+
+/* FORÇA: Hover das estrelas */
+.menuPainel .favorito-star:hover,
+#menuPainel .favorito-star:hover,
+nav.sidebar .favorito-star:hover {
+    color: var(--favorito-color) !important;
+    transform: translateY(-50%) scale(1.1) !important;
+}
+
+/* FORÇA: Estrelas ativas */
+.menuPainel .favorito-star.active,
+#menuPainel .favorito-star.active,
+nav.sidebar .favorito-star.active {
+    color: var(--favorito-color) !important;
+    text-shadow: 0 0 8px rgba(243, 156, 18, 0.5) !important;
+}
+
+/* FORÇA: Links dos favoritos com melhor contraste */
+.menuPainel .favorito-item .favorito-link,
+#menuPainel .favorito-item .favorito-link,
+nav.sidebar .favorito-item .favorito-link {
+    color: #704209 !important;
+}
+
+.menuPainel .favorito-item .favorito-link:hover,
+#menuPainel .favorito-item .favorito-link:hover,
+nav.sidebar .favorito-item .favorito-link:hover {
+    color: var(--favorito-color) !important;
+    background: rgba(243, 156, 18, 0.15) !important;
+}
+
+/* FORÇA: Botões addSubMenu */
+.menuPainel .addSubMenu,
+#menuPainel .addSubMenu,
+nav.sidebar .addSubMenu {
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #28a745 !important;
+    font-size: 16px !important;
+    transition: all var(--transition) !important;
+    cursor: pointer !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+    border-radius: 3px !important;
+    margin: 2px 8px 2px 0 !important;
+}
+
+.menuPainel .addSubMenu:hover,
+#menuPainel .addSubMenu:hover,
+nav.sidebar .addSubMenu:hover {
+    color: #155724 !important;
+    background-color: #d4edda !important;
+    border-radius: 3px !important;
+}
+
+/* DESABILITA: Todos os pseudo-elementos do menu-moderno.css */
+.menuPainel .submenu a.linkSubMenu::before,
+#menuPainel .submenu a.linkSubMenu::before,
+nav.sidebar .submenu a.linkSubMenu::before,
+.menuPainel .menu.dropdown > a::before,
+#menuPainel .menu.dropdown > a::before,
+nav.sidebar .menu.dropdown > a::before,
+.menuPainel .menu.dropdown > a::after,
+#menuPainel .menu.dropdown > a::after,
+nav.sidebar .menu.dropdown > a::after {
+    content: none !important;
+    display: none !important;
+}
+
 /* ======================================== */
+
+/* CORREÇÃO: Impedir que regras genéricas de menu afetem favoritos */
+.favoritos-section.expanded .favoritos-lista,
+.favoritos-section .favoritos-lista {
+    /* Override forçado sobre regras genéricas de .menu.dropdown ul */
+    max-height: unset !important;
+}
+
+.favoritos-section.expanded .favoritos-lista {
+    max-height: 1000px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.favoritos-section:not(.expanded) .favoritos-lista,
+.favoritos-section.collapsed .favoritos-lista {
+    max-height: 0 !important;
+    overflow: hidden !important;
+}

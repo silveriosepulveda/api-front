@@ -51,7 +51,7 @@
                             <i class="fa fa-chevron-down dropdown-arrow" style="float: right; margin-top: 2px;"></i>
                         </a>
                         <ul role="menu" class="favoritos-lista">
-                            <li class="submenu favorito-item" ng-repeat="favorito in vm.favoritos">
+                            <li class="submenu favorito-item" ng-repeat="favorito in vm.favoritos track by (favorito.pagina + '|' + favorito.acao + '|' + (favorito.subacao || '') + '|' + favorito.item)">
                                 <i class="fa fa-star favorito-star active" 
                                    ng-click="vm.toggleFavorito(favorito)" 
                                    title="Remover dos favoritos"></i>
