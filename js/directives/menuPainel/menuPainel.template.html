@@ -1,0 +1,100 @@
+<div class="menuPainel">
+    <nav class="navbar navbar-default sidebar" id="menuPainel" role="navigation">
+        <div class="row">
+            <div class="navbar-header">
+                <h5 class="navbar-brand"></h5>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menuencolhido">
+                    <span class="sr-only">Alterar Navegação</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            
+            <div class="collapse navbar-collapse" id="menuencolhido">
+                <!-- Checkbox para manter menu oculto -->
+                <div class="checkbox-manter-menu col-xs-12" style="margin-top: 5% !important;">
+                    <label>
+                        <input type="checkbox" id="manterMenuOculto" onchange="toggleManterMenu()">
+                        <small>Manter oculto</small>
+                    </label>
+                </div>
+                
+                <!-- Campo de busca -->
+                <form class="navbar-form row" role="search">
+                    <div class="form-group col-xs-12">
+                        <input type="text" 
+                               class="form-control input-lg" 
+                               placeholder="Procurar no Menu" 
+                               id="procuramenu" 
+                               ng-model="vm.searchText"
+                               style="width: 100%;">
+                    </div>
+                </form>
+                
+                <!-- Menu principal -->
+                <ul class="nav navbar-nav" id="divmenu">
+                    <!-- Seção de Favoritos -->
+                    <li class="menu dropdown favoritos-section" ng-show="vm.favoritos && vm.favoritos.length > 0">
+                        <a href="javascript:void(0)" ng-click="vm.toggleFavoritosExpansion()">
+                            <i class="fa fa-star" style="color: #f39c12; margin-right: 8px;"></i>
+                            <span>Favoritos ({{vm.favoritos.length}})</span>
+                        </a>
+                        <ul role="menu" ng-show="vm.favoritosExpanded">
+                            <li class="submenu favorito-item" ng-repeat="favorito in vm.favoritos">
+                                <i class="fa fa-star favorito-star active" 
+                                   ng-click="vm.toggleFavorito(favorito)" 
+                                   title="Remover dos favoritos"></i>
+                                <a href="javascript:void(0)" 
+                                   ng-click="vm.navegar(favorito.pagina, favorito.acao, favorito.subacao); vm.closeMenuOnNavigation()"
+                                   target="{{favorito.target}}" 
+                                   class="linkSubMenu cursor favorito-link">{{favorito.item}}</a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Separador se há favoritos -->
+                    <li class="menu-separator" ng-show="vm.favoritos && vm.favoritos.length > 0"></li>
+                    
+                    <!-- Menus principais -->
+                    <li class="menu dropdown" 
+                        ng-repeat="(keyM, menu) in vm.menuPainel" 
+                        ng-if="menu.exibir && vm.filtrarMenu(menu)"
+                        ng-class="{'expanded': menu.expanded, 'collapsed': !menu.expanded, 'active': menu.active}">
+                        
+                        <a href="javascript:void(0)" ng-click="vm.toggleMenuExpansion(keyM, menu)">
+                            <span>{{menu.menu}}</span>
+                        </a>
+                        
+                        <ul role="menu" ng-show="menu.expanded">
+                            <li class="submenu" 
+                                ng-repeat="(keyI, item) in menu.itens"
+                                ng-if="vm.filtrarItem(item)">
+                                
+                                <!-- Estrela de favorito -->
+                                <i class="fa fa-star favorito-star" 
+                                   ng-class="{'active': vm.isFavorito(item)}" 
+                                   ng-click="vm.toggleFavorito(item)" 
+                                   title="{{vm.isFavorito(item) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}}"></i>
+                                
+                                <!-- Link do item -->
+                                <a href="javascript:void(0)" 
+                                   ng-click="vm.navegar(item.pagina, item.acao, item.subacao); vm.closeMenuOnNavigation()"
+                                   target="{{item.target}}" 
+                                   class="linkSubMenu cursor">{{item.item}}</a>
+                                
+                                <!-- Botão de adicionar -->
+                                <a ng-click="vm.abrirPopUpMenu(item)" 
+                                   class="addSubMenu cursor" 
+                                   ng-if='item.acoes.Cadastrar != undefined'
+                                   title="Adicionar novo {{item.item}}">
+                                    <i class="fa fa-plus"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>

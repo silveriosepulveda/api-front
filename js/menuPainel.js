@@ -1,53 +1,179 @@
 /**
  * Funcionalidade Menu Persistente - SEGMED
  * 
- * Permite que o usuário mantenha o menu lateral sempre aberto em desktop.
- * A preferência é salva no localStorage e carregada automaticamente.
+ * Controla o comportamento do menu lateral com nova lógica:
+ * - Menu ABRE por padrão em desktop na inicialização
+ * - Checkbox "Manter oculto" controla se o menu deve ficar fechado
+ * - Corpo do site se ajusta automaticamente quando menu expande/contrai
  * 
  * Funções principais:
- * - toggleManterMenu(): Alterna a preferência e salva no localStorage
- * - carregarPreferenciaMenu(): Carrega a preferência salva na inicialização
- * - manipularMenu(): Controla abertura/fechamento via botão (força fechamento se necessário)
- * - fecharMenuSeNecessario(): Fecha menu ao navegar (respeita "manter aberto" em desktop)
- * - closeNav(): Fecha o menu forçadamente (sempre fecha)
- * - closeNavCondicional(): Fecha o menu respeitando a preferência "manter aberto"
+ * - toggleManterMenu(): Alterna a preferência "manter oculto" e salva no localStorage
+ * - carregarPreferenciaMenu(): Carrega a preferência e abre menu por padrão (se não marcado "oculto")
+ * - manipularMenu(): Controla abertura/fechamento via botão
+ * - fecharMenuSeNecessario(): Fecha menu ao navegar apenas se "manter oculto" estiver marcado
+ * - closeNav(): Fecha o menu forçadamente e ajusta o corpo do site
+ * - closeNavCondicional(): Fecha o menu apenas se "manter oculto" estiver marcado
  * 
- * COMPORTAMENTO POR AÇÃO:
- * - Botão "Mostrar Menu"/"Ocultar Menu": SEMPRE fecha o menu, desmarcando a preferência se necessário
- * - Navegação pelos itens do menu: Respeita a preferência "manter aberto" (desktop), sempre fecha (mobile)
- * - Tecla ESC: Respeita a preferência "manter aberto" (não fecha se estiver marcada em desktop)
- * - Checkbox "Manter aberto": Disponível apenas em desktop (>1000px)
+ * NOVO COMPORTAMENTO POR AÇÃO:
+ * - Inicialização: Menu ABRE por padrão, só fica fechado se "manter oculto" estiver marcado
+ * - Botão "Mostrar Menu"/"Ocultar Menu": Controla abertura/fechamento e ajusta preferência
+ * - Navegação pelos itens: Respeita "manter oculto" (desktop), sempre fecha (mobile)
+ * - Tecla ESC: Respeita "manter oculto" (não fecha se NÃO estiver marcada em desktop)
+ * - Checkbox "Manter oculto": Inverte lógica - se marcado mantém fechado, se não marcado mantém aberto
  */
 
 app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $location) {        
-    $scope.menuPainel = APIServ.buscaDadosLocais('menuPainel');
+    // Função para carregar/recarregar dados do menu
+    $scope.carregarMenuPainel = function() {
+        $scope.menuPainel = APIServ.buscaDadosLocais('menuPainel');
+        console.log('MenuPainel carregado/recarregado:', $scope.menuPainel);
+        
+        // Atualizar estado de expansão dos menus se já existem dados
+        if ($scope.menuPainel) {
+            angular.forEach($scope.menuPainel, function(menu, key) {
+                // Carregar preferência salva do localStorage
+                const savedState = localStorage.getItem('menu_expanded_' + key);
+                menu.expanded = savedState ? JSON.parse(savedState) : false;
+                menu.active = false;
+            });
+        }
+    };
     
-    // Inicializar estado expandido/colapsado dos menus
-    if ($scope.menuPainel) {
-        angular.forEach($scope.menuPainel, function(menu, key) {
-            // Por padrão, menus ficam colapsados. Carregar preferência do localStorage se existir
-            const savedState = localStorage.getItem('menu_expanded_' + key);
-            menu.expanded = savedState ? JSON.parse(savedState) : false;
-            menu.active = false;
+    // Carregar dados inicialmente
+    $scope.carregarMenuPainel();
+    
+    // Escutar eventos de login para recarregar dados do menu
+    $scope.$on('usuarioLogado', function(event, usuario) {
+        console.log('🔄 MenuPainel: Recarregando dados após login do usuário:', usuario?.nome);
+        // Aguardar um pouco para garantir que os dados foram salvos
+        setTimeout(function() {
+            $scope.carregarMenuPainel();
+            if (!$scope.$$phase) {
+                $scope.$apply();
+            }
+        }, 500);
+    });
+    
+    // Escutar eventos de atualização do menu
+    $scope.$on('menuPainelAtualizado', function() {
+        console.log('🔄 MenuPainel: Recarregando dados após atualização');
+        $scope.carregarMenuPainel();
+        if (!$scope.$$phase) {
+            $scope.$apply();
+        }
+    });
+    
+    // Inicializar favoritos
+    $scope.favoritos = [];
+    $scope.favoritosExpanded = true;
+    
+    // Carregar favoritos salvos
+    $scope.carregarFavoritos = function() {
+        var favoritosSalvos = localStorage.getItem('menuFavoritos');
+        if (favoritosSalvos) {
+            try {
+                $scope.favoritos = JSON.parse(favoritosSalvos);
+                console.log('Favoritos carregados:', $scope.favoritos.length, 'itens');
+            } catch (e) {
+                console.error('Erro ao carregar favoritos:', e);
+                $scope.favoritos = [];
+            }
+        }
+    };
+    
+    // Salvar favoritos
+    $scope.salvarFavoritos = function() {
+        localStorage.setItem('menuFavoritos', JSON.stringify($scope.favoritos));
+        console.log('Favoritos salvos:', $scope.favoritos.length, 'itens');
+    };
+    
+    // Verificar se item é favorito
+    $scope.isFavorito = function(item) {
+        return $scope.favoritos.some(function(fav) {
+            return fav.pagina === item.pagina && 
+                   fav.acao === item.acao && 
+                   fav.subacao === item.subacao;
         });
-    }
+    };
+    
+    // Alternar favorito
+    $scope.toggleFavorito = function(item) {
+        var index = $scope.favoritos.findIndex(function(fav) {
+            return fav.pagina === item.pagina && 
+                   fav.acao === item.acao && 
+                   fav.subacao === item.subacao;
+        });
+        
+        if (index > -1) {
+            // Remover dos favoritos
+            $scope.favoritos.splice(index, 1);
+            console.log('Item removido dos favoritos:', item.item);
+        } else {
+            // Adicionar aos favoritos
+            var novoFavorito = {
+                item: item.item,
+                pagina: item.pagina,
+                acao: item.acao,
+                subacao: item.subacao,
+                target: item.target
+            };
+            $scope.favoritos.push(novoFavorito);
+            console.log('Item adicionado aos favoritos:', item.item);
+        }
+        
+        $scope.salvarFavoritos();
+        
+        // Aplicar mudanças de forma segura
+        if (!$scope.$$phase) {
+            $scope.$apply();
+        }
+    };
+    
+    // Alternar expansão dos favoritos
+    $scope.toggleFavoritosExpansion = function() {
+        $scope.favoritosExpanded = !$scope.favoritosExpanded;
+        localStorage.setItem('favoritos_expanded', JSON.stringify($scope.favoritosExpanded));
+    };
+    
+    // Carregar estado de expansão dos favoritos
+    $scope.carregarEstadoFavoritos = function() {
+        var estadoSalvo = localStorage.getItem('favoritos_expanded');
+        if (estadoSalvo !== null) {
+            $scope.favoritosExpanded = JSON.parse(estadoSalvo);
+        }
+    };
+    
+    // Inicializar favoritos
+    $scope.carregarFavoritos();
+    $scope.carregarEstadoFavoritos();
     
     // Função para alternar expansão do menu
     $scope.toggleMenuExpansion = function(menuKey, menu) {
+        // Fechar outros menus se necessário
+        angular.forEach($scope.menuPainel, function(otherMenu, otherKey) {
+            if (otherKey !== menuKey && otherMenu.expanded) {
+                otherMenu.expanded = false;
+                otherMenu.active = false;
+                localStorage.setItem('menu_expanded_' + otherKey, 'false');
+            }
+        });
+
+        // Alternar o menu atual
         menu.expanded = !menu.expanded;
+        menu.active = menu.expanded;
         
         // Salvar estado no localStorage
         localStorage.setItem('menu_expanded_' + menuKey, JSON.stringify(menu.expanded));
         
-        // Adicionar classe de ativação visual
-        menu.active = menu.expanded;
-        
-        console.log('Menu', menu.menu, menu.expanded ? 'expandido' : 'colapsado');
+        console.log('Menu', menu.menu, menu.expanded ? 'expandido' : 'recolhido');
     };
     
     $scope.navegar = function (pagina, acao, subacao) {
         console.log('Navegando para:', pagina, acao, subacao);
         $location.path('/' + pagina + '/' + acao );
+        
+        // Fechar menu após navegação se necessário
+        $scope.closeMenuOnNavigation();
     };
     
     // Função para fechar menu após navegação (respeita preferência "manter aberto")
@@ -117,6 +243,39 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
             $('#menuencolhido').collapse('hide');
         }
     };
+    
+    // Funções de busca/filtro
+    $scope.filtrarMenu = function(menu) {
+        if (!$scope.searchText || $scope.searchText.trim() === '') {
+            return true;
+        }
+        
+        var texto = $scope.searchText.toLowerCase();
+        
+        // Verificar se o nome do menu contém o texto
+        if (menu.menu && menu.menu.toLowerCase().indexOf(texto) !== -1) {
+            return true;
+        }
+        
+        // Verificar se algum item do menu contém o texto
+        if (menu.itens) {
+            return Object.keys(menu.itens).some(function(key) {
+                var item = menu.itens[key];
+                return item.item && item.item.toLowerCase().indexOf(texto) !== -1;
+            });
+        }
+        
+        return false;
+    };
+    
+    $scope.filtrarItem = function(item) {
+        if (!$scope.searchText || $scope.searchText.trim() === '') {
+            return true;
+        }
+        
+        var texto = $scope.searchText.toLowerCase();
+        return item.item && item.item.toLowerCase().indexOf(texto) !== -1;
+    };
 })
 
 
@@ -155,6 +314,24 @@ $(document).ready(function () {
 
     // Carregar preferência de manter menu aberto
     carregarPreferenciaMenu();
+    
+    // Debug adicional para identificar problemas
+    setTimeout(function() {
+        var manterOculto = localStorage.getItem('manterMenuOculto') === 'true';
+        var botao = document.getElementById('botaoMenu');
+        var largura = $(document).width();
+        
+        console.log('🧪 DEBUG INICIAL DO MENU:');
+        console.log('  - Largura da tela:', largura + 'px');
+        console.log('  - localStorage manterMenuOculto:', localStorage.getItem('manterMenuOculto'));
+        console.log('  - Valor interpretado (manterOculto):', manterOculto);
+        console.log('  - Estado do botão:', botao ? botao.innerHTML : 'BOTÃO NÃO ENCONTRADO');
+        console.log('  - Classes do body:', document.body.className);
+        
+        if (largura > 1000 && !manterOculto && botao && botao.innerHTML === 'Mostrar Menu') {
+            console.log('⚠️  PROBLEMA DETECTADO: Menu deveria estar aberto mas não está!');
+        }
+    }, 1000);
 });
 
 $(document).keyup(function (e) {
@@ -164,8 +341,8 @@ $(document).keyup(function (e) {
 });
 
 function fecharMenuSeNecessario() {
-    // Função específica para navegação - respeita a preferência "manter aberto"
-    var manterAberto = localStorage.getItem('manterMenuAberto') === 'true';
+    // Função específica para navegação - respeita a preferência "manter oculto"
+    var manterOculto = localStorage.getItem('manterMenuOculto') === 'true';
     
     // Em mobile, sempre fecha o menu
     if ($(document).width() <= 1000) {
@@ -173,29 +350,28 @@ function fecharMenuSeNecessario() {
         return;
     }
     
-    // Em desktop, só fecha se "manter aberto" NÃO estiver ativo
-    if (!manterAberto) {
+    // Em desktop, fecha se "manter oculto" estiver ativo, mantém aberto caso contrário
+    if (manterOculto) {
         closeNav();
     }
     
-    console.log('Navegação - Menu permanece:', manterAberto ? 'aberto' : 'fechado');
+    console.log('Navegação - Menu permanece:', manterOculto ? 'fechado' : 'aberto');
 }
 
 function manipularMenu() {
     var botao = document.getElementById('botaoMenu');
-    var manterAberto = localStorage.getItem('manterMenuAberto') === 'true';
+    var manterOculto = localStorage.getItem('manterMenuOculto') === 'true';
     
     if (botao.innerHTML == 'Mostrar Menu') {
         openNav();
     } else if (botao.innerHTML == 'Ocultar Menu') {
-        // Forçar fechamento do menu mesmo com "manter aberto" ativo
-        // e desmarcar a checkbox se estiver marcada
-        if (manterAberto && $(document).width() > 1000) {
-            var checkbox = document.getElementById('manterMenuAberto');
+        // Forçar fechamento do menu e marcar "manter oculto" se necessário
+        if (!manterOculto && $(document).width() > 1000) {
+            var checkbox = document.getElementById('manterMenuOculto');
             if (checkbox) {
-                checkbox.checked = false;
-                localStorage.setItem('manterMenuAberto', false);
-                console.log('Menu fechado via botão - preferência "manter aberto" desmarcada');
+                checkbox.checked = true;
+                localStorage.setItem('manterMenuOculto', true);
+                console.log('Menu fechado via botão - preferência "manter oculto" marcada');
             }
         }
         closeNav();
@@ -212,6 +388,9 @@ function openNav() {
         if (conteudo) {
             conteudo.style.marginLeft = "350px";
         }
+        // Adicionar classe para controle CSS
+        document.body.classList.add('menu-aberto');
+        document.body.classList.remove('menu-fechado');
     } else {
         // Mobile/Tablet: menu overlay
         menuPainel.style.width = "100%";
@@ -253,14 +432,18 @@ function closeNav() {
         overlay.classList.remove('active');
     }
     
+    // Adicionar classe para controle CSS
+    document.body.classList.add('menu-fechado');
+    document.body.classList.remove('menu-aberto');
+    
     document.getElementById('botaoMenu').innerHTML = 'Mostrar Menu';
 }
 
 function closeNavCondicional() {
-    var manterAberto = localStorage.getItem('manterMenuAberto') === 'true';
+    var manterOculto = localStorage.getItem('manterMenuOculto') === 'true';
     
-    // Se "manter aberto" estiver marcado e estivermos em desktop, não fechar
-    if (manterAberto && $(document).width() > 1000) {
+    // Se "manter oculto" NÃO estiver marcado e estivermos em desktop, não fechar
+    if (!manterOculto && $(document).width() > 1000) {
         return;
     }
     
@@ -277,26 +460,26 @@ window.addEventListener('resize', function() {
     }
 });
 
-// Função para gerenciar a preferência de manter menu aberto
+// Função para gerenciar a preferência de manter menu oculto
 function toggleManterMenu() {
-    var checkbox = document.getElementById('manterMenuAberto');
-    var manterAberto = checkbox.checked;
+    var checkbox = document.getElementById('manterMenuOculto');
+    var manterOculto = checkbox.checked;
     
     // Salvar preferência no localStorage
-    localStorage.setItem('manterMenuAberto', manterAberto);
+    localStorage.setItem('manterMenuOculto', manterOculto);
     
-    console.log('Preferência "manter menu aberto":', manterAberto);
+    console.log('Preferência "manter menu oculto":', manterOculto);
     
-    // Se acabou de desmarcar e o menu está aberto em desktop, permitir fechar
-    if (!manterAberto && $(document).width() > 1000) {
+    // Se acabou de marcar (ocultar) e o menu está aberto em desktop, fechar
+    if (manterOculto && $(document).width() > 1000) {
         var botao = document.getElementById('botaoMenu');
         if (botao && botao.innerHTML == 'Ocultar Menu') {
-            // Não fazer nada, apenas permitir que o usuário feche manualmente se quiser
+            closeNav();
         }
     }
     
-    // Se acabou de marcar e estivermos em desktop, abrir o menu
-    if (manterAberto && $(document).width() > 1000) {
+    // Se acabou de desmarcar (manter visível) e estivermos em desktop, abrir o menu
+    if (!manterOculto && $(document).width() > 1000) {
         var botao = document.getElementById('botaoMenu');
         if (botao && botao.innerHTML == 'Mostrar Menu') {
             openNav();
@@ -306,20 +489,49 @@ function toggleManterMenu() {
 
 // Função para carregar a preferência salva
 function carregarPreferenciaMenu() {
-    var manterAberto = localStorage.getItem('manterMenuAberto') === 'true';
-    var checkbox = document.getElementById('manterMenuAberto');
+    var manterOculto = localStorage.getItem('manterMenuOculto') === 'true';
+    var checkbox = document.getElementById('manterMenuOculto');
     
     if (checkbox) {
-        checkbox.checked = manterAberto;
-        
-        // Se a preferência é manter aberto e estivermos em desktop, abrir o menu
-        if (manterAberto && $(document).width() > 1000) {
-            setTimeout(function() {
-                var botao = document.getElementById('botaoMenu');
+        checkbox.checked = manterOculto;
+    }
+    
+    console.log('🔧 Carregando preferência do menu:', manterOculto ? 'manter oculto' : 'manter visível');
+    
+    // NOVO COMPORTAMENTO: Menu abre por padrão, só fica fechado se "manter oculto" estiver marcado
+    if ($(document).width() > 1000) {
+        setTimeout(function() {
+            var botao = document.getElementById('botaoMenu');
+            
+            // Sempre aplicar as classes de controle CSS
+            document.body.classList.remove('menu-aberto', 'menu-fechado');
+            
+            if (!manterOculto) {
+                // Se "manter oculto" NÃO está marcado, abrir o menu por padrão
+                document.body.classList.add('menu-aberto');
+                
                 if (botao && botao.innerHTML == 'Mostrar Menu') {
                     openNav();
+                    console.log('✅ Menu aberto por padrão (preferência: manter visível)');
+                } else {
+                    console.log('🔄 Menu já estava aberto');
                 }
-            }, 500); // Delay para garantir que a página carregou completamente
-        }
+            } else {
+                // Se "manter oculto" está marcado, garantir que o menu esteja fechado
+                document.body.classList.add('menu-fechado');
+                
+                if (botao && botao.innerHTML == 'Ocultar Menu') {
+                    closeNav();
+                    console.log('❌ Menu fechado (preferência: manter oculto)');
+                } else {
+                    console.log('🔄 Menu já estava fechado');
+                }
+            }
+        }, 300); // Delay reduzido mas suficiente para garantir que a página carregou
+    } else {
+        console.log('📱 Mobile detectado - menu permanece fechado');
     }
 }
+
+// NOTA: Inicialização removida - já está sendo feita em carregarPreferenciaMenu() 
+// que é chamada na linha 316 dentro do $(document).ready() principal

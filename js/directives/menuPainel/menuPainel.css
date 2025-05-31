@@ -1,0 +1,475 @@
+/**
+ * CSS da Diretiva Menu Painel - SEGMED
+ * Estilos específicos para o componente de menu lateral
+ */
+
+/* ========================================
+   ESTRUTURA BÁSICA DO MENU
+   ======================================== */
+
+.menuPainel {
+    position: relative;
+}
+
+.linkSubMenu {
+    width: 65%; /* Reduzido para acomodar a estrela */
+    float: left;
+    margin-left: 20px; /* Reduzir espaço para a estrela */
+}
+
+.addSubMenu {
+    width: 15%;
+    padding: 1%;
+    float: right; /* Mudado para right para melhor alinhamento */
+}
+
+.submenu {
+    list-style: none;
+}
+
+.submenu:hover {
+    background: yellow;
+}
+
+.menu {
+    margin-left: 20px;
+}
+
+.navbar-brand {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media screen and (min-width: 900px) {
+    .navbar-brand {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    nav.sidebar {
+        width: 350px;
+        position: fixed;
+        z-index: 998;
+        top: 40px;
+        left: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        transition: width 0.5s ease;
+        height: calc(100vh - 40px);
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+    
+    .submenu {
+        margin-left: -15px;
+    }
+    
+    .dropdown {
+        width: 350px;
+    }
+    
+    #menuPainel {            
+        width: 350px; /* Menu aberto por padrão */
+        position: fixed;
+        top: 40px;
+        left: 0;
+        height: calc(100vh - 40px);
+        overflow-y: auto;
+        z-index: 999;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        transition: width 0.5s ease;
+    }
+    
+    /* Ajuste automático do conteúdo principal */
+    #conteudoEstruturaGerencia {
+        transition: margin-left 0.5s ease;
+        margin-left: 350px; /* Por padrão com margem (menu aberto) */
+    }
+    
+    /* Classe para quando o menu está aberto */
+    body.menu-aberto #conteudoEstruturaGerencia {
+        margin-left: 350px;
+    }
+    
+    /* Classe para quando o menu está fechado */
+    body.menu-fechado #conteudoEstruturaGerencia {
+        margin-left: 0;
+    }
+}
+}
+
+/* ========================================
+   SISTEMA DE FAVORITOS
+   ======================================== */
+
+.favoritos-section {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+}
+
+.favoritos-section a {
+    font-weight: 600;
+    color: #f39c12;
+}
+
+.menu-separator {
+    height: 1px;
+    background-color: #dee2e6;
+    margin: 8px 16px;
+    list-style: none;
+    border: none;
+    padding: 0;
+}
+
+.favorito-star {
+    width: 16px;
+    float: left;
+    cursor: pointer;
+    color: #ccc;
+    font-size: 14px;
+    transition: color 0.3s ease;
+    margin-right: 4px;
+    margin-top: 3px;
+}
+
+.favorito-star:hover {
+    color: #f39c12;
+}
+
+.favorito-star.active {
+    color: #f39c12;
+}
+
+.favorito-item {
+    background-color: #fff9e6;
+    border-left: 3px solid #f39c12;
+    margin-bottom: 2px;
+    padding: 2px 0;
+}
+
+.favorito-item:hover {
+    background-color: #fff3cd !important;
+}
+
+.favorito-link {
+    width: calc(100% - 25px) !important; /* Ajustar largura para comportar a estrela */
+    margin-left: 0 !important;
+    padding-left: 2px !important;
+}
+
+.submenu .favorito-star {
+    margin-left: 15px;
+}
+
+.submenu .linkSubMenu {
+    width: calc(80% - 20px) !important; /* Reduzir espaço entre estrela e texto */
+    margin-left: 20px !important;
+    padding-left: 2px !important;
+}
+
+/* Ajustar botão de adicionar quando há estrela */
+.submenu .addSubMenu {
+    width: 15%;
+    padding: 1%;
+    float: right;
+}
+
+/* Melhorias no espaçamento geral */
+.submenu {
+    padding: 2px 0;
+}
+
+.submenu a {
+    padding: 4px 8px;
+    display: block;
+    text-decoration: none;
+}
+
+/* ========================================
+   CAMPO DE BUSCA
+   ======================================== */
+
+#procuramenu {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 8px 12px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#procuramenu:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+    background: white;
+}
+
+#procuramenu::placeholder {
+    color: #6c757d;
+    font-weight: 400;
+}
+
+/* ========================================
+   CHECKBOX MANTER MENU ABERTO
+   ======================================== */
+
+.checkbox-manter-menu {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.checkbox-manter-menu label {
+    margin: 0;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.checkbox-manter-menu input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+/* ========================================
+   ESTADOS DOS MENUS
+   ======================================== */
+
+.menu.dropdown {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 2px;
+}
+
+.menu.dropdown.expanded {
+    background-color: #e9ecef;
+}
+
+.menu.dropdown.active {
+    background-color: #007bff;
+}
+
+.menu.dropdown.active a {
+    color: white;
+}
+
+.menu.dropdown > a {
+    display: block;
+    padding: 12px 15px;
+    color: #495057;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.menu.dropdown > a:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+}
+
+/* ========================================
+   SUBMENU
+   ======================================== */
+
+.submenu {
+    border-bottom: 1px solid #f1f3f4;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.submenu:hover {
+    background-color: #f8f9fa !important;
+}
+
+.submenu a.linkSubMenu {
+    color: #6c757d;
+    font-size: 14px;
+    padding: 8px 0;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.submenu a.linkSubMenu:hover {
+    color: #007bff;
+}
+
+.submenu .addSubMenu {
+    color: #28a745;
+    font-size: 16px;
+    padding: 8px;
+    text-align: center;
+    transition: color 0.15s ease-in-out;
+}
+
+.submenu .addSubMenu:hover {
+    color: #155724;
+    background-color: #d4edda;
+    border-radius: 3px;
+}
+
+/* ========================================
+   UTILITÁRIOS
+   ======================================== */
+
+.cursor {
+    cursor: pointer;
+}
+
+/* ========================================
+   MEDIA QUERIES ESPECÍFICAS
+   ======================================== */
+
+@media screen and (max-width: 999px) {
+    #menuPainel {
+        width: 100% !important;
+        position: relative !important;
+        height: auto !important;
+        box-shadow: none !important;
+    }
+    
+    nav.sidebar {
+        width: 100% !important;
+        position: relative !important;
+        height: auto !important;
+    }
+    
+    .checkbox-manter-menu {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    .conteudoEstruturaGerencia {
+        margin-left: 350px;
+        transition: margin-left 0.5s ease;
+    }
+    
+    /* Quando o menu está fechado */
+    body.menu-fechado .conteudoEstruturaGerencia {
+        margin-left: 0;
+    }
+    
+    body.menu-fechado #menuPainel {
+        width: 0 !important;
+        overflow: hidden;
+    }
+    
+    body.menu-fechado nav.sidebar {
+        width: 0 !important;
+        overflow: hidden;
+    }
+}
+
+/* ========================================
+   SCROLLBAR PERSONALIZADA
+   ======================================== */
+
+#menuPainel::-webkit-scrollbar {
+    width: 6px;
+}
+
+#menuPainel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#menuPainel::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+#menuPainel::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* ========================================
+   ANIMAÇÕES E TRANSIÇÕES
+   ======================================== */
+
+.menu.dropdown ul[role="menu"] {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.favorito-star {
+    transition: all 0.2s ease-in-out;
+}
+
+.submenu {
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* ========================================
+   CORREÇÕES ESPECÍFICAS
+   ======================================== */
+
+/* Garantir que o menu seja sempre visível em desktop */
+@media screen and (min-width: 1000px) {
+    nav.sidebar {
+        width: 350px !important; /* Força visibilidade */
+    }
+    
+    #menuPainel {
+        width: 350px !important; /* Força visibilidade */
+    }
+}
+
+/* ========================================
+   OVERLAY PARA MOBILE
+   ======================================== */
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ========================================
+   RESPONSIVIDADE MOBILE ESPECÍFICA
+   ======================================== */
+
+@media screen and (max-width: 999px) {
+    #menuPainel {
+        width: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        overflow-y: auto;
+        z-index: 999;
+        background-color: #f8f9fa;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        transition: width 0.3s ease;
+    }
+    
+    .checkbox-manter-menu {
+        display: none; /* Ocultar checkbox em mobile */
+    }
+    
+    .dropdown {
+        width: 100%;
+    }
+    
+    nav.sidebar {
+        width: 0;
+        transition: width 0.3s ease;
+    }
+}
