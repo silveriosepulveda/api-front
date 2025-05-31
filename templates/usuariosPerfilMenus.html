@@ -1,0 +1,350 @@
+<style>
+    /* Estilos da árvore de menus */
+    #listaMenusUsuario ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0;
+    }
+
+    .tree-container {
+        font-family: Arial, sans-serif;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tree-level-1 {
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        background: white;
+        overflow: hidden;
+    }
+
+    .tree-level-2 {
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        margin: 0;
+    }
+
+    .tree-level-3 {
+        background: #ffffff;
+        margin: 3px 0;
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+    }
+
+    .tree-item {
+        position: relative;
+        padding: 6px 12px;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .tree-item:last-child {
+        border-bottom: none;
+    }
+
+    .tree-item:hover {
+        background-color: #e8f4f8;
+    }
+
+    .tree-toggle {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        margin-right: 6px;
+        cursor: pointer;
+        text-align: center;
+        line-height: 16px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background: #fff;
+        font-size: 11px;
+        font-weight: bold;
+        color: #666;
+        transition: all 0.2s ease;
+        vertical-align: middle;
+    }
+
+    .tree-toggle:hover {
+        background: #e8f4f8;
+        border-color: #007bff;
+        color: #007bff;
+    }
+
+    .tree-toggle.expanded::before {
+        content: "−";
+    }
+
+    .tree-toggle.collapsed::before {
+        content: "+";
+    }
+
+    .tree-menu-title {
+        font-weight: bold;
+        font-size: 15px;
+        color: #495057;
+        margin-left: 4px;
+    }
+
+    .tree-item-title {
+        font-weight: 600;
+        color: #6c757d;
+        margin-left: 4px;
+        font-size: 14px;
+    }
+
+    .tree-action-title, .tree-field-title {
+        font-size: 13px;
+        color: #495057;
+        margin-left: 4px;
+    }
+
+    .tree-children {
+        padding-left: 20px;
+        margin-top: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .tree-children.collapsed {
+        display: none;
+    }
+
+    .tree-children.expanded {
+        display: block;
+    }
+
+    .tree-checkbox {
+        margin-right: 6px;
+        transform: scale(1.05);
+    }
+
+    .tree-actions-fields {
+        display: flex;
+        gap: 8px;
+        margin-top: 5px;
+    }
+
+    .tree-actions, .tree-fields {
+        flex: 1;
+    }
+
+    .tree-section-title {
+        font-size: 11px;
+        font-weight: bold;
+        color: #6c757d;
+        margin-bottom: 3px;
+        padding: 3px 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+    }
+
+    .tree-action-item, .tree-field-item {
+        padding: 3px 6px;
+        margin: 1px 0;
+        border-radius: 3px;
+        transition: background-color 0.2s ease;
+    }
+
+    .tree-action-item {
+        background: #e3f2fd;
+    }
+
+    .tree-field-item {
+        background: #f3e5f5;
+    }
+
+    .tree-action-item:hover {
+        background: #bbdefb;
+    }
+
+    .tree-field-item:hover {
+        background: #e1bee7;
+    }
+
+    @media (max-width: 768px) {
+        .tree-actions-fields {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .tree-children {
+            padding-left: 12px;
+        }
+
+        .tree-container {
+            padding: 6px;
+        }
+
+        .tree-item {
+            padding: 5px 10px;
+        }
+
+        .tree-level-1 {
+            margin-bottom: 4px;
+        }
+
+        .tree-menu-title {
+            font-size: 14px;
+        }
+
+        .tree-item-title {
+            font-size: 13px;
+        }
+
+        .tree-action-title, .tree-field-title {
+            font-size: 12px;
+        }
+    }
+
+    /* Destaque para termos filtrados */
+    .filtro-highlight {
+        background-color: #fff3cd;
+        padding: 1px 3px;
+        border-radius: 2px;
+        font-weight: bold;
+    }
+
+    /* Estilo para o campo de filtro */
+    .filtro-arvore-container {
+        position: relative;
+    }
+
+    .filtro-arvore-container .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+
+    /* Otimizações para compactação */
+    #listaMenusUsuario {
+        margin: 10px 0;
+    }
+
+    #listaMenusUsuario .form-group {
+        margin-bottom: 8px;
+    }
+
+    /* Melhorias visuais compactas */
+    .tree-level-1:last-child {
+        margin-bottom: 0;
+    }
+
+    .tree-item:hover {
+        background-color: #e8f4f8;
+        transform: translateX(2px);
+    }
+
+    .tree-toggle:hover {
+        background: #e8f4f8;
+        border-color: #007bff;
+        color: #007bff;
+        transform: scale(1.1);
+    }
+
+    /* Responsividade mobile melhorada */
+    @media (max-width: 576px) {
+        .tree-container {
+            padding: 5px;
+        }
+
+        .tree-item {
+            padding: 4px 8px;
+        }
+
+        .tree-children {
+            padding-left: 10px;
+        }
+
+        .tree-toggle {
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            line-height: 14px;
+        }
+
+        .tree-checkbox {
+            transform: scale(1.0);
+            margin-right: 4px;
+        }
+
+        .tree-actions-fields {
+            gap: 3px;
+        }
+
+        .tree-section-title {
+            font-size: 10px;
+            padding: 2px 4px;
+        }
+
+        .tree-action-item, .tree-field-item {
+            padding: 2px 4px;
+        }
+    }
+</style>
+
+<div class="form-group col-xs-12" ng-init="buscarMenusConfiguracoes()" id="listaMenusUsuario">
+    <div class="tree-container">
+        <div ng-repeat="(keyM, m) in menus | filter:filtrarArvoreMenus" class="tree-level-1">
+            <!-- Menu Principal -->
+            <div class="tree-item">
+                <span class="tree-toggle" 
+                      ng-class="menus[keyM].expanded ? 'expanded' : 'collapsed'"
+                      ng-click="toggleMenu(keyM)"></span>
+                <input type="checkbox" 
+                       class="tree-checkbox"
+                       ng-click="alterarPerfilTela(keyM)" 
+                       ng-model="menus[keyM]['selecionado']">
+                <span class="tree-menu-title" ng-class="{'filtro-highlight': contemFiltro(m.menu)}">{{m.menu}}</span>
+            </div>
+
+            <!-- Itens do Menu -->
+            <div class="tree-children" ng-class="menus[keyM].expanded ? 'expanded' : 'collapsed'">
+                <div ng-repeat="(keyI, i) in m.itens" class="tree-level-2">
+                    <div class="tree-item">
+                        <span class="tree-toggle" 
+                              ng-class="menus[keyM]['itens'][keyI].expanded ? 'expanded' : 'collapsed'"
+                              ng-click="toggleItem(keyM, keyI)"></span>
+                        <input type="checkbox" 
+                               class="tree-checkbox"
+                               ng-click="alterarPerfilTela(keyM, keyI)" 
+                               ng-model="menus[keyM]['itens'][keyI]['selecionado']">
+                        <span class="tree-item-title" ng-class="{'filtro-highlight': contemFiltro(i.item)}">{{i.item}}</span>
+                    </div>
+
+                    <!-- Ações e Campos -->
+                    <div class="tree-children" ng-class="menus[keyM]['itens'][keyI].expanded ? 'expanded' : 'collapsed'">
+                        <div class="tree-level-3">
+                            <div class="tree-actions-fields">
+                                <!-- Ações -->
+                                <div class="tree-actions" ng-if="temElementos(i.acoes)">
+                                    <div class="tree-section-title">Ações</div>
+                                    <div ng-repeat="(keyA, a) in i.acoes" class="tree-action-item">
+                                        <input type="checkbox" 
+                                               class="tree-checkbox"
+                                               ng-model="menus[keyM]['itens'][keyI]['acoes'][keyA]['selecionado']" 
+                                               ng-click="alterarPerfilTela(keyM, keyI, keyA)">
+                                        <span class="tree-action-title" ng-class="{'filtro-highlight': contemFiltro(a.acao)}">{{a.acao}}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Campos -->
+                                <div class="tree-fields" ng-if="temElementos(i.campos)">
+                                    <div class="tree-section-title">Campos</div>
+                                    <div ng-repeat="(keyC, c) in i.campos" class="tree-field-item">
+                                        <input type="checkbox" 
+                                               class="tree-checkbox"
+                                               ng-model="menus[keyM]['itens'][keyI]['campos'][keyC]['selecionado']" 
+                                               ng-click="alterarPerfilTela(keyM, keyI, keyC)">
+                                        <span class="tree-field-title" ng-class="{'filtro-highlight': contemFiltro(c.titulo_campo)}">{{c.titulo_campo}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

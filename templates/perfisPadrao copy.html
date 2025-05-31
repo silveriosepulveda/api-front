@@ -1,0 +1,25 @@
+<meta charset="utf-8">
+<div ng-controller="usuarioCtrl">
+    <h2>Gerenciamento de Perfis Padrões do Sistema</h2>
+    <hr>
+    <button type="button" class="btn btn-primary col-md-1 baixarbotao input-lg" ng-if="!cadastro" ng-click="mudarTelaPerfilPadaro()">Criar Novo</button>
+    <button type="button" class="btn btn-primary col-md-1 baixarbotao input-lg" ng-if="cadastro" ng-click="mudarTelaPerfilPadaro()">Alterar</button>
+
+    <div class="form-group col-sm-6 col-md-4" ng-init="buscarPerfisPadrao()" ng-if="!cadastro">
+        <label>Selecione o Perfil</label>
+        <select class="form-control input-lg" ng-model="$parent.chave_perfil_padrao" ng-options="p.chave_perfil_padrao as p.nome_perfil for (key, p) in perfisPadrao" ng-change="buscarPerfilPadrao()">
+            <option value="">Selecione o Perfil</option>
+        </select>
+    </div>
+    <div class="form-group col-sm-6 col-md-4" ng-if="cadastro == true">
+        <label>Novo Perfil Padrão</label>
+        <input type="text" class="form-control input-lg" ng-model="$parent.menus.novoPerfil">
+    </div>
+    <div class="form-group col-sm-6 col-md-3">
+        <label>Buscar por Ítem</label>
+        <input type="text" ng-model="filtroMenus" class="form-control input-lg">
+    </div>
+    <button type="button" class="btn btn-success input-lg col-sm-3 col-md-2 baixarbotao" ng-click="salvarPerfilPadrao(menus)">Savlar Perfil Padrao</button>
+    <button type="button" class="btn btn-danger input-lg col-sm-3 col-md-2 baixarbotao" ng-click="" ng-if="!cadastro">Excluir Perfil Padrão</button>
+    <div ng-include src="'api/templates/usuariosPerfilMenus.html'"></div>
+</div>

@@ -1,0 +1,8 @@
+.superFiltro, .refreshConsulta, .alteraExibicaoConsulta{
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+.superFiltro .alteraExibicaoConsulta button, .superFiltro .refreshConsulta button{
+    height: 39px !important;
+}

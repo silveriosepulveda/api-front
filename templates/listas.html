@@ -1,0 +1,37 @@
+<div class="row" ng-controller="listaCtrl" ng-init="buscarNomesListas()">
+    <h2>Gerenciamento de Listas de Preencimento</h2>
+    <div class=" col-md-5 form-group">
+        <label>Lista</label>
+        <select class="form-control" ng-options="l.nome as l.nome for l in nomesListas" ng-model="nomeListaSelecionado" ng-change="buscarLista(nomeListaSelecionado)">
+            <option value="">Selecione o Nome da Lista que Deseja Gerenciar</option>
+        </select>
+    </div>
+    <div class="col-md-4 form-group">
+        <label>Descrição</label>
+        <input type="text" ng-model="descricaoLista" class="form-control">
+    </div>
+    <div class="col-md-3">
+        <label class="baixarbotao">Ítens Retornados: {{filtrados.length}}</label>
+
+    </div>
+    <hr>
+    <div class="col-xs-12" ng-repeat="(key, lista) in listaSelecionada | filter : descricaoLista as filtrados">
+        <div class="row itemLista div1">
+            <div class="col-md-4 form-group">
+                <input type="text" class="form-control" ng-model="lista.descricao" ng-focus="setarDescricaoAnterior(lista)" ng-blur="alterarLista(lista)">
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger glyphicon glyphicon-trash" ng-click="excluirLista(key, lista)"></button>
+            </div>
+            <div class="col-xs-12 div6 form-group" ng-if="lista.listaSubstituicao != undefined">
+                <h4>Este Ítem está em uso, caso queira continuar, selecione qual item irá substituí-lo.</h4>
+                <div class="input-group">
+                    <select class="form-control" ng-options="l.chave_lista as l.descricao for l in lista.listaSubstituicao" ng-model="lista.selecionadaSubstituir">
+                        <option value="">Selecione o Nome da Lista que Deseja Gerenciar</option>
+                    </select>
+                    <span class="input-group-addon btn btn-default" ng-disabled="lista.selecionadaSubstituir == undefined" ng-click="substituirLista(key, lista)">Excluir e Substituir</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

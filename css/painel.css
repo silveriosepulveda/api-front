@@ -1,0 +1,1325 @@
+html-detalhe div {
+    white-space: pre-wrap;
+}
+
+label, span {
+    white-space: pre-wrap;
+}
+
+button {
+    font-size: 14px;
+}
+
+div.modalPopUp {
+    overflow: auto;
+    width: 80%;
+    height: auto;
+    margin: 0 auto;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: red;
+}
+
+.input-group-addon.btn{
+    color: #FFFFFF;
+}
+
+.ui-autocomplete {
+    z-index: 99999 !important;
+}
+
+
+div.conteudoBusca div.row.itemConsulta{
+    border: 1px solid;
+}
+
+@media (min-width: 980px) {
+    .cabecalhoSistema {
+        position: fixed;
+        top: 0;
+        z-index: 999;
+        width: 100%
+    }
+    /* .cabecalhoConsulta{
+        position: fixed !important;        
+        top: 30;
+        left: 0;
+        z-index: 999;
+        width: 100%;    
+        background-color: #ffffff;    
+    } */
+    .corpo {
+        top: 40px;
+    }
+    lista-consulta {
+        margin: auto;
+    }
+}
+
+@media screen and (max-width: 2200px) {
+    a, a>span, span, label, select, option, .form-control, div, .ui-autocomplete-input, .btn {
+        font-size: 16px!important;
+    }
+    .divItemCadastro {
+        min-height: 80px !important;
+    }
+}
+
+@media screen and (max-width: 1440px) {
+    a, a>span, span, label, option, .form-control, div, .ui-autocomplete-input, .btn {
+        font-size: 14px!important;
+    }
+    select {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    a, a>span, span, label, select, option, .form-control, div, .ui-autocomplete-input, .btn {
+        font-size: 12px!important;
+    }
+    .divItemCadastro {
+        min-height: 70px !important;
+    }
+}
+
+.formConsultaDispositivoMovel .form-group {
+    margin-bottom: 5px !important;
+}
+
+.form-control:focus, select:focus {
+    background-color: yellow;
+}
+
+/* .conteudoBusca {
+    max-height: 800px !important;
+    overflow-x: auto;
+    height: calc(100%);
+} */
+
+.iconePequeno {
+    font-size: 2em !important;
+}
+
+.iconeMedio {
+    font-size: 3em !important;
+}
+
+.iconeGrande {
+    font-size: 4em !important;
+}
+
+.cabecalho {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+}
+
+.corpo {
+    margin-top: 50px;
+}
+
+.oculto {
+    display: none!important;
+}
+
+/* label, span, div, h1, h2, h3, h4, h5, h6 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 12px;
+} */
+
+.divItemCadastro>label {
+    border-bottom: 0px !important;
+}
+
+a {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/************** PADROES PAINEL ****************/
+
+.ui-datepicker {
+    z-index: 99 !important
+}
+
+.form-control {
+    font-size: 14px !important;
+}
+
+.img-responsive {
+    max-width: 100% !important;
+    margin: 0 auto;
+    max-height: 100% !important;
+}
+
+input[type='checkbox'], input[type='radio'] {
+    padding: 0;
+    min-height: 25px !important;
+    min-width: 25px !important;
+}
+
+.erro {
+    background-color: #f2dede !important;
+    border-radius: 10px;
+    color: #FC6D49;
+}
+
+.baixarbotao, .baixarBotao {
+    cursor: pointer;
+    margin-top: 25px;
+}
+
+.bordadecima {
+    border-top: 1px solid;
+}
+
+.bordadebaixo {
+    border-bottom: 1px solid;
+}
+
+.bordaD {
+    border-right: 1px solid;
+}
+
+.bordaE {
+    border-left: 1px solid;
+}
+
+.divitemconsulta {
+    min-height: 35px;
+}
+
+.linhaFiltro div.form-control {
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/*****  AJUSTES POR TAMANHO DE TELA   *****/
+
+@media (min-width: 1030px) {
+    .baixarbotao, .baixarBotao {
+        margin-top: 25px;
+    }
+}
+
+.cantoArredondado {
+    padding: 5px;
+    border-bottom: 0 !important;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+.arredondado {
+    padding: 5px;
+    
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    margin-bottom: 5px;
+}
+
+.itemConsulta {
+    padding: 5px;
+    /* border-bottom: 0 !important; */
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    margin-bottom: 5px;
+    background-color: rgb(234, 240, 241) !important;
+}
+
+.form-group {
+    margin-bottom: 5px !important;
+}
+
+formulario-cadastro .form-group {
+    margin-top: 0px;
+}
+
+formulario-cadastro .form-group label {
+    margin-bottom: 0px;
+}
+
+.itemConsulta .form-group {
+    padding: 0!important;
+    margin-bottom: 0!important;
+}
+
+.itemConsulta h5, .itemConsulta h4, .itemConsulta h3, .itemConsulta hr, .itemConsulta .form-group {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.bordaRedonda {
+    padding: 5px;
+    padding-top: 15px;
+    border-bottom: 0 !important;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+.bordaQuadrada {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.bordaRedondaSemPadding {
+    border-bottom: 0 !important;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.itemLista {
+    padding: 1px;
+    border-bottom: 0 !important;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 1px 5px;
+    margin-bottom: 15px;
+}
+
+.blocoDetalheConsulta {
+    border: 1px solid;
+}
+
+.itemRelacionado {
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+.itemRelacionado .divItemCadastro {
+    margin-bottom: 0 !important;
+}
+
+.campoItemConsulta {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 20px;
+    margin-bottom: 1px;
+    background-color: #ffffff
+}
+
+.fundoDetalheConsulta {
+    background: #ECECEC;
+    padding: 5px;
+}
+
+.campoDetalheConsulta {
+    margin-left: 1%;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    margin-bottom: 1px;
+    margin-top: 1px;
+    background: #ffffff;
+}
+
+.arquivoAnexo {
+    min-height: 223px !important;
+    border: 1px solid;
+    padding: 0px;
+}
+
+.arquivoAnexo label, .arquivoAnexo img {
+    min-height: 150px !important;
+}
+
+.posicaoAnexo {
+    min-width: 50px !important;
+    padding: 0 !important;
+}
+
+.numeracaoRepeticao {
+    position: absolute;
+    left: 4px;
+    top: 10px;
+}
+
+.numeracaoRepeticao2 {
+    z-index: 99;
+    position: absolute;
+    left: 3px;
+    top: 10px;
+}
+
+.botaoPequeno {
+    padding: 2% !important;
+    max-height: 20px !important;
+}
+
+.botaoAdicionarItemRepeticao, .botaoRemoverItemRepeticao {
+    min-width: 45px;
+}
+
+.divBotoesRepeticao {
+    position: absolute;
+    right: 0 !important;
+}
+
+.linhaImpar {
+    background: #f3ebe3;
+}
+
+.linhaPar {
+    background: #ecd5e0;
+}
+
+.div1 {
+    background: rgb(229, 231, 243)
+}
+
+.div2 {
+    background: rgb(230, 230, 238)
+}
+
+.div3 {
+    background: #E3E1FB;
+}
+
+.div4 {
+    background: rgba(234, 241, 235, 0.993);
+}
+
+.div5 {
+    background: rgb(243, 235, 236);
+}
+
+.div6 {
+    background: rgb(240, 241, 220);
+}
+
+.divit1 {
+    background: #FAF3A9;
+}
+
+.divit2 {
+    background: #E8F4B5;
+}
+
+.error {
+    border: 1px solid red;
+    color: red;
+}
+
+.borda {
+    border: 1px solid;
+}
+
+.nicEdit-panel{
+    min-height: 30px;
+}
+
+/***************** REFERENTE AO ANEXAR POR COPIAR E COLAR ********************/
+
+.quadroColarImagem {
+    border: solid 1px #aaa;
+    min-height: 200px !important;
+    width: 30%;
+    margin-top: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 300ms all;
+    position: relative;
+}
+
+.conteudoQuadroCopiarColar {
+    background-size: cover;
+    position: relative;
+    z-index: 10;
+    top: 0px;
+    left: 0px;
+}
+
+.quadroCopiarColarAtivo {
+    box-shadow: 0px 0px 10px 10px rgba(0, 0, 255, .4);
+}
+
+.quadroColarImagem select{   
+    width: 90%;
+    left: 5px;
+    margin-top: 50%;
+}
+
+/************** PADRÕES   **********************/
+
+.tc {
+    text-align: center;
+}
+
+.td {
+    text-align: right;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+.cursor2:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/*********************  ALTURAS  **********************/
+
+.alt20 {
+    height: 20px;
+}
+
+.alt30 {
+    height: 30px;
+}
+
+.alt40 {
+    height: 40px;
+}
+
+.alt100 {
+    height: 100px;
+}
+
+.alt120 {
+    height: 120px;
+}
+
+.alt150 {
+    height: 150px;
+}
+
+.alt500 {
+    height: 500px;
+}
+
+.alt700 {
+    height: 700px;
+}
+
+.minAlt200 {
+    min-height: 200px !important;
+}
+
+.minalt500 {
+    min-height: 500px;
+}
+
+.maxAlt120 {
+    max-height: 120px !important;
+}
+
+.semMargem{
+    margin: 0 !important;
+}
+/******************* MARGENS DIREITA ***********************/
+
+.dir0 {
+    margin-right: 0px;
+    float: right
+}
+
+.dir10 {
+    margin-right: 10px;
+}
+
+.dir20 {
+    margin-right: 20px;
+}
+
+/******************* MARGENS ESQUERDA ***********************/
+
+.esq05 {
+    margin-left: 5px;
+    float: left;
+}
+
+.esq10 {
+    margin-left: 10px;
+}
+
+.esq15 {
+    margin-left: 15px;
+}
+
+.esq20 {
+    margin-left: 20px
+}
+
+.esq30 {
+    margin-left: 30px;
+}
+
+.esq50 {
+    margin-left: 50px
+}
+
+.esq115 {
+    margin-left: 115px;
+}
+
+.esq150 {
+    margin-left: 130px;
+}
+
+/******************** MARGENS TOP *******************/
+
+.top0 {
+    margin-top: 0 !important;
+}
+
+.top02 {
+    margin-top: 2px;
+}
+
+.top05 {
+    margin-top: 05px;
+}
+
+.top10 {
+    margin-top: 10px;
+}
+
+.top15 {
+    margin-top: 15px;
+}
+
+.top20 {
+    margin-top: 20px;
+}
+
+.top25 {
+    margin-top: 25px;
+}
+
+.top30 {
+    margin-top: 30px;
+}
+
+.top50 {
+    margin-top: 50px;
+}
+
+.top100 {
+    margin-top: 100px;
+}
+
+/******************** MARGENS BOTTOM **************/
+
+.bottom0 {
+    margin-bottom: 0 !important;
+}
+
+/******************* CORES DE FUNDO *****************/
+
+.fundobranco, .fundoBranco {
+    background-color: #fff !important;
+}
+
+.fundoAzul {
+    background: #879cc3;
+}
+
+.fundoazul {
+    background: #879cc3;
+}
+
+.fundoVermelho {
+    background: #FF7979 !important;
+}
+
+.fundovermelho>label {
+    color: #ffffff;
+}
+
+.fundoVerde {
+    background: #97FF97 !important;
+}
+
+.fundoCinza {
+    background: #D0D0D0;
+}
+
+.fundoAmarelo {
+    background: #FAF3A9 !important;
+}
+
+/********************* FONTS ***********************/
+
+.font09 {
+    font-size: 9px !important;
+}
+
+.font10 {
+    font-size: 10px !important;
+}
+
+.font11 {
+    font-size: 11px;
+}
+
+.font12 {
+    font-size: 12px !important;
+}
+
+.font13 {
+    font-size: 13px;
+}
+
+.font14 {
+    font-size: 14px;
+}
+
+.font15 {
+    font-size: 15px;
+}
+
+.font16 {
+    font-size: 16px;
+}
+
+.font18 {
+    font-size: 18px;
+}
+
+.font20 {
+    font-size: 20px;
+}
+
+.font25 {
+    font-size: 25px !important;
+}
+
+.font36 {
+    font-size: 36px;
+}
+
+.negrito {
+    font-weight: bold !important;
+}
+
+.preto {
+    color: #000;
+}
+
+.vermelho {
+    color: #F00;
+}
+
+.verde {
+    color: #0EB112;
+}
+
+.branco {
+    color: #fff;
+}
+
+.georgia {
+    font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+/******************CORES DE FONTE **************/
+
+.fontbranco {
+    color: #fff;
+}
+
+.fontcinzaclaro {
+    color: #91868d;
+}
+
+.fontcinza {
+    color: #909090;
+}
+
+.fontlaranja {
+    color: #f58634
+}
+
+.fonteazul {
+    color: #606DEE;
+}
+
+.fontevermelho {
+    color: red;
+}
+
+/**************** ALINHAMENTOS **********/
+
+.direita {
+    text-align: right;
+    margin-right: 10px;
+    float: left;
+}
+
+.tc {
+    text-align: center;
+}
+
+.td {
+    text-align: right;
+}
+
+.invisivel {
+    display: none;
+}
+
+.larg01p {
+    width: 1%;
+}
+
+.larg02p {
+    width: 2%;
+}
+
+.larg03p {
+    width: 3%;
+}
+
+.larg04p {
+    width: 4%;
+}
+
+.larg05p {
+    width: 5%;
+}
+
+.larg06p {
+    width: 6%;
+}
+
+.larg07p {
+    width: 7%;
+}
+
+.larg08p {
+    width: 8%;
+}
+
+.larg09p {
+    width: 9%;
+}
+
+.larg10p {
+    width: 10%;
+}
+
+.larg11p {
+    width: 11%;
+}
+
+.larg12p {
+    width: 12%;
+}
+
+.larg13p {
+    width: 13%;
+}
+
+.larg14p {
+    width: 14%;
+}
+
+.larg15p {
+    width: 15%;
+}
+
+.larg16p {
+    width: 16%;
+}
+
+.larg17p {
+    width: 17%;
+}
+
+.larg18p {
+    width: 18%;
+}
+
+.larg19p {
+    width: 19%;
+}
+
+.larg20p {
+    width: 20%;
+}
+
+.larg21p {
+    width: 21%;
+}
+
+.larg22p {
+    width: 22%;
+}
+
+.larg23p {
+    width: 23%;
+}
+
+.larg24p {
+    width: 24%;
+}
+
+.larg25p {
+    width: 25%;
+}
+
+.larg26p {
+    width: 26%;
+}
+
+.larg27p {
+    width: 27%;
+}
+
+.larg28p {
+    width: 28%;
+}
+
+.larg29p {
+    width: 29%;
+}
+
+.larg30p {
+    width: 30%;
+}
+
+.larg31p {
+    width: 31%;
+}
+
+.larg32p {
+    width: 32%;
+}
+
+.larg33p {
+    width: 33%;
+}
+
+.larg34p {
+    width: 34%;
+}
+
+.larg35p {
+    width: 35%;
+}
+
+.larg36p {
+    width: 36%;
+}
+
+.larg37p {
+    width: 37%;
+}
+
+.larg38p {
+    width: 38%;
+}
+
+.larg39p {
+    width: 39%;
+}
+
+.larg40p {
+    width: 40%;
+}
+
+.larg41p {
+    width: 41%;
+}
+
+.larg42p {
+    width: 42%;
+}
+
+.larg43p {
+    width: 43%;
+}
+
+.larg44p {
+    width: 44%;
+}
+
+.larg45p {
+    width: 45%;
+}
+
+.larg46p {
+    width: 46%;
+}
+
+.larg47p {
+    width: 47%;
+}
+
+.larg48p {
+    width: 48%;
+}
+
+.larg49p {
+    width: 49%;
+}
+
+.larg50p {
+    width: 50%;
+}
+
+.larg51p {
+    width: 51%;
+}
+
+.larg52p {
+    width: 52%;
+}
+
+.larg53p {
+    width: 53%;
+}
+
+.larg54p {
+    width: 54%;
+}
+
+.larg55p {
+    width: 55%;
+}
+
+.larg56p {
+    width: 56%;
+}
+
+.larg57p {
+    width: 57%;
+}
+
+.larg58p {
+    width: 58%;
+}
+
+.larg59p {
+    width: 59%;
+}
+
+.larg60p {
+    width: 60%;
+}
+
+.larg61p {
+    width: 61%;
+}
+
+.larg62p {
+    width: 62%;
+}
+
+.larg63p {
+    width: 63%;
+}
+
+.larg64p {
+    width: 64%;
+}
+
+.larg65p {
+    width: 65%;
+}
+
+.larg66p {
+    width: 66%;
+}
+
+.larg67p {
+    width: 67%;
+}
+
+.larg68p {
+    width: 68%;
+}
+
+.larg69p {
+    width: 69%;
+}
+
+.larg70p {
+    width: 70%;
+}
+
+.larg71p {
+    width: 71%;
+}
+
+.larg72p {
+    width: 72%;
+}
+
+.larg73p {
+    width: 73%;
+}
+
+.larg74p {
+    width: 74%;
+}
+
+.larg75p {
+    width: 75%;
+}
+
+.larg76p {
+    width: 76%;
+}
+
+.larg77p {
+    width: 77%;
+}
+
+.larg78p {
+    width: 78%;
+}
+
+.larg79p {
+    width: 79%;
+}
+
+.larg80p {
+    width: 80%;
+}
+
+.larg81p {
+    width: 81%;
+}
+
+.larg82p {
+    width: 82%;
+}
+
+.larg83p {
+    width: 83%;
+}
+
+.larg84p {
+    width: 84%;
+}
+
+.larg85p {
+    width: 85%;
+}
+
+.larg86p {
+    width: 86%;
+}
+
+.larg87p {
+    width: 87%;
+}
+
+.larg88p {
+    width: 88%;
+}
+
+.larg89p {
+    width: 89%;
+}
+
+.larg90p {
+    width: 90%;
+}
+
+.larg91p {
+    width: 91%;
+}
+
+.larg92p {
+    width: 92%;
+}
+
+.larg93p {
+    width: 93%;
+}
+
+.larg94p {
+    width: 94%;
+}
+
+.larg95p {
+    width: 95%;
+}
+
+.larg96p {
+    width: 96%;
+}
+
+.larg97p {
+    width: 97%;
+}
+
+.larg98p {
+    width: 98%;
+}
+
+.larg99p {
+    width: 99%;
+}
+
+.larg100p {
+    width: 100%;
+}
+
+.larg09-5 {
+    width: 9.36%;
+}
+
+.largtotal {
+    width: 100%;
+}
+
+/******* TIMER DO CONTADOR NA TELA DA CONSULTA********/
+
+@keyframes animation {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+.botoesTimerConsulta {
+    width: 50px;
+    margin-left: -30px;
+    margin-top: -30px;
+}
+
+.barraProgressoTimer {
+    height: 3px;
+    background-color: black;
+    width: 100%;
+    margin-top: 3px;
+    margin-bottom: 1px;
+}
+
+.animate {
+    animation-name: animation;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+.pause {
+    animation-play-state: paused;
+}
+
+/*************** FIM DO TIMER DA CONSULTA   ********************/
+
+
+/*********************   ZOOM NAS IMAGENS   **********************/
+
+.imagemZoom{
+    cursor: zoom-in;     
+}
+
+.divImagemComZoom{
+    min-width: 500px;
+    min-height: 500px;
+    max-width: 500px;
+    max-height: 500px;
+    position: absolute;
+    overflow: hidden;
+    z-index: 99999;
+}
+#imagemAmpliada{
+    position: relative;
+    left: 0;
+    top: 0;
+}
+
+/********************* FIM ZOOM NAS IMAGENS   ********************/
+/* Ajustes para o cabeçalho fixo */
+.cabecalhoSistema {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 60px;
+    background-color: #337ab7;
+    padding: 10px 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cabecalhoSistema h3 {
+    margin: 0;
+    line-height: 40px;
+    font-size: 18px;
+}
+
+.cabecalhoSistema .btn {
+    margin-top: 5px;
+}
+
+/* Garantir que o body tenha espaçamento superior reduzido */
+body {
+    padding-top: 40px;
+}
+
+/* Select Editável com Filtro */
+.select-editavel {
+    position: relative;
+}
+
+.lista-usuarios {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    border-radius: 0 0 4px 4px;
+}
+
+.item-usuario {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+    color: #333;
+    font-size: 14px;
+}
+
+.item-usuario:hover {
+    background-color: #e8f4f8;
+    color: #000;
+}
+
+.item-usuario:last-child {
+    border-bottom: none;
+}
+
+.select-editavel {
+    position: relative;
+}
+
+.select-editavel .form-control {
+    border-radius: 4px;
+}
+
+.select-editavel .form-control:focus {
+    border-color: #66afe9;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(102,175,233,0.6);
+}

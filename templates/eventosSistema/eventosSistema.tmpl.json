@@ -1,0 +1,66 @@
+{
+    "tipoEstrutura": "somenteConsulta",
+    "tabela": "view_eventos_sistema",
+    "campo_chave": "chave_evento",
+    "raizModelo": "evento",
+    "textoPagina": "Gerenciamento de Eventos do Sistema",
+    "textoNovo": "Incluir Eventos do Sistema",
+    "nomeUsual": "Eventos do Sistema",
+    "textoFormCadastro": "Inclusao de Eventos do Sistema",
+    "textoFormAlteracao": "Alteracao de Eventos do Sistema",
+    "ocultarBotoesSuperiores": true,
+    "todosCampomdaiusculo": true,
+    "todasEtiquetasEmbutidas": true,
+    "filtrarAoIniciar": false,
+    "exibirConsulta": true,
+    "campoOrdemPadraoFiltro": "data_log",
+    "sentidoOrdemPadraoFiltro": "desc",
+    "listaConsulta": {
+        "chave_evento": {},
+        "acao": {
+            "texto": "Tipo",
+            "md": "3"
+        },
+        "tabela": {
+            "texto": "Tabela",
+            "md": "4"
+        },
+        "chave_tabela": {
+            "texto": "Código da Tabela",
+            "md": "4"
+        },
+        "data_log": {
+            "texto": "Data do Evento",
+            "md": "4"
+        },
+        "usuario": {
+            "md": 4
+        }
+    },
+    "camposDetalhes": {
+        "comparacaoValores": "diretiva"
+    },
+    "campos": {
+        "chave_evento": {
+            "tipo": "oculto"
+        },
+        "acao": {
+            "texto": "Tipo",
+            "md": "3"
+        },
+        "tabela": {
+            "texto": "Tabela",
+            "md": "4"
+        },
+        "chave_tabela": {
+            "texto": "Código da Tabela",
+            "operador": "=",
+            "tipo": "inteiro"
+        },
+        "data_log": {
+            "texto": "Data do Evento",
+            "md": "2",
+            "tipo": "intervaloDatas"
+        }
+    }
+}

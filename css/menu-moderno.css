@@ -1,0 +1,565 @@
+/* ========================================
+   MENU PAINEL MODERNO - SEGMED (Tema Claro Bootstrap)
+   Design compacto usando cores do Bootstrap
+   ======================================== */
+
+/* ========================================
+   VARIÁVEIS CSS (Bootstrap Theme)
+   ======================================== */
+:root {
+    --menu-width: 280px;
+    --menu-collapsed-width: 70px;
+    --menu-bg-primary: #ffffff;
+    --menu-bg-secondary: #f8f9fa;
+    --menu-text-primary: #212529;
+    --menu-text-secondary: #6c757d;
+    --menu-accent: #0d6efd;
+    --menu-accent-hover: #0b5ed7;
+    --menu-item-hover: #e9ecef;
+    --menu-border: #dee2e6;
+    --menu-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* ========================================
+   RESET E BASE DO MENU
+   ======================================== */
+#menuPainel {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 400;
+    background: var(--menu-bg-primary);
+    border: 1px solid var(--menu-border);
+    box-shadow: var(--menu-shadow);
+    transition: width var(--transition-slow);
+}
+
+#menuPainel * {
+    box-sizing: border-box;
+}
+
+/* ========================================
+   ESTRUTURA PRINCIPAL DO MENU
+   ======================================== */
+.navbar-collapse {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.nav.navbar-nav {
+    width: 100%;
+    margin: 0;
+    padding: 8px 0;
+}
+
+/* ========================================
+   CABEÇALHO DO MENU (Procurar + Manter Aberto)
+   ======================================== */
+.menu-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--menu-border);
+    background: var(--menu-bg-secondary);
+}
+
+.checkbox-manter-menu {
+    margin: 0 0 12px 0 !important;
+    padding: 0 16px;
+}
+
+.checkbox-manter-menu label {
+    display: flex;
+    align-items: center;
+    color: var(--menu-text-secondary);
+    font-size: 12px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+    margin: 0;
+}
+
+.checkbox-manter-menu label:hover {
+    color: var(--menu-text-primary);
+}
+
+.checkbox-manter-menu input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+    accent-color: var(--menu-accent);
+}
+
+/* Campo de pesquisa compacto */
+.navbar-form {
+    margin: 0;
+    padding: 12px 16px 8px 16px;
+    border: none;
+}
+
+#procuramenu {
+    background: var(--menu-bg-secondary);
+    border: 1px solid var(--menu-border);
+    color: var(--menu-text-primary);
+    font-size: 13px;
+    font-weight: 400;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+}
+
+#procuramenu:focus {
+    outline: none;
+    border-color: var(--menu-accent);
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+    background: white;
+}
+
+#procuramenu::placeholder {
+    color: var(--menu-text-secondary);
+    font-weight: 400;
+}
+
+/* ========================================
+   ITENS PRINCIPAIS DO MENU (Compactos)
+   ======================================== */
+.menu.dropdown {
+    width: 100%;
+    margin: 0;
+    border-bottom: 1px solid var(--menu-border);
+    position: relative;
+}
+
+.menu.dropdown:last-child {
+    border-bottom: none;
+}
+
+/* Link principal do menu - mais compacto */
+.menu.dropdown > a {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    color: var(--menu-text-primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    transition: all var(--transition-fast);
+    position: relative;
+    cursor: pointer;
+    line-height: 1.3;
+}
+
+.menu.dropdown > a:hover,
+.menu.dropdown > a:focus {
+    background: var(--menu-item-hover);
+    color: var(--menu-text-primary);
+    text-decoration: none;
+}
+
+.menu.dropdown.active > a {
+    background: var(--menu-accent);
+    color: white;
+}
+
+/* Ícone para categoria - menor */
+.menu.dropdown > a::before {
+    content: '📁';
+    font-size: 14px;
+    margin-right: 8px;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+}
+
+.menu.dropdown:hover > a::before {
+    opacity: 1;
+}
+
+/* Seta indicadora de expansão - menor */
+.menu.dropdown > a::after {
+    content: '▼';
+    font-size: 10px;
+    margin-left: auto;
+    transition: transform var(--transition-fast);
+    opacity: 0.6;
+}
+
+.menu.dropdown.expanded > a::after {
+    transform: rotate(180deg);
+}
+
+.menu.dropdown.collapsed > a::after {
+    transform: rotate(-90deg);
+}
+
+/* ========================================
+   SUBITENS DO MENU (Uma linha - Compactos)
+   ======================================== */
+.menu.dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--menu-bg-secondary);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--transition-normal) ease-out;
+    border-top: 1px solid var(--menu-border);
+}
+
+.menu.dropdown.expanded ul {
+    max-height: 1000px;
+    transition: max-height var(--transition-normal) ease-in;
+}
+
+/* Submenu item - layout inline compacto */
+.submenu {
+    margin: 0;
+    border: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    border-bottom: 1px solid rgba(222, 226, 230, 0.5);
+}
+
+.submenu:last-child {
+    border-bottom: none;
+}
+
+.submenu a.linkSubMenu {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 6px 16px 6px 40px;
+    color: var(--menu-text-secondary);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 400;
+    transition: all var(--transition-fast);
+    border-left: 3px solid transparent;
+    position: relative;
+    line-height: 1.2;
+}
+
+.submenu a.linkSubMenu:hover {
+    color: var(--menu-text-primary);
+    background: rgba(13, 110, 253, 0.1);
+    border-left-color: var(--menu-accent);
+    text-decoration: none;
+}
+
+.submenu a.linkSubMenu::before {
+    content: '•';
+    color: var(--menu-text-secondary);
+    font-size: 12px;
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: color var(--transition-fast);
+}
+
+.submenu a.linkSubMenu:hover::before {
+    color: var(--menu-accent);
+}
+
+/* Botão de adicionar - inline compacto */
+.addSubMenu {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--menu-text-secondary);
+    font-size: 12px;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    border-radius: 3px;
+    margin: 2px 8px 2px 0;
+}
+
+.addSubMenu:hover {
+    color: var(--menu-accent);
+    background: rgba(13, 110, 253, 0.1);
+    transform: scale(1.05);
+}
+
+/* ========================================
+   ANIMAÇÕES E ESTADOS (Bootstrap Style)
+   ======================================== */
+.menu.dropdown {
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Efeito de loading para itens */
+.menu-loading .menu.dropdown > a {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ========================================
+   RESPONSIVIDADE BOOTSTRAP
+   ======================================== */
+@media screen and (min-width: 1000px) {
+    nav.sidebar {
+        width: 0;
+        position: fixed;
+        z-index: 998;
+        top: 40px;
+        left: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        transition: width var(--transition-slow);
+        height: calc(100vh - 40px);
+        background: var(--menu-bg-primary);
+        border-right: 1px solid var(--menu-border);
+        box-shadow: var(--menu-shadow);
+    }
+
+    .dropdown {
+        width: var(--menu-width);
+    }
+
+    #menuPainel {
+        width: 0px;
+    }
+
+    /* Menu collapsed state */
+    .menu-collapsed #menuPainel {
+        width: var(--menu-collapsed-width);
+    }
+
+    .menu-collapsed .navbar-form,
+    .menu-collapsed .checkbox-manter-menu {
+        display: none;
+    }
+
+    .menu-collapsed .menu.dropdown > a span {
+        display: none;
+    }
+
+    .menu-collapsed .menu.dropdown > a::after {
+        display: none;
+    }
+
+    .menu-collapsed .menu.dropdown ul {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    #menuPainel {
+        background: var(--menu-bg-primary);
+        width: 100%;
+        margin-top: 0;
+    }
+
+    .menu.dropdown {
+        border-bottom: 1px solid var(--menu-border);
+    }
+
+    .dropdown {
+        width: 100%;
+    }
+
+    nav.sidebar {
+        width: 100%;
+        left: 0;
+        overflow-x: hidden;
+        position: relative;
+        height: auto;
+        box-shadow: none;
+    }
+
+    .checkbox-manter-menu {
+        display: none !important;
+    }
+
+    /* Mobile - itens ainda compactos mas tocáveis */
+    .menu.dropdown > a {
+        font-size: 14px;
+        padding: 14px 16px;
+    }
+
+    .submenu a.linkSubMenu {
+        font-size: 13px;
+        padding: 8px 16px 8px 40px;
+    }
+
+    .addSubMenu {
+        width: 32px;
+        height: 32px;
+        margin: 3px 8px;
+    }
+}
+
+/* ========================================
+   SCROLLBAR PERSONALIZADA
+   ======================================== */
+#menuPainel::-webkit-scrollbar {
+    width: 6px;
+}
+
+#menuPainel::-webkit-scrollbar-track {
+    background: var(--menu-bg-secondary);
+}
+
+#menuPainel::-webkit-scrollbar-thumb {
+    background: var(--menu-border);
+    border-radius: 3px;
+}
+
+#menuPainel::-webkit-scrollbar-thumb:hover {
+    background: var(--menu-text-secondary);
+}
+
+/* Firefox */
+#menuPainel {
+    scrollbar-width: thin;
+    scrollbar-color: var(--menu-border) var(--menu-bg-secondary);
+}
+
+/* ========================================
+   INTEGRAÇÃO COM O CONTEÚDO PRINCIPAL (Bootstrap Style)
+   ======================================== */
+.conteudoEstruturaGerencia {
+    margin-left: 0;
+    padding: 20px;
+    min-height: calc(100vh - 60px);
+    transition: margin-left var(--transition-slow);
+    background: #ffffff;
+}
+
+@media screen and (min-width: 1001px) {
+    .conteudoEstruturaGerencia {
+        transition: margin-left var(--transition-slow);
+    }
+
+    .menu-open .conteudoEstruturaGerencia {
+        margin-left: var(--menu-width);
+    }
+
+    .menu-collapsed .conteudoEstruturaGerencia {
+        margin-left: var(--menu-collapsed-width);
+    }
+}
+
+/* ========================================
+   MELHORIAS NO BOTÃO DO MENU (Bootstrap Style)
+   ======================================== */
+.botaoMenu {
+    background: var(--menu-accent);
+    border: 1px solid var(--menu-accent);
+    color: white;
+    font-weight: 400;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.botaoMenu:hover,
+.botaoMenu:focus {
+    background: var(--menu-accent-hover);
+    border-color: var(--menu-accent-hover);
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.botaoMenu:active {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   ESTADOS ESPECIAIS
+   ======================================== */
+
+/* Menu com overlay em mobile */
+@media screen and (max-width: 1000px) {
+    .menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 997;
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--transition-fast);
+    }
+
+    .menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* Indicador visual de carregamento */
+.menu-loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--menu-accent) 0%, var(--menu-accent-hover) 100%);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* ========================================
+   ACESSIBILIDADE E FOCO
+   ======================================== */
+.menu.dropdown > a:focus,
+.submenu a.linkSubMenu:focus {
+    outline: 2px solid var(--menu-accent);
+    outline-offset: 2px;
+}
+
+.addSubMenu:focus {
+    outline: 2px solid var(--menu-accent);
+    outline-offset: 2px;
+}
+
+/* Reduzir motion para usuários que preferem */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ========================================
+   CLASSES DE UTILIDADE BOOTSTRAP
+   ======================================== */
+.text-muted {
+    color: var(--menu-text-secondary) !important;
+}
+
+.bg-light {
+    background-color: var(--menu-bg-secondary) !important;
+}
+
+.border-light {
+    border-color: var(--menu-border) !important;
+}

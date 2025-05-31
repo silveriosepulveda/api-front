@@ -1,0 +1,19 @@
+<meta charset="utf-8">
+<div ng-controller="usuarioCtrl" ng-init="montaTelaAlteracaoSenha()">
+    <h2>Alteração de Senha de Usuários</h2>
+    <hr>
+    <div class="col-sm-6 col-md-offset-3">
+        <label>Olá {{usuarioAlterarSenha.nome}}</label>
+        <form class="row" name="formAltSenha" ng-submit="formAltSenha.$valid && alterarSenha()" novalidate valida-Formulario>
+            <div class="col-md-6 form-group">
+                <label>Digite a Nova Senha</label>
+                <input type="password" name="senha" id="senha" ng-model="usuarioAlterarSenha.senha" class="form-control" required>
+            </div>
+            <div class="col-md-6 form-group">
+                <label>Confirme a Nova Senha</label>
+                <input type="password" name="confirmaSenha" id="confirmaSenha" ng-model="usuarioAlterarSenha.confirmaSenha" class="form-control" required igual="senha-Senha" equalTo>
+            </div>
+            <button type="submit" class="btn btn-primary col-xs-12">Alterar Senha</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,116 @@
+<!-- Lista de resultados de consulta com paginação e ações -->
+<div class="lista-consulta-container">
+    <!-- Cabeçalho da tabela -->
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th ng-repeat="(campo, config) in campos" 
+                        ng-if="campo.substr(0, 5) !== 'botao' && config.tipo !== 'oculto' && config.tipo !== 'diretiva'"
+                        ng-click="ordenarPor(campo)"
+                        class="cabecalho-ordenavel">
+                        {{ config.texto || campo }}
+                        <span ng-if="ordenacao.campo === campo">
+                            <i class="fa" ng-class="{'fa-sort-up': ordenacao.direcao === 'asc', 'fa-sort-down': ordenacao.direcao === 'desc'}"></i>
+                        </span>
+                    </th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!dados || dados.length === 0">
+                    <td colspan="{{ Object.keys(campos).length + 1 }}" class="text-center">
+                        <p>Nenhum registro encontrado.</p>
+                    </td>
+                </tr>
+                <tr ng-repeat-start="item in itensPaginaAtual()" class="linha-item">
+                    <td ng-repeat="(campo, config) in campos" 
+                        ng-if="campo.substr(0, 5) !== 'botao' && config.tipo !== 'oculto' && config.tipo !== 'diretiva'"
+                        ng-class="{ 'text-center': config.alinhamento === 'centro', 'text-right': config.alinhamento === 'direita' }">
+                        {{ item[campo] }}
+                    </td>
+                    <td class="text-center acoes-consulta">
+                        <!-- Botão de detalhes -->
+                        <button type="button" class="btn btn-info btn-sm" 
+                                ng-click="toggleDetalhes(item)" title="Ver detalhes">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                        
+                        <!-- Botão de alterar -->
+                        <button type="button" class="btn btn-primary btn-sm" 
+                                ng-if="temPermissao('alterar')"
+                                ng-click="executarAcao('alterar', item)" title="Alterar">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        
+                        <!-- Botão de excluir -->
+                        <button type="button" class="btn btn-danger btn-sm" 
+                                ng-if="temPermissao('excluir')"
+                                ng-click="executarAcao('excluir', item)" title="Excluir">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        
+                        <!-- Ações personalizadas -->
+                        <button type="button" class="btn btn-sm" 
+                                ng-repeat="acao in acoes"
+                                ng-if="acao.nome !== 'alterar' && acao.nome !== 'excluir'"
+                                ng-class="acao.classe || 'btn-default'"
+                                ng-click="executarAcao(acao.nome, item)" 
+                                title="{{ acao.tooltip || acao.nome }}">
+                            <i class="fa" ng-class="acao.icone"></i>
+                            <span ng-if="acao.texto">{{ acao.texto }}</span>
+                        </button>
+                    </td>
+                </tr>
+                <tr ng-repeat-end ng-if="item.exibirDetalhes" class="detalhes-item">
+                    <td colspan="{{ Object.keys(campos).length + 1 }}">
+                        <div class="detalhes-container" ng-if="item.detalhes">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-6" ng-repeat="(campo, valor) in item.detalhes"
+                                     ng-if="campos[campo] && campos[campo].tipo !== 'oculto' && campos[campo].tipo !== 'diretiva'">
+                                    <strong>{{ campos[campo].texto || campo }}:</strong> {{ valor }}
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-if="!item.detalhes" class="text-center">
+                            <i class="fa fa-spinner fa-spin"></i> Carregando detalhes...
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Paginação -->
+    <div class="text-center" ng-if="paginacao.totalPaginas > 1">
+        <ul class="pagination">
+            <li ng-class="{ disabled: paginacao.paginaAtual === 1 }">
+                <a href ng-click="mudarPagina(1)" title="Primeira página">
+                    <i class="fa fa-angle-double-left"></i>
+                </a>
+            </li>
+            <li ng-class="{ disabled: paginacao.paginaAtual === 1 }">
+                <a href ng-click="mudarPagina(paginacao.paginaAtual - 1)" title="Página anterior">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+            </li>
+            <li ng-repeat="pagina in getPaginas()" ng-class="{ active: paginacao.paginaAtual === pagina }">
+                <a href ng-click="mudarPagina(pagina)">{{ pagina }}</a>
+            </li>
+            <li ng-class="{ disabled: paginacao.paginaAtual === paginacao.totalPaginas }">
+                <a href ng-click="mudarPagina(paginacao.paginaAtual + 1)" title="Próxima página">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+            <li ng-class="{ disabled: paginacao.paginaAtual === paginacao.totalPaginas }">
+                <a href ng-click="mudarPagina(paginacao.totalPaginas)" title="Última página">
+                    <i class="fa fa-angle-double-right"></i>
+                </a>
+            </li>
+        </ul>
+        <div class="pagination-info">
+            <span>Página {{ paginacao.paginaAtual }} de {{ paginacao.totalPaginas }}</span>
+            <span class="total-itens">({{ paginacao.totalItens }} itens)</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<!-- templates/login.html -->
+<div class="container" style="max-width:400px;margin-top:60px;" ng-controller="LoginCtrl">
+    <h3>Login</h3>
+    <form ng-submit="login()">
+        <div class="form-group">
+            <label>Usuário</label>
+            <input type="text" class="form-control" ng-model="user" required autofocus >
+        </div>
+        <div class="form-group">
+            <label>Senha</label>
+            <input type="password" class="form-control" ng-model="pass" required >
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="lembrarMe"> Lembrar-me
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        </div>
+        <div class="text-danger" ng-if="erro">{{erro}}</div>
+    </form>
+</div>

@@ -1,0 +1,166 @@
+<meta charset="utf-8">
+<style>
+    /* Estilos para a linha de filtro harmônica */
+    #linhaFiltro {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    #linhaFiltro:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    #linhaFiltro .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    #linhaFiltro .btn {
+        transition: all 0.2s ease;
+        border-radius: 4px;
+    }
+
+    #linhaFiltro .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    #linhaFiltro .input-group-addon {
+        transition: all 0.2s ease;
+    }
+
+    #linhaFiltro .input-group-addon:hover {
+        transform: scale(1.05);
+    }
+
+    /* Responsividade aprimorada */
+    @media (max-width: 768px) {
+        #linhaFiltro {
+            padding: 8px;
+            margin: 15px 0;
+        }
+        
+        #linhaFiltro .btn-group .btn {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+        
+        #linhaFiltro label {
+            font-size: 14px;
+            text-align: center !important;
+        }
+
+        #linhaFiltro .row {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #linhaFiltro .col-md-7, #linhaFiltro .col-md-4 {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        #linhaFiltro .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+        }
+        
+        #linhaFiltro .btn-group .btn {
+            width: 100%;
+            margin: 0;
+        }
+
+        #linhaFiltro {
+            padding: 8px;
+        }
+
+        #linhaFiltro .input-group {
+            width: 100%;
+        }
+    }
+</style>
+<div ng-controller="usuarioCtrl">
+    <h2>Gerenciamento de Perfis de Usuários</h2>
+    <hr>
+    <div class="form-group col-md-4 col-sm-6" ng-init="buscarUsuarios()">
+        <label>Selecione o Usuário</label>
+        <div class="select-editavel form-group">
+            <div class="input-group">
+
+                <input type="text" class="form-control input-lg" ng-model="keyUsuario" placeholder="Digite para filtrar usuários..." ng-focus="aoFocarCampo()"
+                    ng-blur="ocultarListaUsuarios()" autocomplete="off">
+                <span class="input-group-addon">
+                    <i class="fa fa-trash btn" ng-click="limparUsuario()"> </i>
+                </span>
+            </div>
+            <div class="lista-usuarios" ng-show="mostrarListaUsuarios && usuariosFiltrados.length > 0">
+                <div class="item-usuario" ng-repeat="usuario in usuariosFiltrados" ng-click="selecionarUsuario($index, usuario)"
+                    ng-mousedown="$event.preventDefault()">
+                    {{usuario.nome}} -- {{usuario.login}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group col-sm-4 col-md-2" ng-init="buscarPerfisPadrao()">
+        <label>Selecione o Perfil</label>
+        <select class="form-control input-lg" ng-model="chave_perfil_padrao" ng-options="p.chave_perfil_padrao as p.nome_perfil for (key, p) in perfisPadrao"
+            ng-change="buscarPerfilPadrao()">
+            <option value="">Selecione o Perfil</option>
+        </select>
+    </div>
+    <div class="form-group col-md-2 col-sm-4">
+        <label>Buscar por Ítem</label>
+        <input type="text" ng-model="filtroMenus" class="form-control input-lg">
+    </div> <button type="button" class="btn btn-success input-lg col-md-2 baixarbotao" ng-click="salvarPerfilUsuario()">Salvar Perfil</button>
+
+    <div class="col-xs-12" id="linhaFiltro" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px; margin: 20px 0;">
+        <div class="row" style="align-items: center; display: flex; flex-wrap: wrap;">
+            <!-- Filtro específico para a árvore de menus -->
+            <div class="col-md-7 col-sm-12" style="display: flex; align-items: center;">
+                <div class="form-group filtro-arvore-container" style="margin-bottom: 5px; width: 100%;">                   
+                    <div class="input-group">
+                        <span class="input-group-addon" style="background: #007bff; border-color: #007bff; color: white;">
+                            <i class="glyphicon glyphicon-filter"></i>
+                        </span>
+                        <input type="text" ng-model="filtroArvoreMenus" class="form-control" 
+                               style="border-color: #007bff; font-size: 14px;"
+                               placeholder="Digite para filtrar menus, itens, ações ou campos...">
+                        <span class="input-group-addon" ng-show="filtroArvoreMenus" 
+                              style="cursor: pointer; background: #dc3545; border-color: #dc3545; color: white;" 
+                              ng-click="filtroArvoreMenus = ''" title="Limpar filtro">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </span>
+                    </div>
+                    <small class="text-info" ng-show="filtroArvoreMenus" style="margin-top: 5px; display: block;">
+                        <i class="glyphicon glyphicon-info-sign"></i>
+                        Os menus são expandidos automaticamente para mostrar os resultados encontrados
+                    </small>
+                </div>
+            </div>
+
+            <!-- Divisor vertical visual -->
+            <div class="col-md-1 hidden-sm hidden-xs" style="display: flex; justify-content: center; align-items: center; height: 50px;">
+                <div style="height: 40px; border-left: 2px solid #dee2e6; opacity: 0.6;"></div>
+            </div>
+
+            <!-- Controles da árvore de menus -->
+            <div class="col-md-4 col-sm-12" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">            
+                <div class="btn-group" role="group" style="width: 100%; max-width: 250px;">
+                    <button type="button" class="btn btn-info" ng-click="expandirTodos()" 
+                            style="padding: 8px 12px; font-weight: 500; flex: 1;">
+                        <i class="glyphicon glyphicon-plus"></i> Expandir
+                    </button>
+                    <button type="button" class="btn btn-warning" ng-click="colapsarTodos()" 
+                            style="padding: 8px 12px; font-weight: 500; flex: 1;">
+                        <i class="glyphicon glyphicon-minus"></i> Reduzir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-include src="'api/templates/usuariosPerfilMenus.html'"></div>
+</div>
