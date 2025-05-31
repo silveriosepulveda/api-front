@@ -14,7 +14,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
                 console.log(config.baseUrl + classe + '/' + funcaoExecutar + '/' + parametrosEnviar);
                 return $http.get(config.baseUrl + classe + '/' + funcaoExecutar + '/' + parametrosEnviar);
             } else if (tipo == 'post') {
-                return $http.post('api/' + classe + '/' + funcaoExecutar, parametros, {
+                return $http.post(config.baseUrl + classe + '/' + funcaoExecutar, parametros, {
                     transformRequest: angular.identity,
                     headers: {
                         'Content-Type': undefined

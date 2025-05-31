@@ -28,6 +28,8 @@ app
         return {
             require: "ngModel",
             link: function (scope, element, attr, ctrl) {
+                console.log('data');
+                
                 let obrigatorio = attr.required != undefined && attr.required;
                 var _formatDate = function (date) {
 

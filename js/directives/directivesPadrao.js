@@ -1,4 +1,65 @@
 var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directives.dirPagination'])    
+    .directive('expandeComprimeBloco', function ($compile, APIServ, EGFuncoes) {
+        return {
+            restrict: 'E',
+            replace: true,
+            template: '<button type="button" class="btn btn-default col-xs-3 col-md-1 glyphicon"></button>',
+            link: function (scope, elem, attr) {
+
+                var tamanho = elem.attr('tamanho') != undefined ? elem.attr('tamanho') : 'pequeno';
+
+                var tamanhos = {
+                    original: '',
+                    pequeno: 'iconePequeno',
+                    medio: 'iconeMedio',
+                    grande: 'iconeGrande'
+                };
+
+                let comprimir = false;
+
+                var classeIcone = 'glyphicon-collapse-down';
+
+                //Fiz esta comaracao pois a diretiva pode ser chamanda de fora de uma estruturaGerencia
+                if (scope.estrutura != undefined) {
+                    dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, elem.attr('nome-bloco'));
+                    comprimir = dadosBloco.iniciarComprimido != undefined ? dadosBloco.iniciarComprimido : false;
+                    classeIcone = comprimir ? 'glyphicon-expand' : 'glyphicon-collapse-down';
+                } else {
+                    //Depois tenho que tratar para que eles se auto comprimam vindo pela atributo
+                    comprimir = attr.iniciarComprimido != undefined && attr.iniciarComprimido ? true : false;
+                    classeIcone = comprimir ? 'glyphicon-expand' : 'glyphicon-collapse-down';
+                }
+
+                elem.addClass(classeIcone);
+
+                elem.bind("click", function ($event) {
+                    console.log('teste');
+                    let classeBloco = attr.classeBloco != undefined ? attr.classeBloco : 'conteudoBloco';
+                    console.log(classeBloco);
+
+                    var obj = $event.target;
+                    //var objConteudo = angular.element(obj).parent('div').siblings('div.' + classeBloco);
+                    var objConteudo = $(obj).closest('monta-bloco-html').find('.conteudoBloco');
+                    console.log(objConteudo);
+
+
+                    var visible = !objConteudo.is(':visible');
+
+                    objConteudo.toggle('collapse');
+
+                    if (visible) {
+                        angular.element(obj).removeClass('glyphicon-expand').addClass('glyphicon-collapse-down');
+                    } else {
+                        angular.element(obj).removeClass('glyphicon-collapse-down').addClass('glyphicon-expand');
+                    }
+
+                });
+                elem.addClass(tamanhos[tamanho]);
+                $compile(elem.contents())(scope);
+            }
+        }
+    })
+
     .directive('montaHtmlPosicao', ['$rootScope', '$parse', '$compile', 'APIServ', 'EGFuncoes', function ($rootScope, $parse, $compile, APIServ, EGFuncoes) {
         return {
             restrict: 'E',
@@ -39,7 +100,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                     </select>`;
 
                 var html = `
-                    <div class="form-group form-group-modern col-md-1"  id="div_${campo}" >
+                    <div class="form-group col-md-1"  id="div_${campo}" >
                         ${label}
                         ${input}
                     </div>`;
@@ -59,7 +120,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
             }
         }
     }])
-    .directive('cabecalhoConsulta', ['$compile', 'APIServ', 'EGFuncoes', 'APIAjuFor', '$rootScope', '$parse', function ($compile, APIServ, EGFuncoes, APIAjuFor, $rootScope, $parse) {
+    .directive('cabecalhoConsulta', ['$compile', 'APIServ', 'EGFuncoes', 'APIAjuFor', function ($compile, APIServ, EGFuncoes, APIAjuFor) {
         return {
             restrict: 'E',
             replace: true,
@@ -69,183 +130,8 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                 let raizModelo = scope.estrutura.raizModelo;
                 let campoChave = scope.estrutura.raizModelo + '.' + scope.estrutura.campo_chave;
 
-                // ===== INICIALIZAÇÃO DE CONTROLES DE VISIBILIDADE =====
-                
-                /**
-                 * Inicializa controle de exibição da consulta
-                 */
-                function inicializarControleExibicao() {
-                    // Valor padrão ou da estrutura
-                    scope.exibirConsulta = scope.estrutura && scope.estrutura.exibirConsulta !== undefined 
-                        ? scope.estrutura.exibirConsulta 
-                        : true;
-                }
-
-                /**
-                 * Função para alternar exibição dos filtros de consulta
-                 */
-                scope.alterarExibicaoConsulta = function() {
-                    scope.exibirConsulta = !scope.exibirConsulta;
-                    
-                    // Controlar timer se disponível
-                    if (scope.exibirConsulta && $rootScope.pausarTimer) {
-                        $rootScope.pausarTimer();
-                    } else if (!scope.exibirConsulta && $rootScope.iniciarTimer) {
-                        $rootScope.iniciarTimer();
-                    }
-                };
-
-                // ===== SISTEMA DE FILTROS DINÂMICOS =====
-                
-                /**
-                 * Mescla campos com precedência: camposFiltroPesquisa > campos
-                 */
-                function mesclaCamposFiltro() {
-                    // CORREÇÃO AVANÇADA: Verificar se camposFiltroPesquisa já foi inicializado corretamente
-                    // Usar flag para evitar sobrescrita por múltiplas diretivas
-                    if (scope._camposFiltroPesquisaInicializado) {
-                        console.log('directivesPadrao - camposFiltroPesquisa já inicializado por outra diretiva, pulando...');
-                        return;
-                    }
-                    
-                    var camposBase = {};
-                    var filtrosPesquisa = scope.estrutura && scope.estrutura.camposFiltroPesquisa ? 
-                        scope.estrutura.camposFiltroPesquisa : {};
-                    
-                    // Incluir campos gerais no filtro (exceto se explicitamente excluídos)
-                    var incluirCamposNoFiltro = scope.estrutura && scope.estrutura.camposOcultarFiltroPesquisa === undefined || 
-                        (scope.estrutura && scope.estrutura.camposOcultarFiltroPesquisa !== '*');
-                    
-                    if (incluirCamposNoFiltro && scope.estrutura && scope.estrutura.campos) {
-                        angular.forEach(scope.estrutura.campos, function(config, campo) {
-                            if (config.tipo !== 'oculto') {
-                                camposBase[campo] = angular.copy(config);
-                            }
-                        });
-                    }
-                    
-                    // CORREÇÃO: Verificar múltiplas condições para determinar se deve criar ou preservar
-                    var devePreservar = scope.camposFiltroPesquisa && 
-                                       Object.keys(scope.camposFiltroPesquisa).length > 0 &&
-                                       scope._camposFiltroPesquisaOrigemEstrutura === true;
-                                       
-                    if (!devePreservar) {
-                        scope.camposFiltroPesquisa = {};
-                        
-                        // Aplicar precedência: camposFiltroPesquisa > campos
-                        angular.forEach(camposBase, function(config, campo) {
-                            scope.camposFiltroPesquisa[campo] = config;
-                        });
-                        
-                        angular.forEach(filtrosPesquisa, function(config, campo) {
-                            scope.camposFiltroPesquisa[campo] = angular.merge(
-                                scope.camposFiltroPesquisa[campo] || {}, 
-                                config
-                            );
-                        });
-                        
-                        console.log('directivesPadrao - camposFiltroPesquisa criado:', Object.keys(scope.camposFiltroPesquisa));
-                        scope._camposFiltroPesquisaInicializado = true;
-                        scope._camposFiltroPesquisaOrigemDirectivesPadrao = true;
-                    } else {
-                        console.log('directivesPadrao - camposFiltroPesquisa preservado (origem: estruturaGerencia):', Object.keys(scope.camposFiltroPesquisa));
-                    }
-                }
-
-                /**
-                 * Função para montagem dos campos de filtro da consulta
-                 */
-                function montarCamposFiltroConsulta() {
-                    mesclaCamposFiltro();
-                    
-                    // Aplicar configurações específicas por tipo de campo
-                    angular.forEach(scope.camposFiltroPesquisa, function(config, campo) {
-                        if (!config.texto && !config.titulo) {
-                            config.texto = campo;
-                        }
-                        
-                        if (!config.tipo) {
-                            config.tipo = 'texto';
-                        }
-                        
-                        // Definir operador padrão baseado no tipo
-                        if (!config.operador) {
-                            switch (config.tipo) {
-                                case 'data':
-                                    config.operador = 'eq';
-                                    break;
-                                case 'select':
-                                case 'select-sim-nao':
-                                    config.operador = 'eq';
-                                    break;
-                                default:
-                                    config.operador = 'like';
-                            }
-                        }
-                    });
-                }
-
-                // ===== FUNÇÕES AUXILIARES =====
-                
-                /**
-                 * Função auxiliar para acessar valores dinâmicos de forma segura
-                 */
-                function getScopeValue(expr) {
-                    try {
-                        return $parse(expr)(scope);
-                    } catch (e) {
-                        return undefined;
-                    }
-                }
-
-                /**
-                 * Função auxiliar para atribuir valores dinâmicos de forma segura
-                 */
-                function setScopeValue(expr, value) {
-                    try {
-                        $parse(expr).assign(scope, value);
-                    } catch (e) {
-                        // Fallback para atribuição direta ao scope
-                        try {
-                            scope[expr] = value;
-                        } catch (e2) {}
-                    }
-                }
-
-                /**
-                 * Atualiza campo de filtro
-                 */
-                scope.atualizarCampoFiltro = function(campo, valor) {
-                    setScopeValue(campo, valor);
-                    
-                    // Aplicar ordenação se necessário
-                    let campoOrdenar = scope.ordemFiltro;
-                    
-                    if (scope.listaConsulta && angular.isArray(scope.listaConsulta) && campoOrdenar) {
-                        function crescente(varA, varB) {
-                            return (varA[campoOrdenar] > varB[campoOrdenar]) ? 1 : ((varB[campoOrdenar] > varA[campoOrdenar] ? -1 : 0));
-                        }
-                        
-                        function decrescente(varA, varB) {
-                            return (varA[campoOrdenar] < varB[campoOrdenar]) ? 1 : ((varB[campoOrdenar] < varA[campoOrdenar] ? -1 : 0));
-                        }
-
-                        if (scope.sentidoFiltro == '' || scope.sentidoFiltro == 'asc') {
-                            scope.listaConsulta.sort(crescente);
-                        } else {
-                            scope.listaConsulta.sort(decrescente);
-                        }
-                    }
-                };
-
-                // ===== INICIALIZAÇÃO =====
-                
-                // Inicializar controle de exibição
-                inicializarControleExibicao();
-                
-                // Montar campos de filtro
-                montarCamposFiltroConsulta();
-
+                let nomeFormConsulta = 'formCon' + parametros.raizModelo;
+                let tipoConsulta = parametros.tipoConsulta != undefined ? parametros.tipoConsulta : 'camposDinamicos';
                 //Vou por o acoes inicio consulta, quando houver
                 let acoesInicioConsulta = '';
                 let mostrarAcoesInicioConsultaSemResultado = false;
@@ -345,67 +231,53 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
             }
         }
     })
-    /**
- * @deprecated Esta diretiva foi substituída por uma versão melhorada em um arquivo separado.
- * Mantida apenas para compatibilidade com código legado.
- * Data: 30/05/2025
- */
-/**
- * @deprecated Esta diretiva foi movida para um arquivo separado em:
- * /api/js/directives/srcDirectivesPadrao/selectFiltrosPesquisa.js
- * Não use esta versão. Use a nova implementação que possui melhor tratamento
- * de campos e suporte completo a todos os tipos de filtros.
- */
-/* .directive('selectFiltrosPesquisa', ['$compile', '$parse', 'APIServ', 'EGFuncoes', 'APIAjuFor', function ($compile, $parse, APIServ, EGFuncoes, APIAjuFor) {
+    .directive('selectFiltrosPesquisaOriginal', ['$compile', '$parse', 'APIServ', 'EGFuncoes', 'APIAjuFor', function ($compile, $parse, APIServ, EGFuncoes, APIAjuFor) {
         return {
             restrict: 'E',
             replace: true,
             template: '<select id="campo_consulta" class="form-control"><option value="">Selecione o Campo</option></select>',
             link: function (scope, elem, attr) {
-                
+
                 var montaCampoValor = function (mascara, valor, indice, campo) {
-                    var atributos = [];
-                    var classes = [];
-                    
-                    // Mapear tipos para atributos de máscara
-                    var mapaCarasAtributos = {
-                        'data': ['ui-data', 'placeholder="dd/mm/aaaa"'],
-                        'hora': ['ui-hora', 'placeholder="hh:mm"'],
-                        'telefone': ['ui-Telefone'],
-                        'inteiro': ['ui-Inteiro'],
-                        'decimal2': ['ui-Decimal2'],
-                        'decimal': ['ui-Decimal2'],
-                        'cep': ['ui-cep'],
-                        'cpf-cnpj': ['ui-cpf-cnpj'],
-                        'placa': ['ui-placa']
-                    };
-                    
-                    if (mapaCarasAtributos[mascara]) {
-                        atributos = mapaCarasAtributos[mascara];
-                        classes.push(mascara);
+
+                    atributos = [];
+                    classes = [];
+                    if (mascara == 'data') {
+                        atributos.push('ui-data');
+                        atributos.push('placeholder="dd/mm/aaaa"');
+                        classes.push('data');
+                    } else if (mascara == 'hora') {
+                        atributos.push('ui-hora');
+                        atributos.push('placeholder="hh:mm"');
+                    } else if (mascara == 'telefone') {
+                        atributos.push('ui-Telefone');
+                    } else if (mascara == 'inteiro') {
+                        atributos.push('ui-Inteiro');
+                    } else if (mascara == 'decimal2') {
+                        atributos.push('ui-Decimal2');
+                    } else if (mascara == 'cep') {
+                        atributos.push('ui-cep');
+                    } else if (mascara == 'cpf-cnpj') {
+                        atributos.push('ui-cpf-cnpj')
+                    } else if (mascara == 'placa') {
+                        atributos.push('ui-placa');
                     }
-                    
                     var modeloValor = `filtros[${indice}]['valor']`;
                     var idValor = EGFuncoes.modeloParaId(modeloValor);
 
-                    // Campo de valor baseado no tipo
                     if (!angular.isObject(valor)) {
                         var input = `
-                        <input type="text" ng-model="${modeloValor}" id="${idValor}" ${atributos.join(' ')} 
-                               class="${classes.join(' ')} form-control valorConsulta" 
-                               ng-if="filtro.tipo != 'intervaloDatas'" 
-                               placeholder="Defina o Valor">
+                        <input type="text" ng-model="${modeloValor}" id="${idValor}" ${atributos.join(' ')} class="${classes.join(' ')}  form-control valorConsulta" ng-if="filtro.tipo != 'intervaloDatas'" placeholder="Defina o Valor">
+                        <!--monta-html campo="${campo}" class="valorConsulta" ng-if="filtro.tipo != 'intervaloDatas'"></monta-html -->
                         
                         <div class="input-group" ng-if="filtro.tipo == 'intervaloDatas'">
-                            <span class="input-group-addon">Data Inicial</span>
-                            <input type="text" class="data form-control" ng-model="filtro.di" ui-data placeholder="Data Inicial">
-                            <span class="input-group-addon">Data Final</span>
+                            <span class="input-group-addon">D. F.</span>
                             <input type="text" class="data form-control" ng-model="filtro.df" ui-data placeholder="Data Final">
                         </div>`;
                     } else if (angular.isObject(valor)) {
+
                         var input = `
-                            <select ng-model="${modeloValor}" ng-options="key as value for (key, value) in filtro.valoresMascara" 
-                                    id="${idValor}" ${atributos.join(' ')} class="${classes.join('')} form-control">
+                            <select ng-model="${modeloValor}" ng-options="key as value for (key, value) in filtro.valoresMascara" id="${idValor}" ${atributos.join(' ')} class="${classes.join(' ')} form-control">
                             </select>`;
                     }
 
@@ -510,7 +382,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                 });
             }
         }
-    }] */
+    }])
     .directive('detalhesItemConsulta', ['$rootScope', '$compile', 'APIServ', 'EGFuncoes', 'APIAjuFor', function ($rootScope, $compile, APIServ, EGFuncoes, APIAjuFor) {
         return {
             restrict: 'E',
@@ -970,7 +842,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
         }
         return ddo;
     })
-    .directive('selectSimNao', function () {
+    .directive('selectSimNao', function ($compile) {
         var ddo = {
             restrict: 'E',
             template: `
@@ -1271,7 +1143,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                 let aoAlterar = p.aoAlterar != undefined ? p.aoAlterar : '';
 
                 let html = '';
-                if ($rootScope[$rootRootScope['acao']]['acoes'][campo] != undefined || p.ignorarPerfil) {
+                if ($rootScope[$rootScope['acao']]['acoes'][campo] != undefined || p.ignorarPerfil) {
                     html = `                
                     <div class="form-group ${tamanhos.join(' ')}">
                         <select class="form-control" ng-model="item.${p.campoValor}" ng-change="${aoAlterar}">`;
@@ -1614,18 +1486,3 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
             replace: true
         }
     })
-
-directivesPadrao.filter('property', function() {
-    // Filtro puro para evitar digest infinito
-    return function(input, propertyName) {
-        if (!input || !propertyName) return input;
-        // Se for array, retorna o valor da propriedade do primeiro item (usado com limitTo:1:0)
-        if (Array.isArray(input) && input.length > 0) {
-            var item = input[0];
-            return item && item[propertyName];
-        } else if (input && typeof input === 'object') {
-            return input[propertyName];
-        }
-        return input;
-    };
-});

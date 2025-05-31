@@ -1,78 +1,41 @@
-// EstruturaGerencia.js - Exportação da diretiva estruturaGerencia
-
-angular.module('directivesPadrao')
-    .directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadrao', 'operadoresConsulta', '$http', 'APIServ', '$filter', 'APIAjuFor', 'EGFuncoes',
+app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadrao', 'operadoresConsulta', '$http', 'APIServ', '$filter', 'APIAjuFor', 'EGFuncoes',
         function ($compile, $base64, $parse, filtroPadrao, operadoresConsulta, $http, APIServ, $filter, APIAjuFor, EGFuncoes) {
             ////////////////////////////////////////////////////////////////////////////////////////
             ////////////////FUNCOES DE MONTAGEM DE HTML/////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////
 
-            // Melhorias: Modularização, uso de $parse, comentários, redução de manipulação direta de DOM, extração de funções auxiliares
-
             var controller = function ($rootScope, $scope, $element, $attrs, EGFuncoes, APIAjuFor) {
-                // Função auxiliar para acessar valores dinâmicos de forma segura
-                function getScopeValue(expr) {
-                    try {
-                        return $parse(expr)($scope);
-                    } catch (e) {
-                        return undefined;
-                    }
-                }
-                // Função auxiliar para atribuir valores dinâmicos de forma segura
-                function setScopeValue(expr, value) {
-                    try {
-                        $parse(expr).assign($scope, value);
-                    } catch (e) {}
-                }
-                // Função para obter parâmetros de URL/local
-                function obterParametrosUrlOuLocal() {
-                    let parametrosUrl = APIServ.parametrosUrl();
-                    let parametrosLocalTemp = { pagina: '', acao: '', subAcao: '' };
-                    let parametrosLocal = undefined;
-                    if (parametrosUrl.length == 0) {
-                        parametrosLocal = APIServ.buscaDadosLocais('parametrosUrl');
-                        parametrosLocal = parametrosLocal ? parametrosLocal : parametrosLocalTemp;
-                    }
-                    return { parametrosUrl, parametrosLocal };
-                }
-                // Função para tratar atalho de teclado (modularizada, com debounce)
-                function tratarAtalhosTeclado() {
-                    let debounceTimeout;
-                    window.onkeydown = function (ev) {
-                        clearTimeout(debounceTimeout);
-                        debounceTimeout = setTimeout(function () {
-                            var e = ev || window.event,
-                                key = e.keyCode;
-                            if (key == 107) {
-                                if ($scope.tela != 'cadastro') {
-                                    $scope.mudaTela('cadastro');
-                                    $scope.$apply();
-                                }
-                                e.preventDefault();
-                            }
-                        }, 100);
-                    }
-                }
-
                 $scope.popUp = document.getElementById('popUp') != undefined && document.getElementById('popUp').value;
 
                 $scope.larguraTela = window.screen.availWidth
                 $scope.alturaTela = window.screen.availHeight;
                 $scope.dispositivoMovel = $scope.larguraTela <= 900;
                 $scope.tipoSalvar = 'post';
-                $scope.tipoConsulta = 'get';
+                $scope.tipoConsulta = 'post';
 
                 let html = '';
                 $scope.fd = new FormData();
 
-                // Modularização da montagem da estrutura
                 let montarEstrutura = function (estrutura) {
                     let retorno = estrutura;
 
                     //Fazendo a validacao dos poderes do usuario
                     var menuPainel = APIServ.buscaDadosLocais('menuPainel');
 
-                    let { parametrosUrl, parametrosLocal } = obterParametrosUrlOuLocal();
+                    let parametrosUrl = APIServ.parametrosUrl();
+
+                    let parametrosLocal = undefined;
+                    let parametrosLocalTemp = { pagina: '', acao: '', subAcao: '' };
+
+                    if (!$scope.popUp) {
+                        APIServ.apagaDadosLocais('parametrosUrl');
+                    }
+
+                    if (parametrosUrl.length == 0) {
+                        parametrosLocal = APIServ.buscaDadosLocais('parametrosUrl');
+                        parametrosLocal = parametrosLocal ? parametrosLocal : parametrosLocalTemp;
+                    }
+
                     let raizModelo = retorno.raizModelo;
 
                     let pagina = parametrosUrl[0] != undefined ? parametrosUrl[0] : parametrosLocal['pagina'];
@@ -132,13 +95,6 @@ angular.module('directivesPadrao')
                                         campoEmCampos = APIServ.buscarValorVariavel($scope.estrutura.campos, campo);
 
                                     retornoMCFC[campo] = filtrosPersonalizados[campo] != undefined ? Object.assign(campoEmCampos, filtrosPersonalizados[campo], val) : val;
-                                    
-                                    // CORREÇÃO: Garantir texto para campos de filtro (previne labels undefined)
-                                    if (!retornoMCFC[campo].texto) {
-                                        retornoMCFC[campo].texto = campo.replace(/_/g, ' ')
-                                                                       .replace(/bloco/g, 'Bloco')
-                                                                       .replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-                                    }
                                 }
                             } else {
                                 //console.log($scope.estrutura.camposFiltroPesquisa);
@@ -179,33 +135,6 @@ angular.module('directivesPadrao')
                     let campoEnviarMontarfiltro = MergeRecursive(camposPes, camposMontagemFiltro);
 
                     $scope.camposFiltroPesquisa = _montarCamposFiltroConsulta(campoEnviarMontarfiltro);
-
-                    // CORREÇÃO AVANÇADA: Marcar que camposFiltroPesquisa foi inicializado por estruturaGerencia
-                    $scope._camposFiltroPesquisaInicializado = true;
-                    $scope._camposFiltroPesquisaOrigemEstrutura = true;
-                    $scope._camposFiltroPesquisaOrigemDirectivesPadrao = false;
-
-                    // CORREÇÃO: Proteger camposFiltroPesquisa contra sobrescrita
-                    var camposFiltroPesquisaOriginal = angular.copy($scope.camposFiltroPesquisa);
-                    
-                    // Criar watcher para detectar sobrescrita indevida
-                    var protegerCampos = function() {
-                        if (!$scope.camposFiltroPesquisa || Object.keys($scope.camposFiltroPesquisa).length === 0 || 
-                            $scope._camposFiltroPesquisaOrigemEstrutura === false) {
-                            $scope.camposFiltroPesquisa = angular.copy(camposFiltroPesquisaOriginal);
-                            $scope._camposFiltroPesquisaInicializado = true;
-                            $scope._camposFiltroPesquisaOrigemEstrutura = true;
-                            $scope._camposFiltroPesquisaOrigemDirectivesPadrao = false;
-                        }
-                    };
-                    
-                    // Verificar periodicamente se a variável foi sobrescrita
-                    var intervalProtecao = setInterval(protegerCampos, 100);
-                    
-                    // Limpar interval após 5 segundos (tempo suficiente para carregamento)
-                    setTimeout(function() {
-                        clearInterval(intervalProtecao);
-                    }, 5000);
 
                     $scope.campo_chave = retorno.campo_chave;
                     var estrutura = retorno;
@@ -290,7 +219,7 @@ angular.module('directivesPadrao')
                             } else if (tabelaRel && tabelaSubRel) {
                                 let dadosTabSubRel = dadosTabRel['tabelasSubRelacionadas'][tabelaSubRel];
                                 //Pegando o modelo do elemento relacionado
-                                modeloRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
+                                modeloRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabRel.campo_relacionamento);
 
                                 let modeloSubRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
 
@@ -355,6 +284,7 @@ angular.module('directivesPadrao')
                         let input = $(event.target).closest('monta-html').find(':input');
                         let campo = input.attr('campo');
                         let modelo = input.attr('ng-model');
+                        console.log(modelo);
                         let modeloChave = $scope.estrutura.raizModelo + '["' + input.attr('modelo-chave') + '"]';
 
                         let indice = input.attr('indice');
@@ -377,12 +307,14 @@ angular.module('directivesPadrao')
 
                             $parse(modelo).assign($scope, '');
 
+                            console.log(modeloChave);
                             if (modeloChave != undefined) {
                                 $parse(modeloChave).assign($scope, '');
                             }
 
                             if (desabilitado) {
                                 input.attr('disabled', false)
+                                console.log($scope.temporada);
                             }
                         }
 
@@ -551,6 +483,8 @@ angular.module('directivesPadrao')
                             if ($scope.estrutura.filtrosPadrao != undefined) {
                                 for (let x in $scope.estrutura.filtrosPadrao) {
                                     let obrigatorio = $scope.estrutura.filtrosPadrao[x]['obrigatorio'] != undefined && $scope.estrutura.filtrosPadrao[x]['obrigatorio'];
+                                    console.log(obrigatorio);
+
                                     if (obrigatorio) {
                                         let novoFiltro = {
                                             campo: x,
@@ -618,9 +552,9 @@ angular.module('directivesPadrao')
 
                             if ($scope.estrutura.camposFiltroPersonalizado != undefined) {
                                 let camposPer = Object.assign({}, $scope.estrutura.camposFiltroPersonalizado);
-                                for (let i in camposPer) {
+                                for (i in camposPer) {
                                     let campoPerFil = camposPer[i]['campoFiltro'] != undefined ? camposPer[i]['campoFiltro'] : i;
-                                    let valor = getScopeValue($scope.estrutura.raizModelo + '.' + campoPerFil);
+                                    let valor = eval('$scope.' + $scope.estrutura.raizModelo + '.' + campoPerFil);
                                     if (valor != undefined) {
                                         retorno.push({
                                             campo: campoPerFil,
@@ -803,8 +737,8 @@ angular.module('directivesPadrao')
                                 //APIServ.executaFuncaoClasse('classeGeral', 'consulta', filtros)
                                 APIServ.executaFuncaoClasse('classeGeral', 'consulta', parametrosEnviarFiltro, $scope.tipoConsulta)
                                     .success(function (data) {
-                                        //console.log(data); $rootScope.carregando = false;/*
-                                        console.log(data);
+                                         //console.log(data); $rootScope.carregando = false;/*
+//                                          console.log(data);
                                         if (usarTimerConsulta) {
                                             $rootScope.reiniciarTimer()
                                         }
@@ -1061,7 +995,7 @@ angular.module('directivesPadrao')
                                 // })
                                 APIServ.executaFuncaoClasse('classeGeral', 'manipula', parametrosEnviar, $scope.tipoSalvar)
                                     .success(function (retorno) {
-                                        // console.log(retorno); $scope.desabilitarSalvar = false; $rootScope.carregando = false; /*
+                                       // console.log(retorno); $scope.desabilitarSalvar = false; $rootScope.carregando = false; /*
                                         if ($scope.tipoSalvar == 'get') {
                                             console.log(retorno);
                                             return false;
@@ -1350,7 +1284,8 @@ angular.module('directivesPadrao')
                     }
 
                     let paramEnviarBuscaEstrutura = parametrosBuscaEstrutura;
-                    
+
+                    //console.log(paramEnviarBuscaEstrutura);
                     if ($scope.tipoConsulta == 'post') {
                         let fdEnviarBuscaEstrutura = new FormData();
                         fdEnviarBuscaEstrutura.append('parametros', JSON.stringify(parametrosBuscaEstrutura));
@@ -1358,6 +1293,7 @@ angular.module('directivesPadrao')
                     }
 
                     APIServ.executaFuncaoClasse('classeGeral', 'buscarEstrutura', paramEnviarBuscaEstrutura, $scope.tipoConsulta).success(retorno => {
+                        //console.log(retorno);
                         montarEstrutura(retorno);
                     })
                 }
@@ -1368,4 +1304,4 @@ angular.module('directivesPadrao')
                 controller: controller
             }
         }
-    ]);
+    ])
