@@ -12,35 +12,45 @@
             </div>
             
             <div class="collapse navbar-collapse" id="menuencolhido">
-                <!-- Checkbox para manter menu oculto -->
-                <div class="checkbox-manter-menu col-xs-12" style="margin-top: 5% !important;">
-                    <label>
-                        <input type="checkbox" id="manterMenuOculto" onchange="toggleManterMenu()">
-                        <small>Manter oculto</small>
-                    </label>
-                </div>
-                
-                <!-- Campo de busca -->
-                <form class="navbar-form row" role="search">
-                    <div class="form-group col-xs-12">
-                        <input type="text" 
-                               class="form-control input-lg" 
-                               placeholder="Procurar no Menu" 
-                               id="procuramenu" 
-                               ng-model="vm.searchText"
-                               style="width: 100%;">
+                <!-- Container de controles reorganizado -->
+                <div class="menu-controls-reorganized col-xs-12" style="margin-top: 5% !important;">
+                    <!-- Ícone do olho, busca e botão expandir em linha -->
+                    <div class="busca-expandir-container">
+                        <!-- Ícone do olho para ocultar/mostrar menu -->
+                        <button type="button" 
+                                class="btn btn-sm eye-toggle-btn"
+                                onclick="toggleManterMenu()"
+                                title="Ocultar/Mostrar menu">
+                            <i class="fa fa-eye" id="eyeIcon"></i>
+                        </button>
+                        <div class="form-group busca-group">
+                            <input type="text" 
+                                   class="form-control input-lg busca-input" 
+                                   placeholder="Procurar no Menu" 
+                                   id="procuramenu" 
+                                   ng-model="vm.searchText">
+                        </div>
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-secondary expand-collapse-btn"
+                                ng-click="vm.toggleAllMenus()"
+                                title="{{vm.allMenusExpanded ? 'Recolher todos os menus' : 'Expandir todos os menus'}}">
+                            <i class="fa" ng-class="vm.allMenusExpanded ? 'fa-compress' : 'fa-expand'"></i>
+                        </button>
                     </div>
-                </form>
+                </div>
                 
                 <!-- Menu principal -->
                 <ul class="nav navbar-nav" id="divmenu">
                     <!-- Seção de Favoritos -->
-                    <li class="menu dropdown favoritos-section" ng-show="vm.favoritos && vm.favoritos.length > 0">
+                    <li class="menu dropdown favoritos-section" 
+                        ng-show="vm.favoritos && vm.favoritos.length > 0"
+                        ng-class="{'expanded': vm.favoritosExpanded, 'collapsed': !vm.favoritosExpanded}">
                         <a href="javascript:void(0)" ng-click="vm.toggleFavoritosExpansion()">
                             <i class="fa fa-star" style="color: #f39c12; margin-right: 8px;"></i>
                             <span>Favoritos ({{vm.favoritos.length}})</span>
+                            <i class="fa fa-chevron-down dropdown-arrow" style="float: right; margin-top: 2px;"></i>
                         </a>
-                        <ul role="menu" ng-show="vm.favoritosExpanded">
+                        <ul role="menu" class="favoritos-lista">
                             <li class="submenu favorito-item" ng-repeat="favorito in vm.favoritos">
                                 <i class="fa fa-star favorito-star active" 
                                    ng-click="vm.toggleFavorito(favorito)" 
@@ -63,7 +73,9 @@
                         ng-class="{'expanded': menu.expanded, 'collapsed': !menu.expanded, 'active': menu.active}">
                         
                         <a href="javascript:void(0)" ng-click="vm.toggleMenuExpansion(keyM, menu)">
+                            <i class="fa fa-folder" style="color: var(--menu-text-muted); margin-right: 8px;"></i>
                             <span>{{menu.menu}}</span>
+                            <i class="fa fa-chevron-down dropdown-arrow" style="float: right; margin-top: 2px;"></i>
                         </a>
                         
                         <ul role="menu" ng-show="menu.expanded">

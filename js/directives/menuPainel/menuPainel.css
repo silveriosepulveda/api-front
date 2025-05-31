@@ -31,48 +31,56 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-.linkSubMenu {
-    width: calc(80% - 25px); /* Espaço para estrela + botão adicionar */
-    float: left;
-    margin-left: 25px; /* Espaço para a estrela */
-    color: var(--menu-text-muted);
-    font-size: 14px;
-    padding: 8px 4px;
-    text-decoration: none;
-    transition: color var(--transition);
+/* Cores padronizadas para menus */
+.menu.dropdown > a {
+    color: var(--menu-text) !important;
+    font-weight: 600;
+    padding: 12px 16px;
     display: block;
+    text-decoration: none;
+    transition: all var(--transition);
+    background: transparent;
 }
 
-.linkSubMenu:hover {
-    color: var(--menu-accent);
+.menu.dropdown > a:hover {
+    color: var(--menu-accent) !important;
+    background-color: var(--menu-hover);
     text-decoration: none;
 }
 
-.addSubMenu {
-    width: 15%;
-    padding: 8px;
-    float: right;
-    text-align: center;
-    color: #28a745;
-    font-size: 16px;
-    transition: all var(--transition);
-    cursor: pointer;
+.menu.dropdown > a:focus,
+.menu.dropdown > a:active {
+    color: var(--menu-text) !important;
+    background-color: var(--menu-hover);
+    text-decoration: none;
 }
 
-.addSubMenu:hover {
-    color: #155724;
-    background-color: #d4edda;
-    border-radius: 3px;
+/* Texto dos submenus */
+.submenu .linkSubMenu {
+    color: var(--menu-text-muted) !important;
+    background: transparent !important;
+}
+
+.submenu .linkSubMenu:hover {
+    color: var(--menu-accent) !important;
+    background: rgba(0, 123, 255, 0.1) !important;
+}
+
+.submenu .linkSubMenu:focus,
+.submenu .linkSubMenu:active {
+    color: var(--menu-text-muted) !important;
 }
 
 .submenu {
     list-style: none;
     border-bottom: 1px solid #f1f3f4;
     transition: background-color var(--transition);
-    padding: 4px 0;
     margin: 0;
     position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 4px 0;
     clear: both;
 }
 
@@ -118,6 +126,7 @@
     
     .submenu {
         margin-left: 0;
+        padding-left: 15px; /* Alinhamento consistente em mobile */
     }
     
     .dropdown {
@@ -245,6 +254,7 @@
     display: block;
     text-decoration: none;
     transition: all var(--transition);
+    position: relative;
 }
 
 .favoritos-section > a:hover {
@@ -256,6 +266,38 @@
     font-size: 16px;
     margin-right: 8px;
     animation: starPulse 2s infinite;
+}
+
+/* Seta de dropdown para favoritos */
+.favoritos-section .dropdown-arrow {
+    transition: transform var(--transition);
+    color: var(--favorito-color);
+    font-size: 12px;
+}
+
+.favoritos-section.expanded .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.favoritos-section.collapsed .dropdown-arrow {
+    transform: rotate(0deg);
+}
+
+/* Lista de favoritos com animação */
+.favoritos-section .favoritos-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--favorito-bg);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    border-top: 1px solid var(--favorito-color);
+}
+
+.favoritos-section.expanded .favoritos-lista {
+    max-height: 1000px;
+    transition: max-height 0.3s ease-in;
 }
 
 @keyframes starPulse {
@@ -281,49 +323,67 @@
     margin: 2px 8px;
     border-radius: 0 4px 4px 0;
     transition: all var(--transition);
+    position: relative;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
 }
 
 .favorito-item:hover {
     background: var(--favorito-hover) !important;
     transform: translateX(2px);
-}
+}        .favorito-item .favorito-star {
+            color: var(--favorito-color) !important;
+            font-size: 14px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            margin-right: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all var(--transition);
+            margin-top: -4px; /* Subir o ícone um pouco mais */
+        }
 
-.favorito-item .favorito-star {
-    color: var(--favorito-color) !important;
-    font-size: 14px;
-    margin-left: 12px;
-    margin-top: 8px;
-    position: absolute;
-    left: 0;
+.favorito-item .favorito-star:hover {
+    transform: scale(1.1);
+    color: #e67e22 !important;
 }
 
 .favorito-item .favorito-link {
-    width: calc(100% - 40px) !important;
-    margin-left: 28px !important;
+    flex: 1;
     color: #856404 !important;
     font-weight: 500;
     padding: 6px 8px !important;
+    text-decoration: none;
+    display: block;
+    line-height: 1.4;
 }
 
 .favorito-item .favorito-link:hover {
     color: var(--favorito-color) !important;
     background: rgba(243, 156, 18, 0.1);
+    text-decoration: none;
 }
 
 /* Estrelas de favorito nos menus normais */
 .favorito-star {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     position: absolute;
-    left: 4px;
+    left: 6px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
     color: #ddd;
-    font-size: 16px;
+    font-size: 14px;
     transition: all var(--transition);
     text-align: center;
-    line-height: 20px;
+    line-height: 18px;
     z-index: 10;
 }
 
@@ -342,170 +402,264 @@
 }
 
 /* Ajustes para menus com estrelas */
-.submenu {
-    position: relative;
-    min-height: 36px;
-    padding: 4px 0;
+.submenu .linkSubMenu {
+    flex: 1;
+    margin-left: 22px; /* Espaço reduzido para estrela */
+    color: var(--menu-text-muted);
+    font-size: 14px;
+    padding: 8px 8px;
+    text-decoration: none;
+    transition: color var(--transition);
+    display: block;
+    width: auto;
 }
 
-.submenu .linkSubMenu {
-    padding-left: 8px;
-    margin-left: 28px; /* Espaço para estrela */
-    width: calc(75% - 28px);
+.submenu .linkSubMenu:hover {
+    color: var(--menu-accent);
+    text-decoration: none;
+}
+
+.submenu .addSubMenu {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #28a745;
+    font-size: 16px;
+    transition: all var(--transition);
+    cursor: pointer;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.submenu .addSubMenu:hover {
+    color: #155724;
+    background-color: #d4edda;
+    border-radius: 3px;
 }
 
 /* ========================================
-   CAMPO DE BUSCA
+   CAMPO DE BUSCA (INTEGRADO AOS CONTROLES)
    ======================================== */
 
-#procuramenu {
+/* Estilos já incluídos na seção de controles reorganizados acima */
+/* #procuramenu agora é .busca-input */
+
+/* ========================================
+   CONTROLES REORGANIZADOS DO MENU
+   ======================================== */
+
+.menu-controls-reorganized {
+    padding: 12px 16px 8px 16px !important;
+    background: var(--menu-hover);
+    border: 1px solid var(--menu-border);
+    border-radius: 6px;
+    margin: 12px 16px 8px 16px !important;
+}
+
+/* Container busca + ícone do olho + botão expandir em linha */
+.busca-expandir-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.busca-group {
+    flex: 1;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.busca-input {
     border: 1px solid var(--menu-border);
     border-radius: 4px;
     font-size: 14px;
     padding: 8px 12px;
-    width: 100%;
     background: white;
     color: var(--menu-text);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    width: 100%;
+    height: 36px;
 }
 
-#procuramenu:focus {
+.busca-input:focus {
     outline: none;
     border-color: var(--menu-accent);
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
     background: white;
 }
 
-#procuramenu::placeholder {
+.busca-input::placeholder {
     color: var(--menu-text-muted);
     font-weight: 400;
 }
 
-.navbar-form {
-    margin: 0;
-    padding: 12px 16px 8px 16px;
-    border: none;
-}
-
-/* ========================================
-   CHECKBOX MANTER MENU ABERTO
-   ======================================== */
-
-.checkbox-manter-menu {
-    background: var(--menu-hover);
-    border: 1px solid var(--menu-border);
-    border-radius: 4px;
+/* Botão do ícone do olho */
+.eye-toggle-btn {
+    background: var(--menu-accent);
+    border: 1px solid var(--menu-accent);
+    color: white !important;
     padding: 8px 12px;
-    margin: 12px 16px 8px 16px !important;
-}
-
-.checkbox-manter-menu label {
-    margin: 0;
-    font-weight: normal;
-    cursor: pointer;
+    border-radius: 4px;
+    transition: all var(--transition);
+    font-size: 12px;
+    line-height: 1;
+    min-width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
-    color: var(--menu-text-muted);
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.eye-toggle-btn:hover {
+    background: var(--menu-accent-hover);
+    color: white !important;
+    border-color: var(--menu-accent-hover);
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.eye-toggle-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.eye-toggle-btn i {
+    font-size: 14px;
+    transition: all var(--transition);
+}
+
+/* Estado quando menu está oculto */
+.eye-toggle-btn.menu-hidden {
+    background: #6c757d;
+    border-color: #6c757d;
+}
+
+.eye-toggle-btn.menu-hidden:hover {
+    background: #545b62;
+    border-color: #545b62;
+}
+
+/* Botão expandir/colapsar */
+.expand-collapse-btn {
+    background: var(--menu-accent);
+    border: 1px solid var(--menu-accent);
+    color: white !important;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all var(--transition);
     font-size: 12px;
+    line-height: 1;
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
 }
 
-.checkbox-manter-menu label:hover {
-    color: var(--menu-text);
+.expand-collapse-btn:hover {
+    background: var(--menu-accent-hover);
+    color: white !important;
+    border-color: var(--menu-accent-hover);
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
 
-.checkbox-manter-menu input[type="checkbox"] {
-    margin-right: 6px;
-    width: 14px;
-    height: 14px;
-    accent-color: var(--menu-accent);
+.expand-collapse-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.expand-collapse-btn i {
+    font-size: 11px;
 }
 
 /* ========================================
-   ESTADOS DOS MENUS
+   ESTADO MENU OCULTO
    ======================================== */
 
-.menu.dropdown {
-    border-bottom: 1px solid var(--menu-border);
-    margin-bottom: 2px;
-    position: relative;
-    width: 100%;
+/* Classe aplicada quando menu está oculto */
+.menu-oculto .nav.navbar-nav {
+    display: none !important;
 }
 
-.menu.dropdown:last-child {
-    border-bottom: none;
+.menu-oculto .favoritos-section {
+    display: none !important;
 }
 
-.menu.dropdown.expanded {
-    background-color: var(--menu-hover);
+/* Manter apenas os controles visíveis quando menu oculto */
+.menu-oculto .menu-controls-reorganized {
+    display: flex !important;
 }
 
-.menu.dropdown.active {
-    background-color: var(--menu-accent);
-}
+/* ========================================
+   PADRONIZAÇÃO DE CORES DOS MENUS
+   ======================================== */
 
-.menu.dropdown.active a {
-    color: white;
-}
-
-.menu.dropdown > a {
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
-    color: var(--menu-text);
-    text-decoration: none;
+/* Correção para links de menu com texto branco */
+.menu.dropdown > a,
+.menu > a,
+.nav > li > a {
+    color: var(--menu-text) !important;
     font-weight: 500;
-    font-size: 14px;
-    transition: all 0.15s ease-in-out;
-    cursor: pointer;
-    position: relative;
+    transition: all var(--transition);
+    background: transparent !important;
 }
 
-.menu.dropdown > a:hover {
-    background-color: var(--menu-hover);
-    color: var(--menu-accent);
+.menu.dropdown > a:hover,
+.menu > a:hover,
+.nav > li > a:hover {
+    color: var(--menu-accent) !important;
+    background-color: var(--menu-hover) !important;
     text-decoration: none;
 }
 
-/* Ícone da categoria */
-.menu.dropdown > a::before {
-    content: '📁';
-    font-size: 14px;
-    margin-right: 8px;
-    opacity: 0.7;
+.menu.dropdown > a:focus,
+.menu > a:focus,
+.nav > li > a:focus {
+    color: var(--menu-accent) !important;
+    background-color: var(--menu-hover) !important;
+    outline: none;
 }
 
-/* Seta de expansão */
-.menu.dropdown > a::after {
-    content: '▼';
-    font-size: 10px;
-    margin-left: auto;
-    transition: transform 0.3s ease;
-    opacity: 0.6;
+/* Submenu items */
+.submenu li a {
+    color: var(--menu-text-muted) !important;
+    padding: 8px 32px;
+    font-size: 13px;
+    transition: all var(--transition);
+    background: transparent !important;
 }
 
-.menu.dropdown.expanded > a::after {
-    transform: rotate(180deg);
+.submenu li a:hover {
+    color: var(--menu-accent) !important;
+    background-color: var(--menu-hover) !important;
+    text-decoration: none;
+    padding-left: 36px;
 }
 
-.menu.dropdown.collapsed > a::after {
-    transform: rotate(-90deg);
+/* Estados ativos */
+.menu.dropdown.active > a,
+.menu.active > a {
+    color: var(--menu-accent) !important;
+    background-color: var(--menu-hover) !important;
 }
 
-/* Lista de subitens */
-.menu.dropdown ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    background: var(--menu-hover);
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    border-top: 1px solid var(--menu-border);
+/* Setas de dropdown */
+.dropdown-arrow {
+    color: var(--menu-text-muted) !important;
+    transition: all var(--transition);
 }
 
-.menu.dropdown.expanded ul {
-    max-height: 1000px;
-    transition: max-height 0.3s ease-in;
+.menu.dropdown:hover .dropdown-arrow {
+    color: var(--menu-accent) !important;
 }
 
 /* ========================================
@@ -602,10 +756,6 @@
     opacity: 1 !important;
 }
 
-.favoritos-section[ng-show] {
-    display: block !important;
-}
-
 /* Fix para o ng-show do Angular */
 .ng-hide {
     display: none !important;
@@ -688,3 +838,112 @@ body {
     margin-top: -20px;
     padding-top: 0;
 }
+
+/* ========================================
+   ALINHAMENTO DOS ÍCONES E SETAS - CORREÇÃO FINAL
+   ======================================== */
+
+/* Ícones padronizados para menus normais */
+.menu.dropdown > a .fa-folder {
+    font-size: 16px;
+    margin-right: 8px;
+    transition: color var(--transition);
+}
+
+.menu.dropdown > a:hover .fa-folder {
+    color: var(--menu-accent) !important;
+}
+
+/* Setas de dropdown - comportamento unificado */
+.menu.dropdown .dropdown-arrow {
+    transition: transform var(--transition), color var(--transition);
+    color: var(--menu-text-muted) !important;
+    font-size: 12px;
+}
+
+.menu.dropdown.expanded .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.menu.dropdown.collapsed .dropdown-arrow {
+    transform: rotate(0deg);
+}
+
+.menu.dropdown:hover .dropdown-arrow {
+    color: var(--menu-accent) !important;
+}
+
+/* Garantir que favoritos e menus normais tenham o mesmo espaçamento */
+.menu.dropdown > a,
+.favoritos-section > a {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    min-height: 48px;
+}
+
+.menu.dropdown > a span,
+.favoritos-section > a span {
+    flex: 1;
+}
+
+/* ========================================
+   CORREÇÃO DE ÍCONES DUPLICADOS - BOOTSTRAP OVERRIDE
+   ======================================== */
+
+/* Resetar e controlar todos os ícones e pseudo-elementos no menu */
+.menuPainel * {
+    position: relative;
+}
+
+/* Remover qualquer pseudo-elemento que possa estar criando ícones duplicados */
+.menuPainel .menu.dropdown > a::before,
+.menuPainel .menu.dropdown > a::after,
+.menuPainel .favoritos-section > a::before,
+.menuPainel .favoritos-section > a::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Controle específico para elementos Font Awesome */
+.menuPainel .menu.dropdown .fa::before {
+    display: inline-block !important;
+}
+
+/* Definir explicitamente o conteúdo dos ícones permitidos */
+.menuPainel .menu.dropdown > a .fa-folder::before {
+    content: "\f07b" !important; /* Ícone de pasta */
+}
+
+.menuPainel .menu.dropdown > a .fa-chevron-down::before {
+    content: "\f078" !important; /* Seta para baixo */
+}
+
+.menuPainel .favoritos-section > a .fa-star::before {
+    content: "\f005" !important; /* Estrela */
+}
+
+.menuPainel .favoritos-section > a .fa-chevron-down::before {
+    content: "\f078" !important; /* Seta para baixo */
+}
+
+/* Ocultar qualquer ícone não autorizado */
+.menuPainel .menu.dropdown .fa:not(.fa-folder):not(.fa-chevron-down):not(.fa-star):not(.fa-plus):not(.fa-eye):not(.fa-eye-slash):not(.fa-expand):not(.fa-compress)::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* Evitar interferência específica do Bootstrap */
+.menuPainel .sidebar .fa.arrow::before,
+.menuPainel .dropdown-toggle::after,
+.menuPainel .dropup .dropdown-toggle::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Garantir que não há elementos duplicados visualmente */
+.menuPainel .menu > a > *:not(.fa-folder):not(.fa-chevron-down):not(span):not(.fa-star) {
+    display: none !important;
+}
+
+/* ======================================== */

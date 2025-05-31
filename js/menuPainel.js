@@ -462,27 +462,48 @@ window.addEventListener('resize', function() {
 
 // Função para gerenciar a preferência de manter menu oculto
 function toggleManterMenu() {
-    var checkbox = document.getElementById('manterMenuOculto');
-    var manterOculto = checkbox.checked;
+    // Obter estado atual do menu (se está oculto ou não)
+    var menuHidden = localStorage.getItem('manterMenuOculto') === 'true';
     
-    // Salvar preferência no localStorage
-    localStorage.setItem('manterMenuOculto', manterOculto);
+    // Alternar estado
+    menuHidden = !menuHidden;
     
-    console.log('Preferência "manter menu oculto":', manterOculto);
+    // Salvar nova preferência no localStorage
+    localStorage.setItem('manterMenuOculto', menuHidden);
     
-    // Se acabou de marcar (ocultar) e o menu está aberto em desktop, fechar
-    if (manterOculto && $(document).width() > 1000) {
-        var botao = document.getElementById('botaoMenu');
-        if (botao && botao.innerHTML == 'Ocultar Menu') {
-            closeNav();
+    // Atualizar ícone do olho
+    var eyeIcon = document.getElementById('eyeIcon');
+    var eyeBtn = document.querySelector('.eye-toggle-btn');
+    
+    if (menuHidden) {
+        // Menu oculto - mostrar olho fechado
+        eyeIcon.className = 'fa fa-eye-slash';
+        eyeBtn.classList.add('menu-hidden');
+        eyeBtn.title = 'Mostrar menu';
+        
+        console.log('Preferência "manter menu oculto": true');
+        
+        // Se está em desktop e menu está aberto, fechar
+        if ($(document).width() > 1000) {
+            var botao = document.getElementById('botaoMenu');
+            if (botao && botao.innerHTML == 'Ocultar Menu') {
+                closeNav();
+            }
         }
-    }
-    
-    // Se acabou de desmarcar (manter visível) e estivermos em desktop, abrir o menu
-    if (!manterOculto && $(document).width() > 1000) {
-        var botao = document.getElementById('botaoMenu');
-        if (botao && botao.innerHTML == 'Mostrar Menu') {
-            openNav();
+    } else {
+        // Menu visível - mostrar olho aberto
+        eyeIcon.className = 'fa fa-eye';
+        eyeBtn.classList.remove('menu-hidden');
+        eyeBtn.title = 'Ocultar menu';
+        
+        console.log('Preferência "manter menu oculto": false');
+        
+        // Se está em desktop e menu está fechado, abrir
+        if ($(document).width() > 1000) {
+            var botao = document.getElementById('botaoMenu');
+            if (botao && botao.innerHTML == 'Mostrar Menu') {
+                openNav();
+            }
         }
     }
 }
@@ -490,10 +511,23 @@ function toggleManterMenu() {
 // Função para carregar a preferência salva
 function carregarPreferenciaMenu() {
     var manterOculto = localStorage.getItem('manterMenuOculto') === 'true';
-    var checkbox = document.getElementById('manterMenuOculto');
     
-    if (checkbox) {
-        checkbox.checked = manterOculto;
+    // Atualizar ícone do olho baseado na preferência salva
+    var eyeIcon = document.getElementById('eyeIcon');
+    var eyeBtn = document.querySelector('.eye-toggle-btn');
+    
+    if (eyeIcon && eyeBtn) {
+        if (manterOculto) {
+            // Menu oculto - mostrar olho fechado
+            eyeIcon.className = 'fa fa-eye-slash';
+            eyeBtn.classList.add('menu-hidden');
+            eyeBtn.title = 'Mostrar menu';
+        } else {
+            // Menu visível - mostrar olho aberto
+            eyeIcon.className = 'fa fa-eye';
+            eyeBtn.classList.remove('menu-hidden');
+            eyeBtn.title = 'Ocultar menu';
+        }
     }
     
     console.log('🔧 Carregando preferência do menu:', manterOculto ? 'manter oculto' : 'manter visível');

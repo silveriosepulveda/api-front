@@ -38,6 +38,7 @@
         vm.favoritos = [];
         vm.favoritosExpanded = true;
         vm.searchText = '';
+        vm.allMenusExpanded = false; // Estado de expansão global
 
         // ========== MÉTODOS PÚBLICOS ==========
         vm.carregarMenuPainel = carregarMenuPainel;
@@ -54,6 +55,9 @@
         vm.toggleFavoritosExpansion = toggleFavoritosExpansion;
         vm.carregarEstadoFavoritos = carregarEstadoFavoritos;
 
+        // Método para expandir/colapsar todos os menus
+        vm.toggleAllMenus = toggleAllMenus;
+
         // ========== INICIALIZAÇÃO ==========
         init();
 
@@ -61,6 +65,7 @@
             carregarMenuPainel();
             carregarFavoritos();
             carregarEstadoFavoritos();
+            carregarEstadoGlobalMenus();
             setupEventListeners();
         }
 
@@ -80,6 +85,9 @@
                     menu.expanded = savedState ? JSON.parse(savedState) : false;
                     menu.active = false;
                 });
+                
+                // Atualizar estado global após carregar os menus
+                updateAllMenusState();
             }
         }
 
@@ -104,6 +112,60 @@
             localStorage.setItem('menu_expanded_' + menuKey, JSON.stringify(menu.expanded));
             
             console.log('Menu', menu.menu, menu.expanded ? 'expandido' : 'recolhido');
+            
+            // Atualizar estado global
+            updateAllMenusState();
+        }
+
+        /**
+         * Expande ou colapsa todos os menus
+         */
+        function toggleAllMenus() {
+            vm.allMenusExpanded = !vm.allMenusExpanded;
+            
+            angular.forEach(vm.menuPainel, function(menu, key) {
+                if (menu.exibir) {
+                    menu.expanded = vm.allMenusExpanded;
+                    menu.active = vm.allMenusExpanded;
+                    localStorage.setItem('menu_expanded_' + key, JSON.stringify(menu.expanded));
+                }
+            });
+            
+            // Salvar estado global
+            localStorage.setItem('all_menus_expanded', JSON.stringify(vm.allMenusExpanded));
+            
+            console.log('Todos os menus', vm.allMenusExpanded ? 'expandidos' : 'recolhidos');
+        }
+
+        /**
+         * Atualiza o estado global baseado nos menus individuais
+         */
+        function updateAllMenusState() {
+            var expandedCount = 0;
+            var totalCount = 0;
+            
+            angular.forEach(vm.menuPainel, function(menu) {
+                if (menu.exibir) {
+                    totalCount++;
+                    if (menu.expanded) {
+                        expandedCount++;
+                    }
+                }
+            });
+            
+            vm.allMenusExpanded = (expandedCount === totalCount && totalCount > 0);
+        }
+
+        /**
+         * Carrega estado global dos menus
+         */
+        function carregarEstadoGlobalMenus() {
+            var estadoSalvo = localStorage.getItem('all_menus_expanded');
+            if (estadoSalvo !== null) {
+                vm.allMenusExpanded = JSON.parse(estadoSalvo);
+            } else {
+                updateAllMenusState();
+            }
         }
 
         /**
@@ -220,10 +282,8 @@
             
             salvarFavoritos();
             
-            // Aplicar mudanças de forma segura
-            if (!$scope.$$phase) {
-                $scope.$apply();
-            }
+            // Não é necessário fazer $apply aqui pois já estamos dentro de um evento Angular
+            // O ciclo de digest será executado automaticamente
         }
 
         /**
