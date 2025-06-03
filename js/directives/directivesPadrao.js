@@ -176,7 +176,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                 }
 
                 if (!scope.popUp) {
-                    html += `<button class="col-xs-12 col-md-4 btn btn-primary" ng-class="{'top10': !dispositivoMovel}" ng-if="tela == 'cadastro'" ng-click="mudaTela('consulta')">Ir Para Consulta</button>`;
+                    html += `<button id="botaoIrConsulta" class="col-xs-12 col-md-4 btn btn-primary" ng-class="{'top10': !dispositivoMovel}" ng-if="tela == 'cadastro'" ng-click="mudaTela('consulta')">Ir Para Consulta</button>`;
                 }
 
                 html += `

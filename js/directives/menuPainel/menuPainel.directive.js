@@ -28,9 +28,9 @@
         };
     }
 
-    MenuPainelController.$inject = ['$scope', '$rootScope', 'APIServ', '$location'];
+    MenuPainelController.$inject = ['$scope', '$rootScope', 'APIServ', '$location', 'PopUpModal'];
 
-    function MenuPainelController($scope, $rootScope, APIServ, $location) {
+    function MenuPainelController($scope, $rootScope, APIServ, $location, PopUpModal) {
         var vm = this;
 
         // ========== PROPRIEDADES ==========
@@ -189,8 +189,53 @@
          * Abre popup do menu
          */
         function abrirPopUpMenu(item) {
-            console.log('Abrindo popup para:', item);
-            // Implementar lógica de popup conforme necessário
+            console.log('🔧 [MenuPainel] Abrindo popup para:', item);
+            
+            // Construir rota baseada no item do menu
+            var rota = '';
+            if (item.pagina && item.acao) {
+                rota = '/' + item.pagina + '/' + item.acao;
+                
+                // Item 6.1: Adicionar subação 'cadastro' por padrão quando através do menuPainel a.addSubMenu
+                // Exemplo: /sistema-servicos/servicos -> /sistema-servicos/servicos/cadastro
+                rota += '/cadastro';
+            } else {
+                console.error('❌ [MenuPainel] Item do menu não possui pagina/acao:', item);
+                return;
+            }
+            
+            var titulo = 'Cadastro de ' + (item.item || 'Item');
+            
+            console.log('🚀 [MenuPainel] Abrindo modal com:');
+            console.log('   - Rota:', rota);
+            console.log('   - Título:', titulo);
+            console.log('   - Item original:', item);
+            
+            // Usar o serviço PopUpModal diretamente
+            PopUpModal.abrir({
+                rota: rota,
+                titulo: titulo,
+                parametros: {
+                    // Adicionar parâmetros específicos do menuPainel se necessário
+                    fromMenu: true,
+                    menuItem: item.item,
+                    pagina: item.pagina,
+                    acao: item.acao
+                }
+            }).then(function(dados) {
+                console.log('✅ [MenuPainel] Modal fechado com dados:', dados);
+                // Fechar menu após sucesso se necessário
+                vm.closeMenuOnNavigation();
+                
+                // Aqui poderia implementar lógica adicional como:
+                // - Atualizar listas
+                // - Mostrar notificação de sucesso
+                // - Recarregar dados se necessário
+                
+            }).catch(function(erro) {
+                console.log('ℹ️ [MenuPainel] Modal fechado sem dados:', erro);
+                // Modal foi cancelado ou fechado sem dados
+            });
         }
 
         /**

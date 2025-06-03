@@ -1,10 +1,73 @@
-app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadrao', 'operadoresConsulta', '$http', 'APIServ', '$filter', 'APIAjuFor', 'EGFuncoes',
-        function ($compile, $base64, $parse, filtroPadrao, operadoresConsulta, $http, APIServ, $filter, APIAjuFor, EGFuncoes) {
+app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadrao', 'operadoresConsulta', '$http', 'APIServ', '$filter', 'APIAjuFor', 'EGFuncoes', 'PopUpModal',
+        function ($compile, $base64, $parse, filtroPadrao, operadoresConsulta, $http, APIServ, $filter, APIAjuFor, EGFuncoes, PopUpModal) {
             ////////////////////////////////////////////////////////////////////////////////////////
             ////////////////FUNCOES DE MONTAGEM DE HTML/////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////
 
-            var controller = function ($rootScope, $scope, $element, $attrs, EGFuncoes, APIAjuFor) {
+            var controller = function ($rootScope, $scope, $element, $attrs, EGFuncoes, APIAjuFor, PopUpModal) {
+                // Detectar contexto modal através do atributo local-exibicao
+                $scope.localExibicao = $attrs.localExibicao || 'normal';
+                $scope.isModal = $scope.localExibicao === 'modal';
+                
+                // Se estiver em contexto modal, aplicar CSS para ocultar elementos
+                if ($scope.isModal) {
+                    console.log('🎭 [estruturaGerencia] Contexto MODAL detectado - aplicando ocultação');
+                    
+                    // Aplicar CSS para ocultar elementos no contexto modal
+                    var css = `
+                        .estrutura-modal .cabecalhoSistema,
+                        .estrutura-modal #cabecalhoSistema,
+                        .estrutura-modal .menu-painel,
+                        .estrutura-modal #menuPainel,
+                        .estrutura-modal nav.sidebar,
+                        .estrutura-modal .navbar,
+                        .estrutura-modal #botaoIrConsulta,
+                        .estrutura-modal .header {
+                            display: none !important;
+                        }
+                        
+                        .estrutura-modal .btn[ng-click*="fechar"],
+                        .estrutura-modal .btn[data-dismiss*="modal"],
+                        .estrutura-modal button[ng-click*="salvar"]:not([ng-click*="salvarPersonalizado"]) {
+                            display: none !important;
+                        }
+                        
+                        .estrutura-modal {
+                            width: 100% !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                    `;
+                    
+                    // Injetar CSS se não existir
+                    if (!document.getElementById('estrutura-modal-styles')) {
+                        var style = document.createElement('style');
+                        style.id = 'estrutura-modal-styles';
+                        style.textContent = css;
+                        document.head.appendChild(style);
+                        console.log('🎨 [estruturaGerencia] CSS modal injetado no documento');
+                    }
+                    
+                    // Aplicar classe modal ao elemento da estrutura
+                    if ($element[0]) {
+                        $element[0].classList.add('estrutura-modal');
+                        console.log('🏗️ [estruturaGerencia] Classe "estrutura-modal" aplicada ao elemento');
+                    }
+                    
+                    // Aplicar classe modal ao body para controle global
+                    document.body.classList.add('estrutura-modal-ativa');
+                    console.log('🌐 [estruturaGerencia] Classe "estrutura-modal-ativa" aplicada ao body');
+                    
+                    // Configurar limpeza quando o escopo for destruído
+                    $scope.$on('$destroy', function() {
+                        document.body.classList.remove('estrutura-modal-ativa');
+                        if ($element[0]) {
+                            $element[0].classList.remove('estrutura-modal');
+                        }
+                        console.log('🧹 [estruturaGerencia] Limpeza modal: classes removidas');
+                    });
+                }
+
                 $scope.popUp = document.getElementById('popUp') != undefined && document.getElementById('popUp').value;
 
                 $scope.larguraTela = window.screen.availWidth
@@ -43,9 +106,18 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     $scope.pagina = pagina;
                     let acao = parametrosUrl[1] != undefined ? parametrosUrl[1] : parametrosLocal['acao'];
                     $scope.acao = acao;
-                    let subacao = parametrosUrl[2] != undefined ?
-                        parametrosUrl[2] : parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined ?
-                            parametrosLocal['subAcao'] : '';
+
+                    // let subacao = parametrosUrl[2] != undefined ?
+                    //     parametrosUrl[2] : parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined ?
+                    //         parametrosLocal['subAcao'] : '';
+
+                    let subacao = '';
+                    if(parametrosUrl[2] != undefined)
+                        subacao = parametrosUrl[2];
+                    else if( parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined)
+                        subacao = parametrosLocal['subAcao'];
+                    else if($attrs.subacao != undefined) 
+                        subacao = $attrs.subacao;
 
                     let nomeFiltroLocal = 'filtro' + acao;
                     let nomeFiltroTemp = 'filtroTemp_' + acao;
@@ -176,98 +248,91 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                         let p = angular.fromJson(APIServ.descriptografa(parametros));
 
-                        let largura = p.largura != undefined ? p.largura : 800;
-                        let altura = p.altura != undefined ? p.altura : 800;
+                        console.log('🔄 [estruturaGerencia] abrirPopUp: Migrando para novo sistema PopUpModal');
+                        console.log('   - Parâmetros originais:', p);
 
-                        if (tipoEnvio == 'get') {
-                            window.open('./popup.php?' + p['pagina'] + '/' + p['acao'] + '/' + p['subAcao'], "_blank", "width=" + largura + ",height=" + altura);
-                        } else if (tipoEnvio == 'post') {
-                            let temBloco = $(event.target).closest('monta-html').attr('nome-bloco');
-
-                            let tabelaRel = p.tabelaRelacionada;
-                            let dadosTabRel;
-                            //ModeloValor pode ser tanto relacionada como subrelacionada, pois esta vinculado ao botao clicado
-                            let modeloValor;
-                            let modeloRel;
-
-                            if (tabelaRel) {
-                                p.tabelasRelacionadas = {};
-                                dadosTabRel = Object.assign({}, $scope.estrutura.tabelasRelacionadas[tabelaRel]);
-
-                                let objClicado = $(event.target);
-
-                                //Buscando no elemento input independente de ser relacionada ou subrelacinada
-                                modeloValor = objClicado.closest('div.form-group').find('input:text').attr('ng-model');
-                                //Trocando $index e $parent.$index pele indice contido no button
-                                modeloValor = modeloValor.replace('[$index]', `[${objClicado.attr('indice')}]`).replace('[$parent.$index]', `[${objClicado.attr('indice-superior')}]`);
-
-                                p.tabelasRelacionadas[tabelaRel] = $scope.estrutura.tabelasRelacionadas[tabelaRel];
+                        // Construir a rota baseada nos parâmetros originais
+                        let rota = '';
+                        if (p.pagina && p.acao) {
+                            rota = '/' + p.pagina + '/' + p.acao;
+                            if (p.subAcao) {
+                                rota += '/' + p.subAcao;
                             }
+                        } else {
+                            // Fallback para estrutura padrão
+                            rota = '/estrutura';
+                        }
+
+                        // Preparar parâmetros para o novo modal
+                        let parametrosModal = {
+                            rota: rota,
+                            titulo: p.titulo || 'Modal',
+                            parametros: {
+                                // Preservar parâmetros originais
+                                parametrosEnviados: p.parametrosEnviados,
+                                tabelasRelacionadas: p.tabelasRelacionadas,
+                                parametrosEnviar: p.parametrosEnviar
+                            }
+                        };
+
+                        // Processar tabelas relacionadas se existirem
+                        let tabelaRel = p.tabelaRelacionada;
+                        if (tabelaRel) {
+                            let dadosTabRel = Object.assign({}, $scope.estrutura.tabelasRelacionadas[tabelaRel]);
+                            let objClicado = $(event.target);
+                            
+                            // Buscar modelo de valor
+                            let modeloValor = objClicado.closest('div.form-group').find('input:text').attr('ng-model');
+                            if (modeloValor) {
+                                modeloValor = modeloValor.replace('[$index]', `[${objClicado.attr('indice')}]`)
+                                                       .replace('[$parent.$index]', `[${objClicado.attr('indice-superior')}]`);
+                            }
+
+                            parametrosModal.parametros.tabelasRelacionadas = {};
+                            parametrosModal.parametros.tabelasRelacionadas[tabelaRel] = $scope.estrutura.tabelasRelacionadas[tabelaRel];
 
                             let tabelaSubRel = p.tabelaSubRelacionada;
-
-
                             if (tabelaRel && !tabelaSubRel) {
-                                //Pegando o modelo do elemento relacionado
-                                if (dadosTabRel.campo_valor != undefined) {
-                                    modeloRel = modeloValor.replace(dadosTabRel.campo_valor, dadosTabRel.campo_relacionamento);
-                                    p.tabelasRelacionadas[tabelaRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloRel);
+                                // Processar tabela relacionada
+                                if (dadosTabRel.campo_valor != undefined && modeloValor) {
+                                    let modeloRel = modeloValor.replace(dadosTabRel.campo_valor, dadosTabRel.campo_relacionamento);
+                                    parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloRel);
                                 }
-
-                                //delete p.tabelasRelacionadas[tabelaRel]['tabelasSubRelacionadas'];
-
                             } else if (tabelaRel && tabelaSubRel) {
+                                // Processar tabela sub-relacionada
                                 let dadosTabSubRel = dadosTabRel['tabelasSubRelacionadas'][tabelaSubRel];
-                                //Pegando o modelo do elemento relacionado
-                                modeloRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabRel.campo_relacionamento);
+                                if (modeloValor) {
+                                    let modeloRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
+                                    let modeloSubRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
 
-                                let modeloSubRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
-
-                                p.tabelasRelacionadas[tabelaRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloRel);
-                                p.tabelasRelacionadas[tabelaRel]['tabelasSubRelacionadas'][tabelaSubRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloSubRel);
-                            }
-
-                            //console.log(p.parametrosEnviar);
-                            if (p.parametrosEnviar != undefined) {
-                                p.parametrosEnviados = {};
-                                for (let i in p.parametrosEnviar) {
-                                    let dadosPE = p.parametrosEnviar[i];
-                                    p.parametrosEnviados[i] = {
-                                        texto: dadosPE['texto'],
-                                        valor: eval('$scope.' + dadosPE['valor'])
-                                    }
+                                    parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloRel);
+                                    parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['tabelasSubRelacionadas'][tabelaSubRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloSubRel);
                                 }
                             }
-
-                            //console.log(p.parametrosEnviados);
-
-                            let idPopUp = 'popUp_' + parseInt(Math.random() * 100);
-                            p['idPopUp'] = idPopUp;
-                            parametros = APIServ.criptografa(angular.toJson(p));
-
-                            var mapForm = document.createElement("form");
-                            mapForm.target = idPopUp;
-                            mapForm.method = "POST"; // or "post" if appropriate
-                            mapForm.action = "popup.php";
-
-                            var mapInput = document.createElement("input");
-                            mapInput.type = "hidden";
-                            mapInput.name = "parametros";
-                            mapInput.value = parametros;
-                            APIServ.salvaDadosLocais('parametrosUrl', p);
-                            mapForm.appendChild(mapInput);
-
-                            document.body.appendChild(mapForm);
-                            map = window.open("", idPopUp, "status=0,title=0,height=" + altura + ",width=" + largura + ",scrollbars=1");
-
-                            if (map) {
-                                mapForm.submit();
-                            } else {
-                                alert('You must allow popups for this map to work.');
-                            }
-                            //*/
                         }
-                        //*/
+
+                        // Processar parâmetros para enviar
+                        if (p.parametrosEnviar != undefined) {
+                            parametrosModal.parametros.parametrosEnviados = {};
+                            for (let i in p.parametrosEnviar) {
+                                let dadosPE = p.parametrosEnviar[i];
+                                parametrosModal.parametros.parametrosEnviados[i] = {
+                                    texto: dadosPE['texto'],
+                                    valor: eval('$scope.' + dadosPE['valor'])
+                                }
+                            }
+                        }
+
+                        console.log('✨ [estruturaGerencia] Abrindo novo modal com:', parametrosModal);
+
+                        // Abrir modal usando o novo sistema
+                        return PopUpModal.abrir(parametrosModal).then(function(dados) {
+                            console.log('✅ [estruturaGerencia] Modal fechado com dados:', dados);
+                            return dados;
+                        }).catch(function(erro) {
+                            console.log('ℹ️ [estruturaGerencia] Modal fechado sem dados:', erro);
+                            return null;
+                        });
                     }
                     $scope.abrirVisualizacao = (arquivo, largura, altura) => {
                         var retorno = [];
@@ -1263,18 +1328,47 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 let classe = $attrs.classe;
                 let funcaoEstrutura = $attrs.funcaoEstrutura;
 
-                if (url != undefined && $scope.estrutura == undefined) {
-                    $http.get(url).success(function (retorno) {
-                        montarEstrutura(retorno);
-                    })
-                } else if ($scope.estrutura != undefined) {
-                    montarEstrutura($scope.estrutura);
-                } else if ($element.attr('variavelEstrutura') != undefined) {
-                    $scope.estrutura = $scope[$element.attr('variavelEstrutura')];
-                    montarEstrutura($scope.estrutura);
-                } else if (classe != undefined) {
+                // Função para processar a classe, aguardando interpolação se necessário
+                function processarClasse() {
+                    // Se a classe contém interpolação ({{...}}), aguardar a resolução
+                    if (classe && classe.includes('{{') && classe.includes('}}')) {
+                        console.log('🔄 [estruturaGerencia] Aguardando interpolação da classe:', classe);
+                        
+                        // Aguardar um ciclo do digest para que a interpolação seja resolvida
+                        setTimeout(function() {
+                            let classeInterpolada = $element.attr('classe');
+                            console.log('✅ [estruturaGerencia] Classe interpolada:', classeInterpolada);
+                            
+                            if (classeInterpolada && classeInterpolada !== classe && !classeInterpolada.includes('{{')) {
+                                // A interpolação foi resolvida
+                                processarComClasse(classeInterpolada);
+                            } else {
+                                // Tentar extrair o nome da variável da interpolação
+                                let nomeVariavel = classe.match(/\{\{(.+?)\}\}/);
+                                if (nomeVariavel && nomeVariavel[1]) {
+                                    let valorVariavel = $scope[nomeVariavel[1].trim()];
+                                    console.log('🎯 [estruturaGerencia] Valor da variável', nomeVariavel[1], ':', valorVariavel);
+                                    if (valorVariavel) {
+                                        processarComClasse(valorVariavel);
+                                    } else {
+                                        console.warn('⚠️ [estruturaGerencia] Variável não encontrada, aguardando...');
+                                        setTimeout(processarClasse, 100); // Tentar novamente
+                                    }
+                                }
+                            }
+                        }, 50);
+                    } else {
+                        // Classe normal, processar diretamente
+                        processarComClasse(classe);
+                    }
+                }
+
+                // Função para processar com a classe resolvida
+                function processarComClasse(classeResolvida) {
+                    console.log('🔧 [estruturaGerencia] Processando com classe:', classeResolvida);
+                    
                     let parametrosBuscaEstrutura = {
-                        classe: classe,
+                        classe: classeResolvida,
                         parametrosEnviados: $('#parametrosEnviados').val()
                     };
 
@@ -1285,7 +1379,6 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                     let paramEnviarBuscaEstrutura = parametrosBuscaEstrutura;
 
-                    //console.log(paramEnviarBuscaEstrutura);
                     if ($scope.tipoConsulta == 'post') {
                         let fdEnviarBuscaEstrutura = new FormData();
                         fdEnviarBuscaEstrutura.append('parametros', JSON.stringify(parametrosBuscaEstrutura));
@@ -1293,15 +1386,28 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     }
 
                     APIServ.executaFuncaoClasse('classeGeral', 'buscarEstrutura', paramEnviarBuscaEstrutura, $scope.tipoConsulta).success(retorno => {
-                        //console.log(retorno);
+                        console.log('📋 [estruturaGerencia] Estrutura carregada para classe:', classeResolvida);
                         montarEstrutura(retorno);
                     })
+                }
+
+                if (url != undefined && $scope.estrutura == undefined) {
+                    $http.get(url).success(function (retorno) {
+                        montarEstrutura(retorno);
+                    })
+                } else if ($scope.estrutura != undefined) {
+                    montarEstrutura($scope.estrutura);
+                } else if ($element.attr('variavelEstrutura') != undefined) {
+                    $scope.estrutura = $scope[$element.attr('variavelEstrutura')];
+                    montarEstrutura($scope.estrutura);
+                } else if (classe != undefined) {
+                    processarClasse();
                 }
             }
 
             return {
                 restrict: 'E',
-                controller: controller
+                controller: ['$rootScope', '$scope', '$element', '$attrs', 'EGFuncoes', 'APIAjuFor', 'PopUpModal', controller]
             }
         }
     ])
