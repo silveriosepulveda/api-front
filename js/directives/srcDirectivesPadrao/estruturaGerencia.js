@@ -1114,8 +1114,33 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                                     }, 100);
                                                 }
 
+                                                // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
                                                 if (($scope.estrutura.recarregarAposSalvar != undefined && $scope.estrutura.recarregarAposSalvar) || cadastroDiretoUrl) {
-                                                    window.location.reload();
+                                                    // Se estiver em modal, não recarregar a página - apenas fechar o modal
+                                                    if ($scope.isModal || ($scope.localExibicao && $scope.localExibicao === 'modal')) {
+                                                        console.log('🎭 [estruturaGerencia] Contexto modal detectado - evitando window.location.reload()');
+                                                        
+                                                        // Fechar o modal se estiver em contexto modal
+                                                        if (window.bootstrap && window.bootstrap.Modal) {
+                                                            // Bootstrap 5
+                                                            var modals = document.querySelectorAll('.modal.show');
+                                                            modals.forEach(function(modal) {
+                                                                var modalInstance = window.bootstrap.Modal.getInstance(modal);
+                                                                if (modalInstance) modalInstance.hide();
+                                                            });
+                                                        } else if (window.$ && window.$.fn.modal) {
+                                                            // Bootstrap 4/jQuery
+                                                            $('.modal.show, .popup-modal.show, .popup-modal.in').modal('hide');
+                                                        }
+                                                        
+                                                        // Resetar modelo se necessário
+                                                        if ($scope.estrutura.raizModelo) {
+                                                            $scope[$scope.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo($scope.estrutura);
+                                                        }
+                                                    } else {
+                                                        // Comportamento normal fora do modal
+                                                        window.location.reload();
+                                                    }
                                                 } else {
                                                     $scope[$scope.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo($scope.estrutura);
                                                 }
@@ -1133,7 +1158,31 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                                 $scope.aoSalvar(retorno);
                                             } else if ($scope.estrutura.tipoEstrutura == 'cadastroUnico') {
                                                 let funcaoCadUnico = () => {
-                                                    window.location.reload();
+                                                    // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
+                                                    if ($scope.isModal || ($scope.localExibicao && $scope.localExibicao === 'modal')) {
+                                                        console.log('🎭 [estruturaGerencia] CadastroUnico - contexto modal detectado - evitando window.location.reload()');
+                                                        
+                                                        // Fechar o modal se estiver em contexto modal
+                                                        if (window.bootstrap && window.bootstrap.Modal) {
+                                                            // Bootstrap 5
+                                                            var modals = document.querySelectorAll('.modal.show');
+                                                            modals.forEach(function(modal) {
+                                                                var modalInstance = window.bootstrap.Modal.getInstance(modal);
+                                                                if (modalInstance) modalInstance.hide();
+                                                            });
+                                                        } else if (window.$ && window.$.fn.modal) {
+                                                            // Bootstrap 4/jQuery
+                                                            $('.modal.show, .popup-modal.show, .popup-modal.in').modal('hide');
+                                                        }
+                                                        
+                                                        // Resetar modelo se necessário
+                                                        if ($scope.estrutura.raizModelo) {
+                                                            $scope[$scope.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo($scope.estrutura);
+                                                        }
+                                                    } else {
+                                                        // Comportamento normal fora do modal
+                                                        window.location.reload();
+                                                    }
                                                 }
 
                                                 APIServ.mensagemSimples('Confirmação', textoSalvou, funcaoCadUnico);
@@ -1141,7 +1190,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                                 if ($scope.estrutura.usarChaveTextoConfirmaSalvamento != undefined && $scope.estrutura.usarChaveTextoConfirmaSalvamento) {
                                                     textoSalvou += ' Com código: ' + retorno.chave;
                                                 }
-                                                APIServ.mensagemSimples('Confirmação', textoSalvou, funcao);
+                                                APIServ.mensagemSimples('Confirmação', textoSalvou, funcao, true);
                                             } else {
                                                 funcao();
                                             }

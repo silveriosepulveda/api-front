@@ -1328,99 +1328,177 @@ body {
 /* PopUpModal uses Bootstrap modal default z-index: 1050 */
 /* Message dialogs need to be above PopUpModal when called from within modals */
 
-/* SOLUÇÃO DEFINITIVA E AGRESSIVA PARA Z-INDEX */
+/* SOLUÇÃO DEFINITIVA E AGRESSIVA PARA Z-INDEX - HIERARQUIA CORRIGIDA */
 
-/* 1. Classes primárias de overlay */
+/* 1. HIERARQUIA DE Z-INDEX - ORDEM CRESCENTE */
+/* Backdrop (mais baixo): 99998 */
+/* Dialog (médio): 100000-100001 */  
+/* Container (alto): 100002-100005 */
+/* Botões (mais alto): 100003-100006 */
+
+/* 2. Classes primárias de overlay - Dialog base */
 .popup-modal-dialog-overlay {
     z-index: 100000 !important;
     position: fixed !important;
 }
 
-.popup-modal-dialog-overlay .md-dialog-container {
-    z-index: 100001 !important;
+/* 3. CONTAINERS - PRIORIDADE MÁXIMA PARA BOTÕES FUNCIONAREM */
+._md-dialog-container,
+.md-dialog-container,
+.popup-modal-dialog-overlay .md-dialog-container,
+.popup-modal-dialog-overlay ._md-dialog-container {
+    z-index: 100002 !important;  /* Container SEMPRE mais alto que dialog */
     position: fixed !important;
 }
 
-/* 2. Força TODOS os md-dialog quando modal backdrop existir */
+/* 4. Dialog elements - base level */
+md-dialog {
+    z-index: 100000 !important;  /* Dialog base - ABAIXO do container */
+    position: fixed !important;
+}
+
+/* 5. Força TODOS os containers quando modal backdrop existir */
+.modal-backdrop ~ * ._md-dialog-container,
+.modal.show ~ * ._md-dialog-container,
+.popup-modal.show ~ * ._md-dialog-container,
+.modal-backdrop ~ * .md-dialog-container,
+.modal.show ~ * .md-dialog-container,
+.popup-modal.show ~ * .md-dialog-container {
+    z-index: 100002 !important;  /* Container SEMPRE mais alto */
+    position: fixed !important;
+}
+
+/* 6. Força TODOS os dialogs quando modal backdrop existir */
 .modal-backdrop ~ * md-dialog,
 .modal.show ~ * md-dialog,
 .popup-modal.show ~ * md-dialog {
-    z-index: 100001 !important;
+    z-index: 100000 !important;  /* Dialog base - ABAIXO do container */
     position: fixed !important;
 }
 
-.modal-backdrop ~ * ._md-dialog-container,
-.modal.show ~ * ._md-dialog-container,
-.popup-modal.show ~ * ._md-dialog-container {
-    z-index: 100000 !important;
+/* 7. Usa :has() para detectar presença de modal backdrop (navegadores modernos) */
+body:has(.modal-backdrop) ._md-dialog-container,
+body:has(.popup-modal.show) ._md-dialog-container,
+body:has(.modal.show) ._md-dialog-container,
+body:has(.modal-backdrop) .md-dialog-container,
+body:has(.popup-modal.show) .md-dialog-container,
+body:has(.modal.show) .md-dialog-container {
+    z-index: 100002 !important;  /* Container SEMPRE mais alto */
     position: fixed !important;
 }
 
-/* 3. Usa :has() para detectar presença de modal backdrop (navegadores modernos) */
 body:has(.modal-backdrop) md-dialog,
 body:has(.popup-modal.show) md-dialog,
 body:has(.modal.show) md-dialog {
-    z-index: 100001 !important;
+    z-index: 100000 !important;  /* Dialog base - ABAIXO do container */
     position: fixed !important;
 }
 
-body:has(.modal-backdrop) ._md-dialog-container,
-body:has(.popup-modal.show) ._md-dialog-container,
-body:has(.modal.show) ._md-dialog-container {
-    z-index: 100000 !important;
-    position: fixed !important;
-}
-
-/* 4. Força direto no body quando backdrop existir */
+/* 8. Força direto no body quando backdrop existir */
 .modal-backdrop + * md-dialog,
 .modal-backdrop ~ * md-dialog {
-    z-index: 100001 !important;
+    z-index: 100000 !important;  /* Dialog base - ABAIXO do container */
     position: fixed !important;
 }
 
-/* 5. Classes específicas para diferentes tipos */
-._md-dialog-container {
-    z-index: 100000 !important;
-    position: fixed !important;
+/* 9. BOTÕES - PRIORIDADE MÁXIMA PARA SEREM CLICÁVEIS */
+._md-dialog-container button,
+.md-dialog-container button,
+._md-dialog-container .md-button,
+.md-dialog-container .md-button,
+._md-dialog-container [ng-click],
+.md-dialog-container [ng-click],
+._md-dialog-container .btn,
+.md-dialog-container .btn {
+    z-index: 100003 !important;  /* Botões SEMPRE no topo para serem clicáveis */
+    position: relative !important;
+    pointer-events: auto !important;
 }
 
-md-dialog {
-    z-index: 100001 !important;
-    position: fixed !important;
-}
-
-/* 6. Loading screen sempre no topo */
+/* 10. Loading screen sempre no topo - MAIS ALTO DE TODOS */
 .popup-modal-loading {
-    z-index: 100002 !important;
+    z-index: 100001 !important;  /* Loading dialog level */
     position: fixed !important;
 }
 
-/* 7. Backdrop configuração */
-.md-dialog-backdrop {
-    z-index: 99999 !important;
+.popup-modal-loading ._md-dialog-container,
+.popup-modal-loading .md-dialog-container {
+    z-index: 100005 !important;  /* Container do loading - MAIS ALTO */
+    position: fixed !important;
 }
 
-/* 8. FORÇAR z-index em TODOS os dialogs quando qualquer modal estiver aberto */
+/* 10.1. Botões de loading com prioridade máxima */
+.popup-modal-loading ._md-dialog-container button,
+.popup-modal-loading .md-dialog-container button,
+.popup-modal-loading ._md-dialog-container .md-button,
+.popup-modal-loading .md-dialog-container .md-button,
+.popup-modal-loading ._md-dialog-container .btn,
+.popup-modal-loading .md-dialog-container .btn {
+    z-index: 100006 !important;  /* Botões de loading - MÁXIMA PRIORIDADE */
+    position: relative !important;
+    pointer-events: auto !important;
+}
+
+/* 11. Backdrop configuração - DEVE FICAR ABAIXO DOS DIALOGS */
+.md-dialog-backdrop,
+.md-backdrop,
+.cdk-overlay-backdrop {
+    z-index: 99998 !important;  /* ABAIXO de todos os dialogs */
+    opacity: 0.5 !important;
+}
+
+/* 11.1. Ocultar backdrops problemáticos quando PopUpModal estiver ativo */
+.modal.show ~ * .md-dialog-backdrop,
+.popup-modal.show ~ * .md-dialog-backdrop,
+.modal-backdrop ~ * .md-dialog-backdrop {
+    display: none !important;
+}
+
+/* 11.2. Em contexto modal, backdrop do Angular Material deve ser transparente */
+body:has(.modal.show) .md-dialog-backdrop,
+body:has(.popup-modal.show) .md-dialog-backdrop,
+body:has(.modal-backdrop) .md-dialog-backdrop {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* 12. FORÇAR z-index em TODOS os dialogs quando qualquer modal estiver aberto */
 .modal.in md-dialog,
 .modal.show md-dialog,
 .popup-modal.in md-dialog,
 .popup-modal.show md-dialog {
-    z-index: 100001 !important;
+    z-index: 100000 !important;  /* Dialog base - ABAIXO do container */
     position: fixed !important;
 }
 
-/* 9. ÚLTIMO RECURSO: Força z-index em qualquer md-dialog se backdrop existir */
+/* 12.1. FORÇAR z-index em TODOS os containers quando qualquer modal estiver aberto */
+.modal.in ._md-dialog-container,
+.modal.show ._md-dialog-container,
+.popup-modal.in ._md-dialog-container,
+.popup-modal.show ._md-dialog-container,
+.modal.in .md-dialog-container,
+.modal.show .md-dialog-container,
+.popup-modal.in .md-dialog-container,
+.popup-modal.show .md-dialog-container {
+    z-index: 100002 !important;  /* Container SEMPRE mais alto */
+    position: fixed !important;
+}
+
+/* 13. ÚLTIMO RECURSO: Força z-index em qualquer md-dialog se backdrop existir */
 body .modal-backdrop ~ div md-dialog,
 body .modal-backdrop ~ span md-dialog,
 body .modal-backdrop ~ * md-dialog {
-    z-index: 100001 !important;
+    z-index: 100000 !important;  /* Dialog base - ABAIXO do container */
     position: fixed !important;
 }
 
-/* 10. Ensure containers também */
+/* 13.1. Ensure containers também com último recurso */
 body .modal-backdrop ~ div ._md-dialog-container,
 body .modal-backdrop ~ span ._md-dialog-container,
-body .modal-backdrop ~ * ._md-dialog-container {
-    z-index: 100000 !important;
+body .modal-backdrop ~ * ._md-dialog-container,
+body .modal-backdrop ~ div .md-dialog-container,
+body .modal-backdrop ~ span .md-dialog-container,
+body .modal-backdrop ~ * .md-dialog-container {
+    z-index: 100002 !important;  /* Container SEMPRE mais alto */
     position: fixed !important;
 }

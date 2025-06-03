@@ -100,49 +100,66 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
                     }
                     return false;
                 })();
-        };        
-        // SOLUÇÃO ROBUSTA E EFICAZ: Força z-index de forma mais direta e agressiva
+        };        // SOLUÇÃO ROBUSTA E EFICAZ: Força z-index de forma mais direta e agressiva
         var _forceDialogAboveModal = function (isLoading) {
-            var zIndex = isLoading ? 100002 : 100001;
-            var containerZIndex = isLoading ? 100001 : 100000;
-
-            // Função para aplicar z-index de forma agressiva
+            // HIERARQUIA CORRIGIDA: Container deve ter z-index MAIS ALTO que o dialog para botões funcionarem
+            var dialogZIndex = isLoading ? 100001 : 100000;      // Dialog base
+            var containerZIndex = isLoading ? 100005 : 100002;   // Container SEMPRE mais alto
+            var buttonZIndex = isLoading ? 100006 : 100003;      // Botões mais altos ainda            // Função para aplicar z-index de forma agressiva
             var applyZIndex = function () {
                 try {
                     // ESTRATÉGIA 1: Força TODOS os md-dialog
                     var dialogs = document.querySelectorAll('md-dialog');
                     for (var i = 0; i < dialogs.length; i++) {
                         var dialog = dialogs[i];
-                        dialog.style.setProperty('z-index', zIndex.toString(), 'important');
+                        dialog.style.setProperty('z-index', dialogZIndex.toString(), 'important');
                         dialog.style.setProperty('position', 'fixed', 'important');
                         dialog.classList.add('popup-modal-dialog-overlay');
                         if (isLoading) dialog.classList.add('popup-modal-loading');
 
-                        // Força também no pai se existir
+                        // CORREÇÃO: Container pai deve ter z-index MAIS ALTO
                         if (dialog.parentElement) {
                             dialog.parentElement.style.setProperty('z-index', containerZIndex.toString(), 'important');
+                            dialog.parentElement.style.setProperty('position', 'fixed', 'important');
                         }
                     }
 
-                    // ESTRATÉGIA 2: Força TODOS os containers
+                    // ESTRATÉGIA 2: Força TODOS os containers - PRIORIDADE MÁXIMA
                     var containers = document.querySelectorAll('._md-dialog-container, .md-dialog-container, [role="dialog"]');
                     for (var i = 0; i < containers.length; i++) {
                         var container = containers[i];
+                        // CORREÇÃO: Container deve ter z-index MAIS ALTO para botões funcionarem
                         container.style.setProperty('z-index', containerZIndex.toString(), 'important');
                         container.style.setProperty('position', 'fixed', 'important');
                         container.classList.add('popup-modal-dialog-overlay');
-                    }
-
-                    // ESTRATÉGIA 3: Força backdrops
-                    var backdrops = document.querySelectorAll('.md-dialog-backdrop, .md-backdrop');
+                        
+                        // Garantir que buttons/actions dentro do container funcionem
+                        var buttons = container.querySelectorAll('button, .md-button, [ng-click], .btn');
+                        for (var j = 0; j < buttons.length; j++) {
+                            buttons[j].style.setProperty('z-index', buttonZIndex.toString(), 'important');
+                            buttons[j].style.setProperty('position', 'relative', 'important');
+                            buttons[j].style.setProperty('pointer-events', 'auto', 'important');
+                        }
+                    }// ESTRATÉGIA 3: Força backdrops ABAIXO dos dialogs
+                    var backdrops = document.querySelectorAll('.md-dialog-backdrop, .md-backdrop, .cdk-overlay-backdrop');
                     for (var i = 0; i < backdrops.length; i++) {
-                        backdrops[i].style.setProperty('z-index', '99999', 'important');
+                        // CORREÇÃO: Backdrop deve ficar ABAIXO dos dialogs, não acima
+                        backdrops[i].style.setProperty('z-index', '99998', 'important');
+                        backdrops[i].style.setProperty('opacity', '0.5', 'important');
+                        backdrops[i].style.setProperty('pointer-events', 'none', 'important');
                     }
 
-                    // ESTRATÉGIA 4: Força todos os elementos do Angular Material Dialog
+                    // ESTRATÉGIA 3.1: Desabilitar backdrops problemáticos em contexto modal
+                    if (_isInsideModal()) {
+                        var problematicBackdrops = document.querySelectorAll('.md-dialog-backdrop');
+                        for (var i = 0; i < problematicBackdrops.length; i++) {
+                            // Ocultar backdrop problemático em contexto modal
+                            problematicBackdrops[i].style.setProperty('display', 'none', 'important');
+                        }
+                    }                    // ESTRATÉGIA 4: Força todos os elementos do Angular Material Dialog
                     var allDialogElements = document.querySelectorAll('[aria-describedby*="dialog"], [aria-labelledby*="dialog"], .md-dialog-container > *');
                     for (var i = 0; i < allDialogElements.length; i++) {
-                        allDialogElements[i].style.setProperty('z-index', zIndex.toString(), 'important');
+                        allDialogElements[i].style.setProperty('z-index', dialogZIndex.toString(), 'important');
                     }
 
                 } catch (error) {
@@ -163,7 +180,9 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
         };        
         // Enhanced message system with proper z-index for modals
         
-        var _mensagemSimples = function (titulo, texto, funcao) {
+        var _mensagemSimples = function (titulo, texto, funcao, fecharModal = false) {
+
+
             var dialogOptions = {
                 title: titulo,
                 textContent: texto,
@@ -194,16 +213,32 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
                         _forceDialogAboveModal(false);
                     }, 50);
                 });
-            }
-
-            showPromise.then(function () {
+            }            showPromise.then(function () {
                 if (funcao != undefined) {
                     funcao();
+                }
+                
+                // Fechar PopUpModal se fecharModal=true
+                if (fecharModal) {
+                    // Detectar e fechar modal ativo
+                    if (window.bootstrap && window.bootstrap.Modal) {
+                        // Bootstrap 5
+                        var modals = document.querySelectorAll('.modal.show, .popup-modal.show');
+                        modals.forEach(function(modal) {
+                            var modalInstance = window.bootstrap.Modal.getInstance(modal);
+                            if (modalInstance) modalInstance.hide();
+                        });
+                    } else if (window.$ && window.$.fn.modal) {
+                        // Bootstrap 4/jQuery
+                        $('.modal.show, .popup-modal.show, .popup-modal.in').modal('hide');
+                    }
                 }
             }, function () {
                 // Dialog cancelled
             });
-        }; var _dialogoSimples = function (titulo, texto, btnConfirmar, btnCancelar, funcaoSim, funcaoNao) {
+        }; 
+        
+        var _dialogoSimples = function (titulo, texto, btnConfirmar, btnCancelar, funcaoSim, funcaoNao) {
             var dialogOptions = {
                 title: titulo,
                 textContent: texto,
@@ -419,195 +454,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
             }
         }
 
-        var _manipulaCarrinho = function (produto, acao, valor) {
-            var verQtdCarrinho = function (carrinho, chave) {
-                let retorno = 0;
-                angular.forEach(carrinho.produtos, function (value, key) {
-                    if (value.chave == chave) {
-                        retorno = value.quantidade;
-                    }
-                })
-                return retorno;
-            }
-
-            //console.log(produto + ' - ' + acao + ' - ' + valor);
-            var carTemp = _buscaDadosLocais('carrinho');
-
-            if (produto != '' && produto != undefined) {
-                var p = produto;
-                var chave_sabor = p.chave_sabor != undefined ? p.chave_sabor : 0;
-                var chave = p.chave;
-
-                var posicao = 0;
-                var itens = 0;
-                var total = 0;
-                var avista = 0;
-            }
-            var carrinhoVazio = {
-                itens: 0,
-                total: 0,
-                avista: 0,
-                formaPagamento: '',
-                enderecoEntrega: 'vazio',
-                produtos: {}
-            };
-
-            if (!carTemp) {
-                var carrinho = carrinhoVazio;
-            } else {
-                var carrinho = carTemp;
-            }
-
-            if (acao == 'formaPagamento') {
-                carrinho.formaPagamento = valor;
-            } else if (acao == 'enderecoEntrega') {
-                carrinho.enderecoEntrega = valor;
-            } else if (acao == 'vazio') {
-                carrinho = carrinhoVazio;
-            } else if (acao == 'adicionar') {
-
-                var configuracoes = _buscaDadosLocais('configuracoes');
-
-                produto.noCarrinho = true;
-                var prodAdd = {
-                    chave: p.chave,
-                    chave_produto: p.chave_produto,
-                    chave_tamanho: p.chave_tamanho,
-                    chave_sabor: chave_sabor,
-                    preco_de: p.preco_de,
-                    preco_por: p.preco_por,
-                    valor_avista: p.valor_avista,
-                    produto: p.produto,
-                    tamanho: p.tamanho,
-                    sabor: p.sabor,
-                    imagem_capa: p.imagem_capa,
-                    quantidade: 1
-                }
-                //Varrendo para pegar a proxima posicao ou a posicao que ja tenha este produto para aumentar a quantidade
-                var situacao = 'insert';
-                angular.forEach(carrinho['produtos'], function (val, key) {
-                    if (val.chave == chave) {
-                        situacao = 'edit';
-                        carrinho['produtos'][key]['quantidade']++;
-                        var totalProduto = APIAjuFor.textoParaFloat(val.preco_por) * carrinho['produtos'][key]['quantidade'];
-                        carrinho['produtos'][key]['totalProduto'] = APIAjuFor.numberFormat(totalProduto, 2, ',', '.');
-
-                        var totalProdutoAvista = APIAjuFor.textoParaFloat(val.valor_avista) * carrinho['produtos'][key]['quantidade'];
-                        carrinho['produtos'][key]['totalProdutoAvista'] = APIAjuFor.numberFormat(totalProdutoAvista, 2, ',', '.');
-
-                        //console.log(carrinho['produtos'][key]['totalProduto']);
-                    }
-                    itens += carrinho['produtos'][key]['quantidade'];
-                    posicao = val.chave == chave ? key : posicao + 1;
-                });
-
-                if (situacao == 'insert') {
-                    itens++;
-                    total += prodAdd.preco_de;
-                    carrinho['produtos'][posicao] = prodAdd;
-                    carrinho['produtos'][posicao]['totalProduto'] = prodAdd.preco_por;
-                    carrinho['produtos'][posicao]['totalProdutoAvista'] = prodAdd.valor_avista;
-                }
-                //Informando no Produto a quantidade que tem no carrinho para mostrar nos detalhes do produto
-                //produto.qtdCarrinho = produto.qtdCarrinho != undefined ? produto.qtdCarrinho + 1 : 1;
-                produto.qtdCarrinho = verQtdCarrinho(carrinho, chave);
-                /**/
-
-                carrinho['itens'] = itens > 0 ? itens : 1;
-
-                carrinho['total'] += APIAjuFor.textoParaFloat(prodAdd.preco_por);
-
-                carrinho['avista'] += APIAjuFor.textoParaFloat(prodAdd.valor_avista);
-            } else if (acao == 'removerUnidade') {
-                angular.forEach(carrinho['produtos'], function (val, key) {
-                    //Excluindo o item
-                    if (p.chave == val.chave) {
-                        if (val.quantidade > 1) {
-                            carrinho['produtos'][key]['quantidade'] = val.quantidade - 1;
-                            var totalProduto = APIAjuFor.textoParaFloat(val.preco_por) * carrinho['produtos'][key]['quantidade'];
-                            carrinho['produtos'][key]['totalProduto'] = APIAjuFor.numberFormat(totalProduto, 2, ',', '.');
-
-                            var totalProdutoAvista = APIAjuFor.textoParaFloat(val.valor_avista) * carrinho['produtos'][key]['quantidade'];
-                            carrinho['produtos'][key]['totalProdutoAvista'] = APIAjuFor.numberFormat(totalProdutoAvista, 2, ',', '.');
-
-                            //console.log(carrinho['produtos'][key]['totalProduto']);
-                            //Informando no Produto a quantidade que tem no carrinho para mostrar nos detalhes do produto
-                            //produto.qtdCarrinho = produto.qtdCarrinho != undefined ? produto.qtdCarrinho - 1 : 0;
-                            produto.qtdCarrinho = verQtdCarrinho(carrinho, chave);
-                        } else if (val.quantidade == 1) {
-                            delete carrinho['produtos'][key];
-                            produto.qtdCarrinho = verQtdCarrinho(carrinho, chave);
-                            produto.noCarrinho = false;
-                        }
-                        carrinho['total'] = carrinho['total'] - APIAjuFor.textoParaFloat(val.preco_por);
-                        carrinho['avista'] = carrinho['avista'] - APIAjuFor.textoParaFloat(val.valor_avista);
-                        carrinho['itens']--;
-                    }
-                });
-            } else if (acao == 'removerItem') {
-                produto.noCarrinho = false;
-                var novaKey = -1;
-                angular.forEach(carrinho['produtos'], function (val, key) {
-                    //Excluindo o item
-                    if (p.chave == val.chave) {
-                        delete carrinho['produtos'][key];
-                        produto.qtdCarrinho = verQtdCarrinho(carrinho, chave);
-                        produto.noCarrinho = false;
-                    } else { //Criando o novo Carrinho
-                        novaKey++;
-                        carrinhoVazio.itens += val.quantidade;
-                        carrinhoVazio.total += APIAjuFor.textoParaFloat(val.preco_por) * val.quantidade;
-                        //let avista =
-                        carrinhoVazio.avista += APIAjuFor.textoParaFloat(val.valor_avista) * val.quantidade;
-                        carrinhoVazio['produtos'][novaKey] = val;
-                    }
-                });
-                carrinho = carrinhoVazio;
-            }
-            _salvaDadosLocais('carrinho', carrinho);
-            return carrinho;
-        }
-
-        var _precoFrete = function (produto, cepDestino, origem) {
-            //_telaAguarde();
-            //console.log(produto);
-            var produtos = [];
-
-            addProduto = function (item) {
-                produtos.push({
-                    chave_tamanho: item.chave_tamanho,
-                    preco_por: item.preco_por,
-                    valor_avista: item.valor_avista,
-                    quantidade: item.quantidade != undefined ? item.quantidade : 1
-                });
-            }
-
-            if (origem == 'produto') {
-                addProduto(produto);
-            } else if (origem == 'carrinho' || origem == 'finalizaVenda') {
-                let retorno = 0;
-                angular.forEach(produto.produtos, function (valor, key) {
-                    addProduto(valor);
-                    //console.log(valor);
-                })
-            }
-
-            var parametros = {
-                'produtos': produtos,
-                'cepdestino': cepDestino,
-                'modalidade': 9,
-            }
-
-            if (origem == 'produto' || origem == 'carrinho') {
-                _executaFuncaoClasse('jadLog', 'precoFrete', parametros).success(function (data) {
-                    $rS.freteAvista = data.freteAvista;
-                    $rS.freteAprazo = data.freteAprazo;
-                })
-            } else if (origem == 'finalizaVenda') {
-                return _executaFuncaoClasse('jadLog', 'precoFrete', parametros);
-            }
-            //}
-        }
+        
 
         _criptografa = function (texto) {
             return $base64.encode(texto);
@@ -650,9 +497,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
             valorExisteEmVariavel: _valorExisteEmVariavel,
             transporVariavel: _transporVariavel, excluriKeyArray: _excluriKeyArray,
             buscarValorVariavel: _buscarValorVariavel,
-            operacoesMatematicas: _operacoesMatematicas,
-            manipulaCarrinho: _manipulaCarrinho,
-            precoFrete: _precoFrete,
+            operacoesMatematicas: _operacoesMatematicas,         
             criptografa: _criptografa,
             descriptografa: _descriptografa,
            // abrirModal: _abrirModal,

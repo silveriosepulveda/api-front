@@ -286,7 +286,26 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                             $rS.carregando = false;
                             if (tela == 'cliente') {
                                 var funcao = function () {
-                                    window.location.reload();
+                                    // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
+                                    if (scope.$parent.isModal || (scope.$parent.localExibicao && scope.$parent.localExibicao === 'modal')) {
+                                        console.log('🎭 [arquivosAnexos] Contexto modal detectado - evitando window.location.reload()');
+                                        
+                                        // Fechar o modal se estiver em contexto modal
+                                        if (window.bootstrap && window.bootstrap.Modal) {
+                                            // Bootstrap 5
+                                            var modals = document.querySelectorAll('.modal.show');
+                                            modals.forEach(function(modal) {
+                                                var modalInstance = window.bootstrap.Modal.getInstance(modal);
+                                                if (modalInstance) modalInstance.hide();
+                                            });
+                                        } else if (window.$ && window.$.fn.modal) {
+                                            // Bootstrap 4/jQuery
+                                            $('.modal.show, .popup-modal.show, .popup-modal.in').modal('hide');
+                                        }
+                                    } else {
+                                        // Comportamento normal fora do modal
+                                        window.location.reload();
+                                    }
                                 }
                                 APIServ.mensagemSimples('Confirmação', 'Documento Enviado com Sucesso', funcao)
                             } else {
