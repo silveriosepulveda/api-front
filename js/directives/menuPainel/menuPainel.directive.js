@@ -424,9 +424,62 @@
                     console.log('Favoritos atualizados:', newVal);
                 }
             }, true);
+
+            // Watch para mudanças na busca - expandir menus automaticamente
+            $scope.$watch(function() { return vm.searchText; }, function(newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    expandirMenusComResultados();
+                }
+            });
         }
 
         // ========== BUSCA NO MENU ==========
+
+        /**
+         * Expande automaticamente os menus que contêm resultados da busca
+         */
+        function expandirMenusComResultados() {
+            if (!vm.searchText || vm.searchText.trim() === '') {
+                // Se não há busca, não alterar estado dos menus
+                return;
+            }
+
+            var searchLower = vm.searchText.toLowerCase();
+            var menusExpandidos = 0;
+
+            angular.forEach(vm.menuPainel, function(menu, key) {
+                if (!menu.exibir) return;
+
+                var temResultados = false;
+
+                // Verificar se o nome do menu contém a busca
+                if (menu.menu.toLowerCase().indexOf(searchLower) !== -1) {
+                    temResultados = true;
+                }
+
+                // Verificar se algum item do menu contém a busca
+                if (!temResultados && menu.itens) {
+                    temResultados = Object.keys(menu.itens).some(function(itemKey) {
+                        var item = menu.itens[itemKey];
+                        return item.item && item.item.toLowerCase().indexOf(searchLower) !== -1;
+                    });
+                }
+
+                // Expandir automaticamente se há resultados
+                if (temResultados && !menu.expanded) {
+                    menu.expanded = true;
+                    menu.active = true;
+                    localStorage.setItem('menu_expanded_' + key, JSON.stringify(true));
+                    menusExpandidos++;
+                    // console.log('🔍 Menu expandido automaticamente:', menu.menu);
+                }
+            });
+
+            if (menusExpandidos > 0) {
+                // console.log('🔍 Pesquisa "' + vm.searchText + '" expandiu ' + menusExpandidos + ' menu(s) automaticamente');
+                updateAllMenusState();
+            }
+        }
 
         /**
          * Filtra itens do menu baseado na busca

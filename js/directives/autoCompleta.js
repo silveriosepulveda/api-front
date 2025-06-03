@@ -98,14 +98,14 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 // Comentário: $apply não é necessário aqui pois já está em contexto Angular
             }
 
-            elem.bind('keyup', debounce(() => {
+            elem.bind('keyup', debounce((event) => {
                 if (!elem.hasClass('valorConsulta')) {
                     let campoChaveControle = scope.estrutura.campoChave != undefined ? scope.estrutura.campoChave : scope.estrutura.campo_chave;
 
-                    let elemAC = $(event.target);
+                    let elemAC = elem; // Usar elem diretamente é mais seguro
                     elemAC.val(elemAC.val().toUpperCase());
 
-                    let indice = $(event.target).attr('indice');
+                    let indice = elem.attr('indice');
                     let temp = elemAC.attr('modelo-chave').split('.');
                     let campoChave = temp[temp.length - 1];
                     let modeloChaveAC = elemAC.attr('modelo-chave').replace('$index', indice);
@@ -116,7 +116,7 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                         tabela: dAC.tabela,
                         //campo: campo,
                         campo: dAC.campoValor,
-                        valor: $(event.target).val()
+                        valor: elem.val()
                     }
                     APIServ.executaFuncaoClasse('classeGeral', 'objetoexistesimples', parametros).then(retorno => {
                         if (retorno.data.existe) {
@@ -140,7 +140,7 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 }
             })
 
-            elem.bind("blur", function () {
+            elem.bind("blur", function (event) {
                 //Se for valor de consulta, não precisa verificar se existe na base
                 if (elem.hasClass('valorConsulta')) {
                     return false;
@@ -148,10 +148,10 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
 
                 let indice = 0;
                 if (temBloco) {
-                    indice = $(event.target).attr('indice');
+                    indice = elem.attr('indice');
                 }
 
-                let elemAC = $(event.target);
+                let elemAC = elem;
 
                 //Se estiver vazio, e tiver o modelo da chave, seto 0
                 let campoChaveControle = scope.estrutura.campoChave != undefined ? scope.estrutura.campoChave : scope.estrutura.campo_chave;

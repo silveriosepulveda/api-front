@@ -17,7 +17,7 @@ app.controller('eventoCtrl', function () {
                     variavelPercorrer = dados.valor_novo;
                     variavelComparar = dados.valor_anterior;
                 }
-                console.log(variavelComparar);
+                //console.log(variavelComparar);
 
                 for (let i in variavelPercorrer) {
                     //console.log(dados.valor_novo[i] + ' -- ' + dados.valor_anterior[i]);

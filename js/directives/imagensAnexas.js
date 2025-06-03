@@ -2,7 +2,7 @@ directivesPadrao.directive('imagensAnexas', ['$compile', '$http', '$rootScope', 
     return {
         restrict: "E",
         replace: true,
-        templateUrl: 'api/js/directives/imagensAnexas.html',
+        templateUrl: 'api/front/js/directives/imagensAnexas.html',
         link: function (scope, element) {
             scope.idChaveAnexos = scope.estrutura.campo_chave;
             scope.chaveTabela = scope.item[scope.estrutura.campo_chave];

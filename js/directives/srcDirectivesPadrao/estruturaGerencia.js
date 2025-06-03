@@ -11,10 +11,11 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 
                 // Se estiver em contexto modal, aplicar CSS para ocultar elementos
                 if ($scope.isModal) {
-                    console.log('🎭 [estruturaGerencia] Contexto MODAL detectado - aplicando ocultação');
+                    //console.log('🎭 [estruturaGerencia] Contexto MODAL detectado - aplicando ocultação');
                     
-                    // Aplicar CSS para ocultar elementos no contexto modal
+                    // CSS completo para contexto modal (unificado - antes havia duplicação com PopUpModal)
                     var css = `
+                        /* Ocultar elementos do sistema principal */
                         .estrutura-modal .cabecalhoSistema,
                         .estrutura-modal #cabecalhoSistema,
                         .estrutura-modal .menu-painel,
@@ -22,20 +23,40 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         .estrutura-modal nav.sidebar,
                         .estrutura-modal .navbar,
                         .estrutura-modal #botaoIrConsulta,
+                        .estrutura-modal .cancelaCadastro,
                         .estrutura-modal .header {
                             display: none !important;
                         }
                         
+                        /* Ocultar botões de controle do formulário */
                         .estrutura-modal .btn[ng-click*="fechar"],
                         .estrutura-modal .btn[data-dismiss*="modal"],
                         .estrutura-modal button[ng-click*="salvar"]:not([ng-click*="salvarPersonalizado"]) {
                             display: none !important;
                         }
                         
+                        /* Layout otimizado para modal */
                         .estrutura-modal {
                             width: 100% !important;
                             margin: 0 !important;
                             padding: 0 !important;
+                        }
+                        
+                        /* Melhorias específicas para o container do modal */
+                        .popup-modal .modal-dialog {
+                            width: 90%;
+                            max-width: 1200px;
+                        }
+                        
+                        .popup-modal-body {
+                            max-height: 70vh;
+                            overflow-y: auto;
+                            padding: 15px;
+                        }
+                        
+                        .loading-container {
+                            text-align: center;
+                            padding: 50px;
                         }
                     `;
                     
@@ -45,18 +66,18 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         style.id = 'estrutura-modal-styles';
                         style.textContent = css;
                         document.head.appendChild(style);
-                        console.log('🎨 [estruturaGerencia] CSS modal injetado no documento');
+                        //console.log('🎨 [estruturaGerencia] CSS modal injetado no documento');
                     }
                     
                     // Aplicar classe modal ao elemento da estrutura
                     if ($element[0]) {
                         $element[0].classList.add('estrutura-modal');
-                        console.log('🏗️ [estruturaGerencia] Classe "estrutura-modal" aplicada ao elemento');
+                        //console.log('🏗️ [estruturaGerencia] Classe "estrutura-modal" aplicada ao elemento');
                     }
                     
                     // Aplicar classe modal ao body para controle global
                     document.body.classList.add('estrutura-modal-ativa');
-                    console.log('🌐 [estruturaGerencia] Classe "estrutura-modal-ativa" aplicada ao body');
+                    //console.log('🌐 [estruturaGerencia] Classe "estrutura-modal-ativa" aplicada ao body');
                     
                     // Configurar limpeza quando o escopo for destruído
                     $scope.$on('$destroy', function() {
@@ -64,7 +85,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         if ($element[0]) {
                             $element[0].classList.remove('estrutura-modal');
                         }
-                        console.log('🧹 [estruturaGerencia] Limpeza modal: classes removidas');
+                        //console.log('🧹 [estruturaGerencia] Limpeza modal: classes removidas');
                     });
                 }
 
@@ -248,8 +269,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                         let p = angular.fromJson(APIServ.descriptografa(parametros));
 
-                        console.log('🔄 [estruturaGerencia] abrirPopUp: Migrando para novo sistema PopUpModal');
-                        console.log('   - Parâmetros originais:', p);
+                        //console.log('🔄 [estruturaGerencia] abrirPopUp: Migrando para novo sistema PopUpModal');
+                        //console.log('   - Parâmetros originais:', p);
 
                         // Construir a rota baseada nos parâmetros originais
                         let rota = '';
@@ -323,14 +344,14 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                             }
                         }
 
-                        console.log('✨ [estruturaGerencia] Abrindo novo modal com:', parametrosModal);
+                        //console.log('✨ [estruturaGerencia] Abrindo novo modal com:', parametrosModal);
 
                         // Abrir modal usando o novo sistema
                         return PopUpModal.abrir(parametrosModal).then(function(dados) {
-                            console.log('✅ [estruturaGerencia] Modal fechado com dados:', dados);
+                            //console.log('✅ [estruturaGerencia] Modal fechado com dados:', dados);
                             return dados;
                         }).catch(function(erro) {
-                            console.log('ℹ️ [estruturaGerencia] Modal fechado sem dados:', erro);
+                            //console.log('ℹ️ [estruturaGerencia] Modal fechado sem dados:', erro);
                             return null;
                         });
                     }
@@ -349,7 +370,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         let input = $(event.target).closest('monta-html').find(':input');
                         let campo = input.attr('campo');
                         let modelo = input.attr('ng-model');
-                        console.log(modelo);
+                        //console.log(modelo);
                         let modeloChave = $scope.estrutura.raizModelo + '["' + input.attr('modelo-chave') + '"]';
 
                         let indice = input.attr('indice');
@@ -372,14 +393,14 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                             $parse(modelo).assign($scope, '');
 
-                            console.log(modeloChave);
+                            //console.log(modeloChave);
                             if (modeloChave != undefined) {
                                 $parse(modeloChave).assign($scope, '');
                             }
 
                             if (desabilitado) {
                                 input.attr('disabled', false)
-                                console.log($scope.temporada);
+                                //console.log($scope.temporada);
                             }
                         }
 
@@ -548,7 +569,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                             if ($scope.estrutura.filtrosPadrao != undefined) {
                                 for (let x in $scope.estrutura.filtrosPadrao) {
                                     let obrigatorio = $scope.estrutura.filtrosPadrao[x]['obrigatorio'] != undefined && $scope.estrutura.filtrosPadrao[x]['obrigatorio'];
-                                    console.log(obrigatorio);
+                                    //console.log(obrigatorio);
 
                                     if (obrigatorio) {
                                         let novoFiltro = {
@@ -561,7 +582,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                     }
                                 }
                             }
-                            console.log($scope.filtros);
+                            //console.log($scope.filtros);
 
                         }
 
@@ -594,7 +615,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                         tirarPrimeiroFiltro = true;
                                     }
 
-                                    console.log(key);
+                                    //console.log(key);
                                     $scope.filtros.push({
                                         campo: key,
                                         operador: val.operador,
@@ -810,7 +831,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                                         if (usarDataAlteracaoAoFiltrar) {
                                             $scope.dataUltimaConsulta = new Date();
-                                            console.log($scope.dataUltimaConsulta);
+                                            //console.log($scope.dataUltimaConsulta);
                                         }
 
                                         $rS.carregando = false;
@@ -830,8 +851,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                                         let inserir = false;
 
                                                         for (let y in novaLista) {
-                                                            console.log(listaAtual[x][estrutura.campo_chave]);
-                                                            console.log(novaLista[y][estrutura.campo_chave]);
+                                                            //console.log(listaAtual[x][estrutura.campo_chave]);
+                                                            //console.log(novaLista[y][estrutura.campo_chave]);
 
                                                             if (listaAtual[x][estrutura.campo_chave] != novaLista[y][estrutura.campo_chave]) {
                                                                 inserir = true;
@@ -865,9 +886,9 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                                         //*/
                                     }).error(function (a, b, c) {
-                                        console.log(a);
-                                        console.log(b);
-                                        console.log(c);
+                                        //console.log(a);
+                                        //console.log(b);
+                                        //console.log(c);
                                         $rS.carregando = false;
                                         APIServ.mensagemSimples('Informação', 'Erro ao Filtrar');
                                     });
@@ -898,14 +919,14 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         }
 
                         $scope.itensPaginaPaginacao = () => {
-                            console.log(app.current_page);
+                            //console.log(app.current_page);
                         }
 
                         if ($scope.selecionarTodosItensConsulta == undefined) {
                             $scope.selecionarTodosItensConsulta = function () {
 
                                 let teste = $scope.itensPaginaPaginacao();
-                                console.log(teste);
+                                //console.log(teste);
 
                                 $scope.todosItensSelecionados = $scope.todosItensSelecionados == 'false' || !$scope.todosItensSelecionados;
                                 if ($scope.listaConsulta != undefined && Object.keys($scope.listaConsulta).length > 0) {
@@ -942,7 +963,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                 //Vendo se o detalhe do item ja foi carregado
                                 if (item['detalhes'] == undefined) {
                                     APIServ.executaFuncaoClasse('classeGeral', 'detalhar', filtros).success(function (data) {
-                                        console.log(data);
+                                        //console.log(data);
                                         item['arquivosAnexados'] = data.arquivosAnexados;
                                         item['exibirDetalhes'] = true;
                                         item['detalhes'] = {};
@@ -1062,7 +1083,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                     .success(function (retorno) {
                                        // console.log(retorno); $scope.desabilitarSalvar = false; $rootScope.carregando = false; /*
                                         if ($scope.tipoSalvar == 'get') {
-                                            console.log(retorno);
+                                            //console.log(retorno);
                                             return false;
                                         }
 
@@ -1129,7 +1150,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                         //*/
                                     })
                                     .error(function (a, b, c) {
-                                        console.log(a);
+                                        //console.log(a);
                                         $scope.desabilitarSalvar = false;
                                         $rootScope.carregando = false;
                                         APIServ.mensagemSimples('Informação', 'Erro ao Salvar. Tente Novamente!');
@@ -1157,7 +1178,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                         if ($scope.alterar == undefined) {
                             $scope.alterar = function (valor) {
-                                console.log(valor);
+                                //console.log(valor);
                                 //console.log('alterando');
                                 if (usarTimerConsulta) {
                                     $rootScope.pausarTimer();
@@ -1210,7 +1231,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                         //$scope.mudaTela('cadastro');
                                         if (($scope.tela == 'cadastro' || $scope.tela == 'consulta') && $scope.estrutura.usarTinyMCE == true && $scope.carregarTinyMCE != undefined) {
 
-                                            console.log('mudando');
+                                            //console.log('mudando');
                                             $scope.carregarTinyMCE();
                                         }
 
@@ -1222,7 +1243,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                         }
                                     }
                                 }).error((a, b, c) => {
-                                    console.log(a);
+                                    //console.log(a);
                                 })
                             }
                         }

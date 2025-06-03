@@ -3,7 +3,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
         var _enviaDadosTabela = function (tabela, chave, dados) {
             var temp = _converteParametrosparaUrl(dados);
             var parametrosEnviar = angular.isObject(temp) ? angular.toJson(temp) : temp;
-            console.log(config.baseUrl + '/manipulaTabela/' + tabela + '/' + chave + '/' + parametrosEnviar);
+            //console.log(config.baseUrl + '/manipulaTabela/' + tabela + '/' + chave + '/' + parametrosEnviar);
             return $http.get(config.baseUrl + '/manipulaTabela/' + tabela + '/' + chave + '/' + parametrosEnviar);
         }
 
@@ -11,7 +11,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
             if (tipo == 'get') {                
                 var temp = _converteParametrosparaUrl(parametros);
                 var parametrosEnviar = angular.isObject(temp) ? angular.toJson(temp) : temp;
-                console.log(config.baseUrl + classe + '/' + funcaoExecutar + '/' + parametrosEnviar);
+                //console.log(config.baseUrl + classe + '/' + funcaoExecutar + '/' + parametrosEnviar);
                 return $http.get(config.baseUrl + classe + '/' + funcaoExecutar + '/' + parametrosEnviar);
             } else if (tipo == 'post') {
                 return $http.post(config.baseUrl + classe + '/' + funcaoExecutar, parametros, {
@@ -126,7 +126,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
         }
 
         var _abrirPopUpArquivo = function (arquivo){
-            console.log(arquivo);
+            //console.log(arquivo);
             
             $mdDialog.show({
                 template: `<objeto-visualizacao arquivo="${arquivo}" largura="100%" altura="100%"></objeto-visualizacao>`
@@ -190,9 +190,8 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
 
         let _excluriKeyArray = (array, key) => {
             let nova = [];
-            for(let k in array){
-                console.log(k);
-                console.log(key);
+            for(let k in array){                //console.log(k);
+                //console.log(key);
                 
                 
                 if (k != key) {

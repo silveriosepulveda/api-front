@@ -26,7 +26,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
     // Função para carregar/recarregar dados do menu
     $scope.carregarMenuPainel = function() {
         $scope.menuPainel = APIServ.buscaDadosLocais('menuPainel');
-        console.log('MenuPainel carregado/recarregado:', $scope.menuPainel);
+        //console.log('MenuPainel carregado/recarregado:', $scope.menuPainel);
         
         // Atualizar estado de expansão dos menus se já existem dados
         if ($scope.menuPainel) {
@@ -44,7 +44,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
     
     // Escutar eventos de login para recarregar dados do menu
     $scope.$on('usuarioLogado', function(event, usuario) {
-        console.log('🔄 MenuPainel: Recarregando dados após login do usuário:', usuario?.nome);
+        //console.log('🔄 MenuPainel: Recarregando dados após login do usuário:', usuario?.nome);
         // Aguardar um pouco para garantir que os dados foram salvos
         setTimeout(function() {
             $scope.carregarMenuPainel();
@@ -56,7 +56,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
     
     // Escutar eventos de atualização do menu
     $scope.$on('menuPainelAtualizado', function() {
-        console.log('🔄 MenuPainel: Recarregando dados após atualização');
+        //console.log('🔄 MenuPainel: Recarregando dados após atualização');
         $scope.carregarMenuPainel();
         if (!$scope.$$phase) {
             $scope.$apply();
@@ -73,7 +73,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
         if (favoritosSalvos) {
             try {
                 $scope.favoritos = JSON.parse(favoritosSalvos);
-                console.log('Favoritos carregados:', $scope.favoritos.length, 'itens');
+                //console.log('Favoritos carregados:', $scope.favoritos.length, 'itens');
             } catch (e) {
                 console.error('Erro ao carregar favoritos:', e);
                 $scope.favoritos = [];
@@ -84,7 +84,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
     // Salvar favoritos
     $scope.salvarFavoritos = function() {
         localStorage.setItem('menuFavoritos', JSON.stringify($scope.favoritos));
-        console.log('Favoritos salvos:', $scope.favoritos.length, 'itens');
+        //console.log('Favoritos salvos:', $scope.favoritos.length, 'itens');
     };
     
     // Verificar se item é favorito
@@ -107,7 +107,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
         if (index > -1) {
             // Remover dos favoritos
             $scope.favoritos.splice(index, 1);
-            console.log('Item removido dos favoritos:', item.item);
+            //console.log('Item removido dos favoritos:', item.item);
         } else {
             // Adicionar aos favoritos
             var novoFavorito = {
@@ -118,7 +118,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
                 target: item.target
             };
             $scope.favoritos.push(novoFavorito);
-            console.log('Item adicionado aos favoritos:', item.item);
+            //console.log('Item adicionado aos favoritos:', item.item);
         }
         
         $scope.salvarFavoritos();
@@ -165,11 +165,11 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
         // Salvar estado no localStorage
         localStorage.setItem('menu_expanded_' + menuKey, JSON.stringify(menu.expanded));
         
-        console.log('Menu', menu.menu, menu.expanded ? 'expandido' : 'recolhido');
+        //console.log('Menu', menu.menu, menu.expanded ? 'expandido' : 'recolhido');
     };
     
     $scope.navegar = function (pagina, acao, subacao) {
-        console.log('Navegando para:', pagina, acao, subacao);
+        //console.log('Navegando para:', pagina, acao, subacao);
         $location.path('/' + pagina + '/' + acao );
         
         // Fechar menu após navegação se necessário
@@ -230,7 +230,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
     }
 
     $scope.fecharMenu = function() {
-        console.log('Fechando o menu lateral');
+        //console.log('Fechando o menu lateral');
         
         // Fecha o menu lateral (Bootstrap collapse)
         var menu = document.getElementById('menuencolhido');
@@ -276,6 +276,56 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
         var texto = $scope.searchText.toLowerCase();
         return item.item && item.item.toLowerCase().indexOf(texto) !== -1;
     };
+
+    // Função para expandir automaticamente menus com resultados da busca
+    $scope.expandirMenusComResultados = function() {
+        if (!$scope.searchText || $scope.searchText.trim() === '') {
+            // Se não há busca, não alterar estado dos menus
+            return;
+        }
+
+        var searchLower = $scope.searchText.toLowerCase();
+        var menusExpandidos = 0;
+
+        angular.forEach($scope.menuPainel, function(menu, key) {
+            if (!menu.exibir) return;
+
+            var temResultados = false;
+
+            // Verificar se o nome do menu contém a busca
+            if (menu.menu.toLowerCase().indexOf(searchLower) !== -1) {
+                temResultados = true;
+            }
+
+            // Verificar se algum item do menu contém a busca
+            if (!temResultados && menu.itens) {
+                temResultados = Object.keys(menu.itens).some(function(itemKey) {
+                    var item = menu.itens[itemKey];
+                    return item.item && item.item.toLowerCase().indexOf(searchLower) !== -1;
+                });
+            }
+
+            // Expandir automaticamente se há resultados
+            if (temResultados && !menu.expanded) {
+                menu.expanded = true;
+                menu.active = true;
+                localStorage.setItem('menu_expanded_' + key, JSON.stringify(true));
+                menusExpandidos++;
+                // console.log('🔍 Menu expandido automaticamente:', menu.menu);
+            }
+        });
+
+        if (menusExpandidos > 0) {
+            // console.log('🔍 Pesquisa "' + $scope.searchText + '" expandiu ' + menusExpandidos + ' menu(s) automaticamente');
+        }
+    };
+
+    // Watch para mudanças na busca - expandir menus automaticamente
+    $scope.$watch('searchText', function(newVal, oldVal) {
+        if (newVal !== oldVal) {
+            $scope.expandirMenusComResultados();
+        }
+    });
 })
 
 
@@ -300,14 +350,31 @@ $(document).ready(function () {
     };
     $("#procuramenu").keyup(function () {
         var texto = this.value;
-        $("li.menu").each(function (index) {
-            if ($(this).find(".submenu a:containsIgnoreCase('" + texto + "')").length < 1) {
-                $(this).fadeOut('fast');
-            } else {
+        
+        // Expandir menus automaticamente se há texto de busca
+        if (texto && texto.trim() !== '') {
+            $("li.menu").each(function (index) {
+                var $menu = $(this);
+                var temResultados = $menu.find(".submenu a:containsIgnoreCase('" + texto + "')").length > 0;
+                
+                if (temResultados) {
+                    // Expandir o menu que contém resultados
+                    $menu.addClass('expanded');
+                    $menu.removeClass('collapsed');
+                    $menu.find('ul[role="menu"]').show();
+                    $menu.fadeIn('fast');
+                } else {
+                    $menu.fadeOut('fast');
+                }
+            });
+        } else {
+            // Se não há busca, mostrar todos os menus na configuração padrão
+            $("li.menu").each(function (index) {
                 $(this).fadeIn('fast');
-            }
-        });
+            });
+        }
 
+        // Mostrar/ocultar itens individuais baseado na busca
         $(".submenu a:not(:containsIgnoreCase('" + texto + "'))").fadeOut('fast');
         $(".submenu a:containsIgnoreCase('" + texto + "')").fadeIn('fast');
     });
@@ -321,15 +388,15 @@ $(document).ready(function () {
         var botao = document.getElementById('botaoMenu');
         var largura = $(document).width();
         
-        console.log('🧪 DEBUG INICIAL DO MENU:');
-        console.log('  - Largura da tela:', largura + 'px');
-        console.log('  - localStorage manterMenuOculto:', localStorage.getItem('manterMenuOculto'));
-        console.log('  - Valor interpretado (manterOculto):', manterOculto);
-        console.log('  - Estado do botão:', botao ? botao.innerHTML : 'BOTÃO NÃO ENCONTRADO');
-        console.log('  - Classes do body:', document.body.className);
+        //console.log('🧪 DEBUG INICIAL DO MENU:');
+        //console.log('  - Largura da tela:', largura + 'px');
+        //console.log('  - localStorage manterMenuOculto:', localStorage.getItem('manterMenuOculto'));
+        //console.log('  - Valor interpretado (manterOculto):', manterOculto);
+        //console.log('  - Estado do botão:', botao ? botao.innerHTML : 'BOTÃO NÃO ENCONTRADO');
+        //console.log('  - Classes do body:', document.body.className);
         
         if (largura > 1000 && !manterOculto && botao && botao.innerHTML === 'Mostrar Menu') {
-            console.log('⚠️  PROBLEMA DETECTADO: Menu deveria estar aberto mas não está!');
+            //console.log('⚠️  PROBLEMA DETECTADO: Menu deveria estar aberto mas não está!');
         }
     }, 1000);
 });
@@ -355,7 +422,7 @@ function fecharMenuSeNecessario() {
         closeNav();
     }
     
-    console.log('Navegação - Menu permanece:', manterOculto ? 'fechado' : 'aberto');
+    //console.log('Navegação - Menu permanece:', manterOculto ? 'fechado' : 'aberto');
 }
 
 function manipularMenu() {
