@@ -1323,3 +1323,104 @@ body {
     border-color: #66afe9;
     box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(102,175,233,0.6);
 }
+
+/* Z-index hierarchy for modal system compatibility */
+/* PopUpModal uses Bootstrap modal default z-index: 1050 */
+/* Message dialogs need to be above PopUpModal when called from within modals */
+
+/* SOLUÇÃO DEFINITIVA E AGRESSIVA PARA Z-INDEX */
+
+/* 1. Classes primárias de overlay */
+.popup-modal-dialog-overlay {
+    z-index: 100000 !important;
+    position: fixed !important;
+}
+
+.popup-modal-dialog-overlay .md-dialog-container {
+    z-index: 100001 !important;
+    position: fixed !important;
+}
+
+/* 2. Força TODOS os md-dialog quando modal backdrop existir */
+.modal-backdrop ~ * md-dialog,
+.modal.show ~ * md-dialog,
+.popup-modal.show ~ * md-dialog {
+    z-index: 100001 !important;
+    position: fixed !important;
+}
+
+.modal-backdrop ~ * ._md-dialog-container,
+.modal.show ~ * ._md-dialog-container,
+.popup-modal.show ~ * ._md-dialog-container {
+    z-index: 100000 !important;
+    position: fixed !important;
+}
+
+/* 3. Usa :has() para detectar presença de modal backdrop (navegadores modernos) */
+body:has(.modal-backdrop) md-dialog,
+body:has(.popup-modal.show) md-dialog,
+body:has(.modal.show) md-dialog {
+    z-index: 100001 !important;
+    position: fixed !important;
+}
+
+body:has(.modal-backdrop) ._md-dialog-container,
+body:has(.popup-modal.show) ._md-dialog-container,
+body:has(.modal.show) ._md-dialog-container {
+    z-index: 100000 !important;
+    position: fixed !important;
+}
+
+/* 4. Força direto no body quando backdrop existir */
+.modal-backdrop + * md-dialog,
+.modal-backdrop ~ * md-dialog {
+    z-index: 100001 !important;
+    position: fixed !important;
+}
+
+/* 5. Classes específicas para diferentes tipos */
+._md-dialog-container {
+    z-index: 100000 !important;
+    position: fixed !important;
+}
+
+md-dialog {
+    z-index: 100001 !important;
+    position: fixed !important;
+}
+
+/* 6. Loading screen sempre no topo */
+.popup-modal-loading {
+    z-index: 100002 !important;
+    position: fixed !important;
+}
+
+/* 7. Backdrop configuração */
+.md-dialog-backdrop {
+    z-index: 99999 !important;
+}
+
+/* 8. FORÇAR z-index em TODOS os dialogs quando qualquer modal estiver aberto */
+.modal.in md-dialog,
+.modal.show md-dialog,
+.popup-modal.in md-dialog,
+.popup-modal.show md-dialog {
+    z-index: 100001 !important;
+    position: fixed !important;
+}
+
+/* 9. ÚLTIMO RECURSO: Força z-index em qualquer md-dialog se backdrop existir */
+body .modal-backdrop ~ div md-dialog,
+body .modal-backdrop ~ span md-dialog,
+body .modal-backdrop ~ * md-dialog {
+    z-index: 100001 !important;
+    position: fixed !important;
+}
+
+/* 10. Ensure containers também */
+body .modal-backdrop ~ div ._md-dialog-container,
+body .modal-backdrop ~ span ._md-dialog-container,
+body .modal-backdrop ~ * ._md-dialog-container {
+    z-index: 100000 !important;
+    position: fixed !important;
+}
