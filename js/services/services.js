@@ -117,20 +117,33 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
                 var aguarde = $mdDialog.show({
                     template: '<img ng-src="api/front/imagens/aguarde.gif" class="img-responsive imgAguarde">'
                 })
-                $mdDialog.show(aguarde);
-            } else if (acao == 'fechar') {
+                $mdDialog.show(aguarde);            } else if (acao == 'fechar') {
                 //angular.element.triggerHandler({type:"keydown", which:27});
                 $mdDialog.hide();
                 $mdDialog.hide();
             }
-        }
+        };
 
         var _abrirPopUpArquivo = function (arquivo){
             //console.log(arquivo);
             
-            $mdDialog.show({
-                template: `<objeto-visualizacao arquivo="${arquivo}" largura="100%" altura="100%"></objeto-visualizacao>`
-            })
+            // Usar novo sistema PopUpModal se disponível
+            if (typeof PopUpModal !== 'undefined') {
+                return PopUpModal.abrir({
+                    rota: '/visualizacao/arquivo',
+                    titulo: 'Visualizar Arquivo',
+                    parametros: {
+                        arquivo: arquivo,
+                        modo: 'visualizacao'
+                    },
+                    mostrarBotaoSalvar: false
+                });
+            } else {
+                // Fallback para $mdDialog
+                $mdDialog.show({
+                    template: `<objeto-visualizacao arquivo="${arquivo}" largura="100%" altura="100%"></objeto-visualizacao>`
+                })
+            }
         }
 
         var _converteParametrosparaUrl = function (parametros) {

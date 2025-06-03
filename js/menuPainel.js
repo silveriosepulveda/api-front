@@ -185,48 +185,81 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
     };
     
     $scope.abrirPopUpMenu = function (parametros) {
-
-        let p = {
-            pagina: parametros.pagina,
-            acao: parametros.acao,
-            subAcao: 'cadastro',
-            altura: screen.availHeight,
-            largura: screen.availWidth
-        }
-
-        let largura = p.largura != undefined ? p.largura : 800;
-        let altura = p.altura != undefined ? p.altura : 800;
-
-        //ModeloValor pode ser tanto relacionada como subrelacionada, pois esta vinculado ao botao clicado
-        let modeloValor;
-        let modeloRel;
-
-
-        let idPopUp = 'popUp_' + parseInt(Math.random() * 100);
-        p['idPopUp'] = idPopUp;
-        parametros = APIServ.criptografa(angular.toJson(p));
-
-        var mapForm = document.createElement("form");
-        mapForm.target = idPopUp;
-        mapForm.method = "POST"; // or "post" if appropriate
-        mapForm.action = "popup.php";
-
-        var mapInput = document.createElement("input");
-        mapInput.type = "hidden";
-        mapInput.name = "parametros";
-        mapInput.value = parametros;
-        APIServ.salvaDadosLocais('parametrosUrl', p);
-        mapForm.appendChild(mapInput);
-
-        document.body.appendChild(mapForm);
-        map = window.open("", idPopUp, "status=0,title=0,height=" + altura + ",width=" + largura + ",scrollbars=1");
-
-        if (map) {
-            mapForm.submit();
+        //console.log('🔄 [menuPainel] abrirPopUpMenu: Migrando para novo sistema PopUpModal');
+        
+        // Construir rota baseada nos parâmetros
+        let rota = '';
+        if (parametros.pagina && parametros.acao) {
+            rota = '/' + parametros.pagina + '/' + parametros.acao + '/cadastro';
         } else {
-            alert('You must allow popups for this map to work.');
+            console.error('❌ [menuPainel] Parâmetros inválidos:', parametros);
+            return;
         }
-        //*/
+        
+        let titulo = 'Cadastro de ' + (parametros.item || parametros.acao || 'Item');
+        
+        // Usar o novo sistema PopUpModal
+        if (typeof PopUpModal !== 'undefined') {
+            return PopUpModal.abrir({
+                rota: rota,
+                titulo: titulo,
+                parametros: {
+                    fromMenu: true,
+                    menuItem: parametros.item,
+                    pagina: parametros.pagina,
+                    acao: parametros.acao
+                }
+            }).then(function(dados) {
+                //console.log('✅ [menuPainel] Modal fechado com dados:', dados);
+                // Fechar menu após sucesso se necessário
+                if (typeof fecharMenuSeNecessario === 'function') {
+                    fecharMenuSeNecessario();
+                }
+                return dados;
+            }).catch(function(erro) {
+                //console.log('ℹ️ [menuPainel] Modal fechado sem dados:', erro);
+                return null;
+            });
+        } else {
+            // Fallback para sistema antigo se PopUpModal não estiver disponível
+            console.warn('⚠️ [menuPainel] PopUpModal não encontrado, usando sistema antigo');
+            
+            let p = {
+                pagina: parametros.pagina,
+                acao: parametros.acao,
+                subAcao: 'cadastro',
+                altura: screen.availHeight,
+                largura: screen.availWidth
+            }
+
+            let largura = p.largura != undefined ? p.largura : 800;
+            let altura = p.altura != undefined ? p.altura : 800;
+
+            let idPopUp = 'popUp_' + parseInt(Math.random() * 100);
+            p['idPopUp'] = idPopUp;
+            parametros = APIServ.criptografa(angular.toJson(p));
+
+            var mapForm = document.createElement("form");
+            mapForm.target = idPopUp;
+            mapForm.method = "POST";
+            mapForm.action = "popup.php";
+
+            var mapInput = document.createElement("input");
+            mapInput.type = "hidden";
+            mapInput.name = "parametros";
+            mapInput.value = parametros;
+            APIServ.salvaDadosLocais('parametrosUrl', p);
+            mapForm.appendChild(mapInput);
+
+            document.body.appendChild(mapForm);
+            map = window.open("", idPopUp, "status=0,title=0,height=" + altura + ",width=" + largura + ",scrollbars=1");
+
+            if (map) {
+                mapForm.submit();
+            } else {
+                alert('You must allow popups for this map to work.');
+            }
+        }
     }
 
     $scope.fecharMenu = function() {

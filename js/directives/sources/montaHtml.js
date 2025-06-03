@@ -362,7 +362,25 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                         textoNovo = p.novo['texto'] != undefined ? p.novo['texto'] : 'Novo(a)';
                         htmlAbreInputGroup = '<div class="input-group">';
 
-                        let clickNovo = p.novo['click'] == undefined ? `abrirPopUp('${parametrosClick}')` : p.novo['click'];
+                        // Migrar para novo sistema de modal PopUpModal
+                        let clickNovo;
+                        if (p.novo['click'] == undefined) {
+                            // Construir rota para o novo sistema
+                            let rota = '';
+                            if (p.novo.pagina && p.novo.acao) {
+                                rota = '/' + p.novo.pagina + '/' + p.novo.acao;
+                                if (p.novo.subAcao) {
+                                    rota += '/' + p.novo.subAcao;
+                                } else {
+                                    rota += '/cadastro'; // Padrão para novo registro
+                                }
+                            }
+                            
+                            // Usar novo sistema PopUpModal em vez de abrirPopUp
+                            clickNovo = `abrirModal('${rota}', ${JSON.stringify(p.novo.parametrosEnviar || {})}, '${p.novo.titulo || textoNovo}')`;
+                        } else {
+                            clickNovo = p.novo['click'];
+                        }
 
                         let atributosNovo = p.novo.atributos_novo != undefined ? EGFuncoes.montarAtributos(p.novo.atributos_novo).join(' ') : '';
 
