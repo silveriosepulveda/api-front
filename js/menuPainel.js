@@ -185,6 +185,8 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
     };
     
     $scope.abrirPopUpMenu = function (parametros) {
+        console.log($(event));
+        
         //console.log('🔄 [menuPainel] abrirPopUpMenu: Migrando para novo sistema PopUpModal');
         
         // Construir rota baseada nos parâmetros

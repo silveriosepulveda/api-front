@@ -121,24 +121,43 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     }
 
                     let raizModelo = retorno.raizModelo;
+                    let pagina;
+                    let acao;
+                    let subacao;
+                    let parametrosAcao;
+                    
 
-                    let pagina = parametrosUrl[0] != undefined ? parametrosUrl[0] : parametrosLocal['pagina'];
+                    console.log($attrs);
+                    
+
+                    if($scope.isModal) {
+                      //  pagina = $attrs.classe;
+                        acao = $attrs.subacao || '';
+                        subacao = $attrs.subacao || '';
+                        parametrosAcao = $attrs.parametros || '';
+                    }else{
+                        pagina = parametrosUrl[0] != undefined ? parametrosUrl[0] : parametrosLocal['pagina'];                    
+                        acao = parametrosUrl[1] != undefined ? parametrosUrl[1] : parametrosLocal['acao'];
+                        subacao = parametrosUrl[2] != undefined ? parametrosUrl[2] : parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined ? parametrosLocal['subAcao'] : '';
+
+                    }
 
                     $scope.pagina = pagina;
-                    let acao = parametrosUrl[1] != undefined ? parametrosUrl[1] : parametrosLocal['acao'];
                     $scope.acao = acao;
+                    $scope.subacao = subacao;
+                                       
 
                     // let subacao = parametrosUrl[2] != undefined ?
                     //     parametrosUrl[2] : parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined ?
                     //         parametrosLocal['subAcao'] : '';
 
-                    let subacao = '';
-                    if(parametrosUrl[2] != undefined)
-                        subacao = parametrosUrl[2];
-                    else if( parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined)
-                        subacao = parametrosLocal['subAcao'];
-                    else if($attrs.subacao != undefined) 
-                        subacao = $attrs.subacao;
+                    // let subacao = '';
+                    // if(parametrosUrl[2] != undefined)
+                    //     subacao = parametrosUrl[2];
+                    // else if( parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined)
+                    //     subacao = parametrosLocal['subAcao'];
+                    // else if($attrs.subacao != undefined) 
+                    //     subacao = $attrs.subacao;
 
                     let nomeFiltroLocal = 'filtro' + acao;
                     let nomeFiltroTemp = 'filtroTemp_' + acao;
