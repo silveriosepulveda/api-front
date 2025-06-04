@@ -9,7 +9,7 @@ directivesPadrao.directive('imagensAnexas', ['$compile', '$http', '$rootScope', 
             scope.idFormAnexos = 'formAnexos_' + scope.chaveTabela;
             
             
-         //let html = '<h1>Teste</h1>';
+         //var html = '<h1>Teste</h1>';
 
 
             //element.html(html);

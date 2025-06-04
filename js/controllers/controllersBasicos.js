@@ -24,7 +24,7 @@ angular.module('app.controllersBasicos', [])
 
         $scope.excluirLista = function (key, lista) {
             APIServ.executaFuncaoClasse('listas', 'excluirLista', lista.chave_lista).success(function (retorno) {
-                let funcaoExcluir = () => {
+                var funcaoExcluir = () => {
                     if (retorno.chave != undefined && retorno.chave == 0) {
                         APIServ.mensagemSimples('Confirmação', 'Lista Excluída');
                         $scope.listaSelecionada.splice(key, 1);
@@ -45,7 +45,7 @@ angular.module('app.controllersBasicos', [])
         $scope.alterarLista = function (lista) {
             if (lista.descricao != $scope.descricaoAnterior.descricao) {
                 var funcao = function () {
-                    let fd = new FormData();
+                    var fd = new FormData();
                     fd.append('dados', JSON.stringify(lista));
                     APIServ.executaFuncaoClasse('listas', 'alterarLista', fd, 'post').success(function (retorno) {
                         console.log(retorno);
@@ -60,8 +60,8 @@ angular.module('app.controllersBasicos', [])
         }
 
         $scope.substituirLista = function (key, lista) {
-            let substituir = function () {
-                let parametros = {
+            var substituir = function () {
+                var parametros = {
                     chave_lista: lista.chave_lista,
                     chave_substituir: lista.selecionadaSubstituir,
                     nome_lista: $scope.nomeListaSelecionado

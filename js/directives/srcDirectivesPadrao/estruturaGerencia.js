@@ -97,19 +97,19 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 $scope.tipoSalvar = 'post';
                 $scope.tipoConsulta = 'post';
 
-                let html = '';
+                var html = '';
                 $scope.fd = new FormData();
 
-                let montarEstrutura = function (estrutura) {
-                    let retorno = estrutura;
+                var montarEstrutura = function (estrutura) {
+                    var retorno = estrutura;
 
                     //Fazendo a validacao dos poderes do usuario
                     var menuPainel = APIServ.buscaDadosLocais('menuPainel');
 
-                    let parametrosUrl = APIServ.parametrosUrl();
+                    var parametrosUrl = APIServ.parametrosUrl();
 
-                    let parametrosLocal = undefined;
-                    let parametrosLocalTemp = { pagina: '', acao: '', subAcao: '' };
+                    var parametrosLocal = undefined;
+                    var parametrosLocalTemp = { pagina: '', acao: '', subAcao: '' };
 
                     if (!$scope.popUp) {
                         APIServ.apagaDadosLocais('parametrosUrl');
@@ -120,11 +120,11 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         parametrosLocal = parametrosLocal ? parametrosLocal : parametrosLocalTemp;
                     }
 
-                    let raizModelo = retorno.raizModelo;
-                    let pagina;
-                    let acao;
-                    let subacao;
-                    let parametrosAcao;
+                    var raizModelo = retorno.raizModelo;
+                    var pagina;
+                    var acao;
+                    var subacao;
+                    var parametrosAcao;
                     
 
                     console.log($attrs);
@@ -147,11 +147,11 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     $scope.subacao = subacao;
                                        
 
-                    // let subacao = parametrosUrl[2] != undefined ?
+                    // var subacao = parametrosUrl[2] != undefined ?
                     //     parametrosUrl[2] : parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined ?
                     //         parametrosLocal['subAcao'] : '';
 
-                    // let subacao = '';
+                    // var subacao = '';
                     // if(parametrosUrl[2] != undefined)
                     //     subacao = parametrosUrl[2];
                     // else if( parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined)
@@ -159,10 +159,10 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     // else if($attrs.subacao != undefined) 
                     //     subacao = $attrs.subacao;
 
-                    let nomeFiltroLocal = 'filtro' + acao;
-                    let nomeFiltroTemp = 'filtroTemp_' + acao;
-                    let filtroTemp = APIServ.buscaDadosLocais(nomeFiltroTemp);
-                    let filtroLocal = APIServ.buscaDadosLocais(nomeFiltroLocal);
+                    var nomeFiltroLocal = 'filtro' + acao;
+                    var nomeFiltroTemp = 'filtroTemp_' + acao;
+                    var filtroTemp = APIServ.buscaDadosLocais(nomeFiltroTemp);
+                    var filtroLocal = APIServ.buscaDadosLocais(nomeFiltroLocal);
 
                     $rS['acao'] = acao;
                     if ($rS[acao] == undefined) {
@@ -185,22 +185,22 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     var _montarCamposFiltroConsulta = function (campos, retornoEnt) {
                         //Despois tenho que por opcoes de pesquisar por tabelas relacionadas
                         var retornoMCFC = retornoEnt != undefined ? retornoEnt : [];
-                        let filtrosPersonalizados = $scope.estrutura.camposFiltroPesquisa != undefined ? $scope.estrutura.camposFiltroPesquisa : {};
+                        var filtrosPersonalizados = $scope.estrutura.camposFiltroPesquisa != undefined ? $scope.estrutura.camposFiltroPesquisa : {};
 
 
                         angular.forEach(campos, function (val, campo) {
-                            let temCampoFiltro = $scope.estrutura.camposFiltroPesquisa != undefined && $scope.estrutura.camposFiltroPesquisa[campo] != undefined;
+                            var temCampoFiltro = $scope.estrutura.camposFiltroPesquisa != undefined && $scope.estrutura.camposFiltroPesquisa[campo] != undefined;
 
                             if (EGFuncoes.eBloco(campo) && val.nome == undefined) {
                                 retornoMCFC = _montarCamposFiltroConsulta(val.campos, retornoMCFC);
                             } else if ((val.tipo != 'oculto' || temCampoFiltro) && val.tipo != 'area-texto' && campo.substr(0, 5) != 'botao' && typeof (val) === "object" && val.tipo != 'diretiva') {
 
-                                let ocultarCampoFiltro = $scope.estrutura.camposOcultarFiltroPesquisa != undefined &&
+                                var ocultarCampoFiltro = $scope.estrutura.camposOcultarFiltroPesquisa != undefined &&
                                     APIServ.valorExisteEmVariavel($scope.estrutura.camposOcultarFiltroPesquisa, campo);
 
                                 if (!ocultarCampoFiltro) {
 
-                                    let campoEmCampos = null;
+                                    var campoEmCampos = null;
                                     if (temCampoFiltro) {
                                         campoEmCampos = Object.assign(APIServ.buscarValorVariavel($scope.estrutura.campos, campo), $scope.estrutura.camposFiltroPesquisa[campo]);
                                     } else
@@ -218,9 +218,9 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         return retornoMCFC;
                     }
 
-                    let MergeRecursive = (obj1E, obj2E) => {
-                        let obj1 = Object.assign({}, obj1E);
-                        let obj2 = Object.assign({}, obj2E);
+                    var MergeRecursive = (obj1E, obj2E) => {
+                        var obj1 = Object.assign({}, obj1E);
+                        var obj2 = Object.assign({}, obj2E);
 
                         for (var p in obj2) {
                             try {
@@ -240,11 +240,11 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     }
 
 
-                    let camposPes = $scope.estrutura.camposFiltroPesquisa != undefined ? Object.assign({}, $scope.estrutura.camposFiltroPesquisa) : {};
+                    var camposPes = $scope.estrutura.camposFiltroPesquisa != undefined ? Object.assign({}, $scope.estrutura.camposFiltroPesquisa) : {};
 
-                    let incluirCamposNoFiltro = $scope.estrutura.camposOcultarFiltroPesquisa == undefined || $scope.estrutura.camposOcultarFiltroPesquisa != '*';
-                    let camposMontagemFiltro = incluirCamposNoFiltro ? Object.assign({}, Object.assign({}, $scope.estrutura.campos)) : {};
-                    let campoEnviarMontarfiltro = MergeRecursive(camposPes, camposMontagemFiltro);
+                    var incluirCamposNoFiltro = $scope.estrutura.camposOcultarFiltroPesquisa == undefined || $scope.estrutura.camposOcultarFiltroPesquisa != '*';
+                    var camposMontagemFiltro = incluirCamposNoFiltro ? Object.assign({}, Object.assign({}, $scope.estrutura.campos)) : {};
+                    var campoEnviarMontarfiltro = MergeRecursive(camposPes, camposMontagemFiltro);
 
                     $scope.camposFiltroPesquisa = _montarCamposFiltroConsulta(campoEnviarMontarfiltro);
 
@@ -263,8 +263,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                     $scope[retorno.raizModelo] = {};
 
-                    let usarTimerConsulta = estrutura.usarTimerConsulta != undefined && estrutura.usarTimerConsulta;
-                    let usarDataAlteracaoAoFiltrar = estrutura.usarDataAlteracaoAoFiltrar != undefined && estrutura.usarDataAlteracaoAoFiltrar
+                    var usarTimerConsulta = estrutura.usarTimerConsulta != undefined && estrutura.usarTimerConsulta;
+                    var usarDataAlteracaoAoFiltrar = estrutura.usarDataAlteracaoAoFiltrar != undefined && estrutura.usarDataAlteracaoAoFiltrar
 
 
 
@@ -286,13 +286,13 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         if ($(event.target).attr('disabled') == 'disabled')
                             return false;
 
-                        let p = angular.fromJson(APIServ.descriptografa(parametros));
+                        var p = angular.fromJson(APIServ.descriptografa(parametros));
 
                         //console.log('🔄 [estruturaGerencia] abrirPopUp: Migrando para novo sistema PopUpModal');
                         //console.log('   - Parâmetros originais:', p);
 
                         // Construir a rota baseada nos parâmetros originais
-                        let rota = '';
+                        var rota = '';
                         if (p.pagina && p.acao) {
                             rota = '/' + p.pagina + '/' + p.acao;
                             if (p.subAcao) {
@@ -304,7 +304,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         }
 
                         // Preparar parâmetros para o novo modal
-                        let parametrosModal = {
+                        var parametrosModal = {
                             rota: rota,
                             titulo: p.titulo || 'Modal',
                             parametros: {
@@ -316,13 +316,13 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         };
 
                         // Processar tabelas relacionadas se existirem
-                        let tabelaRel = p.tabelaRelacionada;
+                        var tabelaRel = p.tabelaRelacionada;
                         if (tabelaRel) {
-                            let dadosTabRel = Object.assign({}, $scope.estrutura.tabelasRelacionadas[tabelaRel]);
-                            let objClicado = $(event.target);
+                            var dadosTabRel = Object.assign({}, $scope.estrutura.tabelasRelacionadas[tabelaRel]);
+                            var objClicado = $(event.target);
                             
                             // Buscar modelo de valor
-                            let modeloValor = objClicado.closest('div.form-group').find('input:text').attr('ng-model');
+                            var modeloValor = objClicado.closest('div.form-group').find('input:text').attr('ng-model');
                             if (modeloValor) {
                                 modeloValor = modeloValor.replace('[$index]', `[${objClicado.attr('indice')}]`)
                                                        .replace('[$parent.$index]', `[${objClicado.attr('indice-superior')}]`);
@@ -331,19 +331,19 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                             parametrosModal.parametros.tabelasRelacionadas = {};
                             parametrosModal.parametros.tabelasRelacionadas[tabelaRel] = $scope.estrutura.tabelasRelacionadas[tabelaRel];
 
-                            let tabelaSubRel = p.tabelaSubRelacionada;
+                            var tabelaSubRel = p.tabelaSubRelacionada;
                             if (tabelaRel && !tabelaSubRel) {
                                 // Processar tabela relacionada
                                 if (dadosTabRel.campo_valor != undefined && modeloValor) {
-                                    let modeloRel = modeloValor.replace(dadosTabRel.campo_valor, dadosTabRel.campo_relacionamento);
+                                    var modeloRel = modeloValor.replace(dadosTabRel.campo_valor, dadosTabRel.campo_relacionamento);
                                     parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloRel);
                                 }
                             } else if (tabelaRel && tabelaSubRel) {
                                 // Processar tabela sub-relacionada
-                                let dadosTabSubRel = dadosTabRel['tabelasSubRelacionadas'][tabelaSubRel];
+                                var dadosTabSubRel = dadosTabRel['tabelasSubRelacionadas'][tabelaSubRel];
                                 if (modeloValor) {
-                                    let modeloRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
-                                    let modeloSubRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
+                                    var modeloRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
+                                    var modeloSubRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
 
                                     parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloRel);
                                     parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['tabelasSubRelacionadas'][tabelaSubRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloSubRel);
@@ -354,8 +354,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         // Processar parâmetros para enviar
                         if (p.parametrosEnviar != undefined) {
                             parametrosModal.parametros.parametrosEnviados = {};
-                            for (let i in p.parametrosEnviar) {
-                                let dadosPE = p.parametrosEnviar[i];
+                            for (var i in p.parametrosEnviar) {
+                                var dadosPE = p.parametrosEnviar[i];
                                 parametrosModal.parametros.parametrosEnviados[i] = {
                                     texto: dadosPE['texto'],
                                     valor: eval('$scope.' + dadosPE['valor'])
@@ -377,7 +377,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     $scope.abrirVisualizacao = (arquivo, largura, altura) => {
                         var retorno = [];
                         var temp = window.location.href;
-                        let raiz = temp.split('?')[0];
+                        var raiz = temp.split('?')[0];
                         window.open(raiz + arquivo, 'popup', 'width=' + largura + ',height=' + largura);
                     }
 
@@ -386,18 +386,18 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     }
 
                     $scope.limparCampo = (e) => {
-                        let input = $(event.target).closest('monta-html').find(':input');
-                        let campo = input.attr('campo');
-                        let modelo = input.attr('ng-model');
+                        var input = $(event.target).closest('monta-html').find(':input');
+                        var campo = input.attr('campo');
+                        var modelo = input.attr('ng-model');
                         //console.log(modelo);
-                        let modeloChave = $scope.estrutura.raizModelo + '["' + input.attr('modelo-chave') + '"]';
+                        var modeloChave = $scope.estrutura.raizModelo + '["' + input.attr('modelo-chave') + '"]';
 
-                        let indice = input.attr('indice');
-                        let indiceSuperior = input.attr('indice-superior');
+                        var indice = input.attr('indice');
+                        var indiceSuperior = input.attr('indice-superior');
 
-                        let campoEstrutura = APIServ.buscarValorVariavel($scope.estrutura.campos, campo);
+                        var campoEstrutura = APIServ.buscarValorVariavel($scope.estrutura.campos, campo);
 
-                        let desabilitado = input.attr('disabled') == 'disabled';
+                        var desabilitado = input.attr('disabled') == 'disabled';
 
                         const limpar = () => {
                             if (indice != undefined) {
@@ -436,13 +436,13 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     }
 
                     $scope.limparCampoConsulta = function (event) {
-                        let input = $(event.target).closest('monta-html').find(':input');
-                        let campo = input.attr('campo');
-                        let modelo = input.attr('ng-model');
-                        let modeloChave = input.attr('modelo-chave');
+                        var input = $(event.target).closest('monta-html').find(':input');
+                        var campo = input.attr('campo');
+                        var modelo = input.attr('ng-model');
+                        var modeloChave = input.attr('modelo-chave');
 
-                        let indice = input.attr('indice');
-                        let indiceSuperior = input.attr('indice-superior');
+                        var indice = input.attr('indice');
+                        var indiceSuperior = input.attr('indice-superior');
 
                         if (indice != undefined) {
                             modelo = modelo.replace('[$index]', `[${indice}]`);
@@ -472,8 +472,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                     $scope.adicionarTodosItensRepeticao = function (nomeBloco) {
                         var dadosBloco = APIServ.buscarValorVariavel($scope.estrutura.campos, nomeBloco);
-                        let autoCompleta = APIServ.buscarValorVariavel(dadosBloco, 'autoCompleta');
-                        let parametros = {
+                        var autoCompleta = APIServ.buscarValorVariavel(dadosBloco, 'autoCompleta');
+                        var parametros = {
                             tabela: autoCompleta.tabela
                         }
                     }
@@ -485,19 +485,19 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     }
 
                     $scope.trocarPosicao = (idElemento) => {
-                        let objeto = angular.element('#' + idElemento);
-                        let posicaoAtual = Number(objeto.attr('indice')) + 1;
-                        let posicaoNova = objeto.val().split(':')[1];
+                        var objeto = angular.element('#' + idElemento);
+                        var posicaoAtual = Number(objeto.attr('indice')) + 1;
+                        var posicaoNova = objeto.val().split(':')[1];
 
-                        let indiceAtual = objeto.attr('indice');
-                        let indiceNovo = parseInt(posicaoNova) - 1;
+                        var indiceAtual = objeto.attr('indice');
+                        var indiceNovo = parseInt(posicaoNova) - 1;
 
-                        let nomeVariavelRepeticao = objeto.attr('item-repetir');
-                        let variavelRepeticao = eval('$scope.' + objeto.attr('item-repetir'));
+                        var nomeVariavelRepeticao = objeto.attr('item-repetir');
+                        var variavelRepeticao = eval('$scope.' + objeto.attr('item-repetir'));
 
-                        let valorAtual = variavelRepeticao[indiceAtual];
+                        var valorAtual = variavelRepeticao[indiceAtual];
                         valorAtual['posicao'] = parseInt(posicaoNova);
-                        let valorNovo = variavelRepeticao[indiceNovo];
+                        var valorNovo = variavelRepeticao[indiceNovo];
                         valorNovo['posicao'] = parseInt(posicaoAtual);
                         variavelRepeticao[indiceAtual] = valorNovo;
                         variavelRepeticao[indiceNovo] = valorAtual;
@@ -586,12 +586,12 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                             $scope.filtros = [];
                             $scope.adicionarFiltro();
                             if ($scope.estrutura.filtrosPadrao != undefined) {
-                                for (let x in $scope.estrutura.filtrosPadrao) {
-                                    let obrigatorio = $scope.estrutura.filtrosPadrao[x]['obrigatorio'] != undefined && $scope.estrutura.filtrosPadrao[x]['obrigatorio'];
+                                for (var x in $scope.estrutura.filtrosPadrao) {
+                                    var obrigatorio = $scope.estrutura.filtrosPadrao[x]['obrigatorio'] != undefined && $scope.estrutura.filtrosPadrao[x]['obrigatorio'];
                                     //console.log(obrigatorio);
 
                                     if (obrigatorio) {
-                                        let novoFiltro = {
+                                        var novoFiltro = {
                                             campo: x,
                                             operador: $scope.estrutura.filtrosPadrao[x]['operador'],
                                             valor: $scope.estrutura.filtrosPadrao[x]['valor'],
@@ -616,9 +616,9 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                             })
                         } else if (estrutura.filtrosPadrao) {
                             //$scope.filtros = [];
-                            let tirarPrimeiroFiltro = false;
+                            var tirarPrimeiroFiltro = false;
                             angular.forEach(estrutura.filtrosPadrao, function (val, key) {
-                                let incluirFiltroPadrao = true;
+                                var incluirFiltroPadrao = true;
                                 angular.forEach($scope.filtros, function (valF, keyF) {
                                     incluirFiltroPadrao = valF.campo != key || valF.operador != val.operador || valF.valor != val.valor ? true : false;
                                 })
@@ -653,13 +653,13 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         }
 
                         $scope.converterFiltroParaEnvio = function () {
-                            let retorno = [];
+                            var retorno = [];
 
                             if ($scope.estrutura.camposFiltroPersonalizado != undefined) {
-                                let camposPer = Object.assign({}, $scope.estrutura.camposFiltroPersonalizado);
+                                var camposPer = Object.assign({}, $scope.estrutura.camposFiltroPersonalizado);
                                 for (i in camposPer) {
-                                    let campoPerFil = camposPer[i]['campoFiltro'] != undefined ? camposPer[i]['campoFiltro'] : i;
-                                    let valor = eval('$scope.' + $scope.estrutura.raizModelo + '.' + campoPerFil);
+                                    var campoPerFil = camposPer[i]['campoFiltro'] != undefined ? camposPer[i]['campoFiltro'] : i;
+                                    var valor = eval('$scope.' + $scope.estrutura.raizModelo + '.' + campoPerFil);
                                     if (valor != undefined) {
                                         retorno.push({
                                             campo: campoPerFil,
@@ -696,7 +696,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                         $scope.atualizarCampoFiltro = (campo, valor) => {
                             $parse(campo).assign($scope, valor);
-                            let campoOrdenar = $scope.ordemFiltro;
+                            var campoOrdenar = $scope.ordemFiltro;
 
                             function crescente(varA, varB) {
                                 return (varA[campoOrdenar] > varB[campoOrdenar]) ? 1 : ((varB[campoOrdenar] > varA[campoOrdenar] ? -1 : 0));
@@ -721,15 +721,15 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         if ($scope.filtrar == undefined) {
                             $scope.filtrar = function (pagina = 1, origem = 'filtro') {
                                 //Testando por limite no filtro inicial, para buscar apenas os últimos 500 registros
-                                let limite = 0;// pagina == 0 ? 500 : 0;
+                                var limite = 0;// pagina == 0 ? 500 : 0;
 
                                 if ($scope.antesDeFiltrar != undefined) {
                                     $scope.antesDeFiltrar();
                                 }
 
                                 if ($scope.estrutura.filtroObrigatorio != undefined && $scope.estrutura.filtroObrigatorio) {
-                                    let filtroVer = $scope.filtros[0];
-                                    let temValor = filtroVer.valor != '' || (filtroVer.di != undefined && filtroVer.di != '') || (filtroVer.df != undefined && filtroVer.df != '');
+                                    var filtroVer = $scope.filtros[0];
+                                    var temValor = filtroVer.valor != '' || (filtroVer.di != undefined && filtroVer.di != '') || (filtroVer.df != undefined && filtroVer.df != '');
                                     if (filtroVer.campo == '' || !temValor) {
                                         APIServ.mensagemSimples('Defina ao Menos um Filtro');
                                         return false;
@@ -743,7 +743,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                 //if (estrutura.mostrarAguardeAoFiltrar == undefined || estrutura.mostrarAguardeAoFiltrar) {
                                 $rS.carregando = true;
                                 //}
-                                let resumo = [];
+                                var resumo = [];
                                 if (estrutura.resumoConsulta != undefined) {
                                     angular.forEach(estrutura.resumoConsulta, function (val, key) {
                                         resumo.push({
@@ -753,7 +753,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                     })
                                 }
 
-                                let addFiltro = function (campo, operador, valor, exibir) {
+                                var addFiltro = function (campo, operador, valor, exibir) {
                                     $scope.filtroEnviar.push({
                                         campo: campo,
                                         operador: operador,
@@ -783,23 +783,23 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                     }
                                 });
 
-                                let ordemCampoTela = angular.element('#ordemFiltro').val();
+                                var ordemCampoTela = angular.element('#ordemFiltro').val();
 
-                                let ordemFiltro = ordemCampoTela != undefined && ordemCampoTela != '' > 0 ?
+                                var ordemFiltro = ordemCampoTela != undefined && ordemCampoTela != '' > 0 ?
                                     angular.element('#ordemFiltro').val().split(':')[1] : $scope.ordemFiltro != '' ?
                                         $scope.ordemFiltro : '';
 
-                                let sentidoFiltro = angular.element('#sentidoFiltro').length > 0 ?
+                                var sentidoFiltro = angular.element('#sentidoFiltro').length > 0 ?
                                     angular.element('#sentidoFiltro').val() : $scope.sentidoFiltro != '' ?
                                         $scope.sentidoFiltro : '';
 
                                 if (usarDataAlteracaoAoFiltrar && $scope.dataUltimaConsulta != undefined && origem == 'timer') {
-                                    let data_alteracao = APIAjuFor.dateParaTimestamp($scope.dataUltimaConsulta);
+                                    var data_alteracao = APIAjuFor.dateParaTimestamp($scope.dataUltimaConsulta);
                                     addFiltro('data_alteracao', '>=', data_alteracao, false);
                                 }
 
 
-                                let filtros = {
+                                var filtros = {
                                     tabela: $scope.estrutura.tabela,
                                     tabelaConsulta: $scope.estrutura.tabelaConsulta != undefined ? $scope.estrutura.tabelaConsulta : $scope.estrutura.tabela,
                                     tela: acao,
@@ -826,10 +826,10 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                     filtros.itensPagina = angular.element('#itensPagina') != undefined ? angular.element('#itensPagina').val() : 0;
                                 }
 
-                                let fd = new FormData();
+                                var fd = new FormData();
                                 fd.append('parametros', angular.toJson(filtros));
 
-                                let parametrosEnviarFiltro = $scope.tipoConsulta == 'post' ? fd : filtros;
+                                var parametrosEnviarFiltro = $scope.tipoConsulta == 'post' ? fd : filtros;
 
                                 // if (usarTimerConsulta && $scope.listaConsulta == undefined) {
                                 //     setTimeout(() => {
@@ -861,15 +861,15 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                             $scope.pagina = pagina;
 
                                             if (usarDataAlteracaoAoFiltrar && $scope.dataUltimaConsulta != undefined && origem == 'timer' && $scope.listaConsulta != undefined) {
-                                                let novaLista = Object.assign([], data.lista);
-                                                let listaAtual = Object.assign([], $scope.listaConsulta);
-                                                let novaListaDefinitiva = Object.assign([], novaLista);
+                                                var novaLista = Object.assign([], data.lista);
+                                                var listaAtual = Object.assign([], $scope.listaConsulta);
+                                                var novaListaDefinitiva = Object.assign([], novaLista);
 
                                                 if (Object.keys(novaLista).length > 0) {
-                                                    for (let x in listaAtual) {
-                                                        let inserir = false;
+                                                    for (var x in listaAtual) {
+                                                        var inserir = false;
 
-                                                        for (let y in novaLista) {
+                                                        for (var y in novaLista) {
                                                             //console.log(listaAtual[x][estrutura.campo_chave]);
                                                             //console.log(novaLista[y][estrutura.campo_chave]);
 
@@ -924,7 +924,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                         if ($scope.selecionarItemConsulta == undefined) {
                             $scope.selecionarItemConsulta = function (key, item) {
-                                let parametros = {
+                                var parametros = {
                                     tela: acao,
                                     key: key,
                                     campo_chave: $scope.estrutura.campo_chave,
@@ -944,12 +944,12 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         if ($scope.selecionarTodosItensConsulta == undefined) {
                             $scope.selecionarTodosItensConsulta = function () {
 
-                                let teste = $scope.itensPaginaPaginacao();
+                                var teste = $scope.itensPaginaPaginacao();
                                 //console.log(teste);
 
                                 $scope.todosItensSelecionados = $scope.todosItensSelecionados == 'false' || !$scope.todosItensSelecionados;
                                 if ($scope.listaConsulta != undefined && Object.keys($scope.listaConsulta).length > 0) {
-                                    let parametros = {
+                                    var parametros = {
                                         tela: acao,
                                         selecionado: $scope.todosItensSelecionados
                                     }
@@ -964,11 +964,11 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                         if ($scope.detalhar == undefined) {
                             $scope.detalhar = function (item) {
-                                let retorno = [];
-                                let keyRetorno = 0;
+                                var retorno = [];
+                                var keyRetorno = 0;
                                 //Monto o filtro com a chave do item
 
-                                let filtros = {
+                                var filtros = {
                                     tabela: $scope.estrutura.tabela,
                                     campo_chave: $scope.estrutura.campo_chave,
                                     chave: item[$scope.estrutura.campo_chave],
@@ -1024,14 +1024,14 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                 var dados = APIServ.transporVariavel($scope[estrutura.raizModelo]);
 
                                 $rootScope.carregando = true;
-                                let fd = $scope.fd;
+                                var fd = $scope.fd;
 
-                                let textoSalvou = $scope.estrutura.textoConfirmaSalvamento != undefined ? $scope.estrutura.textoConfirmaSalvamento : 'Dados Inseridos com Sucesso!';
+                                var textoSalvou = $scope.estrutura.textoConfirmaSalvamento != undefined ? $scope.estrutura.textoConfirmaSalvamento : 'Dados Inseridos com Sucesso!';
 
                                 fd.append('dados', angular.toJson(dados));
 
                                 //Definindo as configuracoes
-                                let configuracoes = {
+                                var configuracoes = {
                                     tabela: $scope.estrutura.tabela,
                                     campo_chave: $scope.estrutura.campoChave != undefined ? $scope.estrutura.campoChave : $scope.estrutura.campo_chave,
                                     classe: $scope.estrutura.classe != undefined ? $scope.estrutura.classe : $scope.estrutura.tabela,
@@ -1043,14 +1043,14 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                                 //console.log(configuracoes);
 
-                                let varrerCamposVerificarAnexos = campos => {
+                                var varrerCamposVerificarAnexos = campos => {
                                     angular.forEach(campos, function (val, key) {
                                         if (key.substr(0, 5) == 'bloco') {
                                             varrerCamposVerificarAnexos(campos[key]['campos']);
                                         } else if (val.tipo == 'arquivo' || val.tipo == 'imagem') {
 
                                             configuracoes['arquivosAnexar'] = configuracoes['arquivosAnexar'] != undefined ? configuracoes['arquivosAnexar'] : [];
-                                            let at = val.atributos_arquivo != undefined ? val.atributos_arquivo : [];
+                                            var at = val.atributos_arquivo != undefined ? val.atributos_arquivo : [];
                                             fd.append(key, dadosTela[key]);
 
                                             configuracoes['arquivosAnexar'].push({
@@ -1075,7 +1075,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                     configuracoes['relacionamentosVerificar'] = $scope.estrutura.relacionamentosVerificar;
                                 }
 
-                                let parametrosEnviar;
+                                var parametrosEnviar;
                                 if ($scope.tipoSalvar == 'post') {
                                     fd.append('configuracoes', angular.toJson(configuracoes));
 
@@ -1120,7 +1120,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                         } else if (typeof retorno === 'string') {
                                             APIServ.mensagemSimples('Informação', 'Erro ao Salvar, tente novamente!');
                                         } else {
-                                            let cadastroDiretoUrl = parametrosUrl[2] != undefined && parametrosUrl[2] == 'cadastro' ? true : false;
+                                            var cadastroDiretoUrl = parametrosUrl[2] != undefined && parametrosUrl[2] == 'cadastro' ? true : false;
                                             var funcao = function () {
                                                 if (EGFuncoes.temConsulta($scope.estrutura) && !cadastroDiretoUrl) {
                                                     $scope.tela = 'consulta';
@@ -1176,7 +1176,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                             if ($scope.aoSalvar != undefined) {
                                                 $scope.aoSalvar(retorno);
                                             } else if ($scope.estrutura.tipoEstrutura == 'cadastroUnico') {
-                                                let funcaoCadUnico = () => {
+                                                var funcaoCadUnico = () => {
                                                     // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
                                                     if ($scope.isModal || ($scope.localExibicao && $scope.localExibicao === 'modal')) {
                                                         console.log('🎭 [estruturaGerencia] CadastroUnico - contexto modal detectado - evitando window.location.reload()');
@@ -1230,7 +1230,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         }
 
                         if ($scope.estrutura.tipoEstrutura == 'cadastroUnico') {
-                            let filtros = {
+                            var filtros = {
                                 tabela: $scope.estrutura.tabela,
                                 campo_chave: $scope.estrutura.campo_chave,
                                 campos: $scope.estrutura.listaConsulta != undefined ? Object.keys($scope.estrutura.listaConsulta) : '*',
@@ -1253,7 +1253,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                 }
                                 $rS.carregando = true;
                                 var indiceVariavel = this.$index;
-                                let filtros = {
+                                var filtros = {
                                     tabela: $scope.estrutura.tabela,
                                     tabelaConsulta: $scope.estrutura.tabelaConsulta,
                                     campo_chave: $scope.estrutura.campo_chave,
@@ -1274,7 +1274,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                     $scope.antesDeBuscarParaAlterar(filtros);
                                 }
 
-                                let fd = new FormData();
+                                var fd = new FormData();
                                 fd.append('filtros', JSON.stringify(filtros));
                                 APIServ.executaFuncaoClasse('classeGeral', 'buscarParaAlterar', fd, 'post').success(function (data) {
                                     //APIServ.executaFuncaoClasse('classeGeral', 'buscarParaAlterar', filtros).success(function (data) {
@@ -1304,7 +1304,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                         }
 
                                         if ($scope.estrutura.funcaoAoAlterar != undefined) {
-                                            let nomeFuncaoAlterar = eval('$scope.' + $scope.estrutura.funcaoAoAlterar);
+                                            var nomeFuncaoAlterar = eval('$scope.' + $scope.estrutura.funcaoAoAlterar);
                                             nomeFuncaoAlterar(data);
                                         } else if ($scope.aoAlterar != undefined) {
                                             $scope.aoAlterar(data);
@@ -1320,7 +1320,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     //Fazendo esta comparaca para nao sobrescrever a funcao caso seja declarada no controller
                     if ($scope.excluir == undefined) {
                         $scope.excluir = function (item) {
-                            let parametros = {
+                            var parametros = {
                                 tabela: $scope.estrutura.tabela,
                                 campo_chave: $scope.estrutura.campo_chave,
                                 chave: item[$scope.estrutura.campo_chave]
@@ -1332,7 +1332,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                     if (retorno.erro != undefined) {
                                         APIServ.mensagemSimples(retorno.erro)
                                     } else if (retorno.chave >= 0) {
-                                        let key = $scope.listaConsulta.indexOf(item);
+                                        var key = $scope.listaConsulta.indexOf(item);
                                         $scope.listaConsulta.splice(key, 1);
                                         APIServ.mensagemSimples('Confirmação', $scope.estrutura.nomeUsual + ' Excluído!');
                                     } else if (retorno.chave > 0) {
@@ -1346,10 +1346,10 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     }
 
                     $scope.mostrarInformacoes = (campo) => {
-                        let elemento = $(event.target);
-                        let campoTemp = APIServ.buscarValorVariavel($scope.estrutura.campos, campo);
-                        let mensagem = campoTemp.informacoes;
-                        let elementoPai = elemento.closest('div.form-group');
+                        var elemento = $(event.target);
+                        var campoTemp = APIServ.buscarValorVariavel($scope.estrutura.campos, campo);
+                        var mensagem = campoTemp.informacoes;
+                        var elementoPai = elemento.closest('div.form-group');
                         elementoPai.attr('data-toggle', 'popover').attr('data-content', mensagem).popover({
                             'placement': 'bottom'
                         }).popover('show')
@@ -1360,7 +1360,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         */
                     }
 
-                    let html = '';
+                    var html = '';
                     if (EGFuncoes.temConsulta(retorno)) {
                         html += '<cabecalho-consulta></cabecalho-consulta>'; //montaCabecalhoConsulta(retorno, $scope);
                         html += '<lista-consulta></lista-consulta>'; //  montaListaConsulta(estrutura);
@@ -1414,8 +1414,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 }
 
                 var url = $attrs.urlTemplate;
-                let classe = $attrs.classe;
-                let funcaoEstrutura = $attrs.funcaoEstrutura;
+                var classe = $attrs.classe;
+                var funcaoEstrutura = $attrs.funcaoEstrutura;
 
                 // Função para processar a classe, aguardando interpolação se necessário
                 function processarClasse() {
@@ -1425,7 +1425,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         
                         // Aguardar um ciclo do digest para que a interpolação seja resolvida
                         setTimeout(function() {
-                            let classeInterpolada = $element.attr('classe');
+                            var classeInterpolada = $element.attr('classe');
                             console.log('✅ [estruturaGerencia] Classe interpolada:', classeInterpolada);
                             
                             if (classeInterpolada && classeInterpolada !== classe && !classeInterpolada.includes('{{')) {
@@ -1433,9 +1433,9 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                 processarComClasse(classeInterpolada);
                             } else {
                                 // Tentar extrair o nome da variável da interpolação
-                                let nomeVariavel = classe.match(/\{\{(.+?)\}\}/);
+                                var nomeVariavel = classe.match(/\{\{(.+?)\}\}/);
                                 if (nomeVariavel && nomeVariavel[1]) {
-                                    let valorVariavel = $scope[nomeVariavel[1].trim()];
+                                    var valorVariavel = $scope[nomeVariavel[1].trim()];
                                     console.log('🎯 [estruturaGerencia] Valor da variável', nomeVariavel[1], ':', valorVariavel);
                                     if (valorVariavel) {
                                         processarComClasse(valorVariavel);
@@ -1456,7 +1456,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 function processarComClasse(classeResolvida) {
                     console.log('🔧 [estruturaGerencia] Processando com classe:', classeResolvida);
                     
-                    let parametrosBuscaEstrutura = {
+                    var parametrosBuscaEstrutura = {
                         classe: classeResolvida,
                         parametrosEnviados: $('#parametrosEnviados').val()
                     };
@@ -1466,10 +1466,10 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         $scope.funcaoEstrutura = funcaoEstrutura;
                     }
 
-                    let paramEnviarBuscaEstrutura = parametrosBuscaEstrutura;
+                    var paramEnviarBuscaEstrutura = parametrosBuscaEstrutura;
 
                     if ($scope.tipoConsulta == 'post') {
-                        let fdEnviarBuscaEstrutura = new FormData();
+                        var fdEnviarBuscaEstrutura = new FormData();
                         fdEnviarBuscaEstrutura.append('parametros', JSON.stringify(parametrosBuscaEstrutura));
                         paramEnviarBuscaEstrutura = fdEnviarBuscaEstrutura;
                     }

@@ -15,7 +15,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                     grande: 'iconeGrande'
                 };
 
-                let comprimir = false;
+                var comprimir = false;
 
                 var classeIcone = 'glyphicon-collapse-down';
 
@@ -184,7 +184,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
 
 
                 if (scope.estrutura.filtroPersonalzadoDiretiva != undefined) {
-                    let temp = `<${APIAjuFor.variavelParaDiretiva(scope.estrutura.filtroPersonalzadoDiretiva)} ng-if="tela != 'cadastro'"></${APIAjuFor.variavelParaDiretiva(scope.estrutura.filtroPersonalzadoDiretiva)}>`;
+                    var temp = '<' + APIAjuFor.variavelParaDiretiva(scope.estrutura.filtroPersonalzadoDiretiva) + ' ng-if="tela != \'cadastro\'"></' + APIAjuFor.variavelParaDiretiva(scope.estrutura.filtroPersonalzadoDiretiva) + '>';
                     html += temp;
                 } else {
                     html += '<form-cabecalho-consulta-padrao></form-cabecalho-consulta-padrao>';

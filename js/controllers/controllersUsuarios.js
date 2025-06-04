@@ -58,7 +58,7 @@ angular.module('app.controllersUsuarios', [])
 
             ];
 
-            let filtros = {
+            var filtros = {
                 tabela: 'usuarios',
                 filtros: filtro,
                 campo_chave: 'chave_usuario',
@@ -187,7 +187,7 @@ angular.module('app.controllersUsuarios', [])
         $scope.buscarPerfisPadrao = function () {
             $scope.cadastro = false;
 
-            let filtros = {
+            var filtros = {
                 tabela: 'usuarios_perfil_padrao',
                 campo_chave: 'chave_usuario_padrao',
                 campos: ['chave_perfil_padrao', 'nome_perfil'],
@@ -286,15 +286,15 @@ angular.module('app.controllersUsuarios', [])
             })
         }
 
-        let desvincularPerfilPadrao = () => {
+        var desvincularPerfilPadrao = () => {
             return new Promise((resolve) => {
                 if ($scope.chave_perfil_padrao > 0) {
-                    let funcaoSim = () => {
+                    var funcaoSim = () => {
                         $scope.chave_perfil_padrao = null;
                         resolve(true);
                     }
 
-                    let funcaoNao = () => {
+                    var funcaoNao = () => {
                         resolve(false);
                     }
                     APIServ.dialogoSimples('Informação!', 'Esta ação desvincula o Perfil Padrão. Continuar?', 'Sim', 'Não', funcaoSim, funcaoNao);

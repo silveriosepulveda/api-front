@@ -4,22 +4,22 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
         replace: false,
         template: '',
         link: function (scope, elem, attr) {
-            let campo = elem.attr('campo');
+            var campo = elem.attr('campo');
 
             var e = angular.fromJson(scope.estrutura);
 
-            let tela = attr.tela != undefined ? attr.tela : scope.tela;
+            var tela = attr.tela != undefined ? attr.tela : scope.tela;
 
             var nomeBloco = elem.attr('nome-bloco');
             //Faco essa comparaca, pois o campo dentro do bloco, pode ter o mesmo nome de outro campa em outro bloco ou fora de blocos
             var dadosBloco = nomeBloco != undefined ? APIServ.buscarValorVariavel(e.campos, nomeBloco) : false;
 
-            let campoLista = scope.estrutura.listaConsulta != undefined ? Object.assign({}, scope.estrutura.listaConsulta) : {};
+            var campoLista = scope.estrutura.listaConsulta != undefined ? Object.assign({}, scope.estrutura.listaConsulta) : {};
 
-            let raizModelo = attr.raizModelo != undefined ? attr.raizModelo : tela == 'consulta' && e.tipoEstrutura != 'personalizado' ? 'item' : e.raizModelo;
+            var raizModelo = attr.raizModelo != undefined ? attr.raizModelo : tela == 'consulta' && e.tipoEstrutura != 'personalizado' ? 'item' : e.raizModelo;
 
             if (tela == 'consulta' && scope.estrutura.camposFiltroPersonalizado != undefined) {
-                let camposPerso = Object.assign({}, scope.estrutura.camposFiltroPersonalizado);
+                var camposPerso = Object.assign({}, scope.estrutura.camposFiltroPersonalizado);
                 var campos = angular.merge(campoLista, scope.estrutura.campos, camposPerso);
             } else {
                 //var campos = angular.merge({}, scope.estrutura.campos, campoLista);
@@ -35,23 +35,23 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
             p = p == '' ? [] : p;
 
             if (p == 'linhaDivisoria') {
-                let html = '<linha-divisoria></linha-divisoria>';
+                var html = '<linha-divisoria></linha-divisoria>';
                 elem.html(html);
                 $compile(elem.contents())(scope);
                 return false;
             }
 
             if (p == 'quebraLinha') {
-                let html = '<quebra-linha></quebra-linha>';
+                var html = '<quebra-linha></quebra-linha>';
                 elem.html(html);
                 $compile(elem.contents())(scope);
                 return false;
             }
 
-            let campoChaveAC;
+            var campoChaveAC;
 
             p.tipo = p.tipo != undefined ? p.tipo : 'texto';
-            let tipoEtiqueta = p.tipoEtiqueta != undefined ? p.tipoEtiqueta : (e.todasEtiquetasEmbutidas != undefined && (e.todasEtiquetasEmbutidas == true || e.todasEtiquetasEmbutidas == 'true')) ||
+            var tipoEtiqueta = p.tipoEtiqueta != undefined ? p.tipoEtiqueta : (e.todasEtiquetasEmbutidas != undefined && (e.todasEtiquetasEmbutidas == true || e.todasEtiquetasEmbutidas == 'true')) ||
                 (p.tipoEtiqueta != undefined && p.tipoEtiqueta == 'embutido') ? 'embutido' : 'normal';
 
             tipoEtiqueta = tela == 'consulta' ? '' : tipoEtiqueta;
@@ -62,22 +62,22 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
             if (tela == 'consulta') {
                 p.modelo = raizModelo + "[$index]" + "['" + campo + "']";
             } else {
-                let raizModeloBloco = dadosBloco.raizModeloBloco != undefined ? dadosBloco.raizModeloBloco : raizModelo;
+                var raizModeloBloco = dadosBloco.raizModeloBloco != undefined ? dadosBloco.raizModeloBloco : raizModelo;
                 p.modelo = p.modelo != undefined ? p.modelo : raizModeloBloco + "['" + campo + "']";
             }
 
             var acao = scope.acao != undefined ? scope.acao : APIServ.parametrosUrl()[1];
 
-            let verificarPerfil = p.verificarPerfil != undefined && p.verificarPerfil;
+            var verificarPerfil = p.verificarPerfil != undefined && p.verificarPerfil;
 
-            let temAcao = $rS[acao] != undefined && $rS[acao]['campos'] != undefined && $rS[acao]['campos'][campo] != undefined;
+            var temAcao = $rS[acao] != undefined && $rS[acao]['campos'] != undefined && $rS[acao]['campos'][campo] != undefined;
 
             if (!verificarPerfil || (verificarPerfil && temAcao)) {
                 var dadosUsuario = APIServ.buscarValorVariavel(APIServ.buscaDadosLocais('usuario'), campo);
                 var temDadosUsuario = dadosUsuario != undefined && dadosUsuario != '' && APIServ.valorExisteEmVariavel(scope.estrutura.camposBuscarNoUsuario, campo);
 
-                let spanObrigatorio = '';
-                let info = '';
+                var spanObrigatorio = '';
+                var info = '';
 
                 if (!temDadosUsuario) {
                     //O elemento pode estar dentro de um bloco, assim o modelo e dinamico
@@ -121,10 +121,10 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                         var filho = '';
 
                         var classes = (temInput && p.tipo != 'oculto') || (p.tipo == 'select') ? ['form-control'] : [];
-                        let classesInput = p.classes_input != undefined ? p.classes_input.split(' ') : [];
+                        var classesInput = p.classes_input != undefined ? p.classes_input.split(' ') : [];
                         classes = p.classes_input != undefined ? [].concat(classes, classesInput) : classes;
 
-                        let atributos = p.atributosInput != undefined ? p.atributosInput : p.atributos_input != undefined ? p.atributos_input : undefined;
+                        var atributos = p.atributosInput != undefined ? p.atributosInput : p.atributos_input != undefined ? p.atributos_input : undefined;
                         atributos = atributos != undefined ? EGFuncoes.montarAtributos(atributos) : [];
 
                         if (elem.attr('foco') != undefined) {
@@ -292,17 +292,17 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                             atributos.push(`ng-disabled="${e.raizModelo}.${e.campo_chave} > 0"`);
                         }
 
-                        let tituloInput = p.titulo != undefined ? `title="${p.titulo}"` : '';
-                        let placeHolder = p.titulo != undefined ? p.titulo : '';
+                        var tituloInput = p.titulo != undefined ? `title="${p.titulo}"` : '';
+                        var placeHolder = p.titulo != undefined ? p.titulo : '';
 
-                        let tamanhoInput = p.tamanhoInput != undefined ? 'input-' + p.tamanhoInput :
+                        var tamanhoInput = p.tamanhoInput != undefined ? 'input-' + p.tamanhoInput :
                             e.tamanhoInputs != undefined ? 'input-' + e.tamanhoInputs : 'input-lg';
                         tamanhoInput = tela == 'consulta' ? 'input-xs' : tamanhoInput;
 
 
                         if (temInput) {
                             if (p.tipo == 'area-texto') {
-                                let linhas = p.linhas != undefined ? p.linhas : 3;
+                                var linhas = p.linhas != undefined ? p.linhas : 3;
                                 var input = `<textarea name="${nomeElemento}" ng-model="${p.modelo}" id="${idElemento}" ${atributos.join(' ')} rows="${linhas}" ${tituloInput} class="${classes.join(' ')}"></textarea>`
                             } else {
                                 if (p.tipo == 'imagem' && p.tipoImagem != undefined && p.tipoImagem == 'exibicao') {
@@ -310,7 +310,7 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                                 id="${idElemento}" ${atributos.join(' ')} ${tituloInput} class="img-responsive">`;
                                 } else {
 
-                                    let modeloChaveAC = campoChaveAC != undefined ? `modelo-chave="${campoChaveAC.join('.')}"` : '';
+                                    var modeloChaveAC = campoChaveAC != undefined ? `modelo-chave="${campoChaveAC.join('.')}"` : '';
 
 
                                     var input = `<input type="${typeElemento}" placeholder="${placeHolder}" indice="{{$index}}" indice-superior="{{$parent.$index}}" name="${nomeElemento}" ng-model="${p.modelo}" ${modeloChaveAC}
@@ -326,13 +326,13 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                         }
                     }
 
-                    let atributosDiv = [];
+                    var atributosDiv = [];
                     if (p.atributos_div != undefined)
                         atributosDiv = EGFuncoes.montarAtributos(p.atributos_div)
                     else if (p.atributosDiv != undefined)
                         atributosDiv = EGFuncoes.montarAtributos(p.atributosDiv);
 
-                    let classesDiv = p.classes_div != undefined ? p.classes_div.split(' ') : [];
+                    var classesDiv = p.classes_div != undefined ? p.classes_div.split(' ') : [];
 
                     //Acrecentando as classes de tamanho do elemento div
                     if (tela == 'cadastro') {
@@ -351,22 +351,22 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
 
                     if (p.porcent != undefined && p.porc > 0) classesDiv.push('larg' + p.porc + 'p');
 
-                    let textoNovo = '';
-                    let htmlAbreInputGroup = '';
-                    let htmlFechaInputGroup = '';
-                    let htmlNovo = '';
-                    let htmlEtiqueta = '';
+                    var textoNovo = '';
+                    var htmlAbreInputGroup = '';
+                    var htmlFechaInputGroup = '';
+                    var htmlNovo = '';
+                    var htmlEtiqueta = '';
 
                     if (p.novo != undefined && p.novo != '') {
-                        let parametrosClick = APIServ.criptografa(JSON.stringify(p.novo));
+                        var parametrosClick = APIServ.criptografa(JSON.stringify(p.novo));
                         textoNovo = p.novo['texto'] != undefined ? p.novo['texto'] : 'Novo(a)';
                         htmlAbreInputGroup = '<div class="input-group">';
 
                         // Migrar para novo sistema de modal PopUpModal
-                        let clickNovo;
+                        var clickNovo;
                         if (p.novo['click'] == undefined) {
                             // Construir rota para o novo sistema
-                            let rota = '';
+                            var rota = '';
                             if (p.novo.pagina && p.novo.acao) {
                                 rota = '/' + p.novo.pagina + '/' + p.novo.acao;
                                 if (p.novo.subAcao) {
@@ -382,7 +382,7 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                             clickNovo = p.novo['click'];
                         }
 
-                        let atributosNovo = p.novo.atributos_novo != undefined ? EGFuncoes.montarAtributos(p.novo.atributos_novo).join(' ') : '';
+                        var atributosNovo = p.novo.atributos_novo != undefined ? EGFuncoes.montarAtributos(p.novo.atributos_novo).join(' ') : '';
 
                         htmlNovo = `<span class="input-group-btn btn btn-primary" tabindex="false" parametros="' ${parametrosClick}'" ${atributosNovo} ng-click="${clickNovo}" indice="{{$index}}" indice-superior="{{$parent.$index}}"> ${textoNovo}</span>`;
 
@@ -397,10 +397,10 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                     //Vendo o tipo de Etiqueta (Label)
                     if (tipoEtiqueta == 'embutido') {
                         htmlAbreInputGroup = '<div class="input-group">';
-                        let infoEmb = p.informacoes != undefined ? `<span class="glyphicon glyphicon-info-sign"  tabIndex="-1" ng-click="mostrarInformacoes('${campo}')"></span>` : '';
+                        var infoEmb = p.informacoes != undefined ? `<span class="glyphicon glyphicon-info-sign"  tabIndex="-1" ng-click="mostrarInformacoes('${campo}')"></span>` : '';
                         htmlEtiqueta = `<span class="input-group-addon ">${p.texto} ${spanObrigatorio} ${infoEmb} </span>`;
 
-                        let htmlPosInputGroup = p.informacoes != undefined ? `<div class="col-xs-12 div6 informacoes" ng-if="${e.raizModelo}.mostrarInformacoes_${campo}">${p.informacoes}</div>` : '';
+                        var htmlPosInputGroup = p.informacoes != undefined ? `<div class="col-xs-12 div6 informacoes" ng-if="${e.raizModelo}.mostrarInformacoes_${campo}">${p.informacoes}</div>` : '';
 
                         if (tela == 'consulta' && (p.autoCompleta != undefined && p.autoCompleta.opcaoLimpar)) {
                             htmlFechaInputGroup = `<span class="input-group-btn btn btn-default glyphicon glyphicon-erase" title="Limpar o Campo"  

@@ -28,7 +28,7 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
         var retorno = [];
         // angular.forEach(atributos, function (val, atr) {   
         //     console.log(val);
-        //     let temp = val != "" ? `${atr}="${val}"` : atr; 
+        //     var temp = val != "" ? `${atr}="${val}"` : atr; 
         //     console.log(val);
         //     console.log(temp);                                  
         //     //Comentei essa linha pois estava dando erro, mas não sei onde usava
@@ -36,9 +36,9 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
         //     retorno.push(temp);
         // })
 
-        for (let key in atributos) {
-            let val = atributos[key];
-            let temp = val != "" ? `${key}="${val}"` : atributos;
+        for (var key in atributos) {
+            var val = atributos[key];
+            var temp = val != "" ? `${key}="${val}"` : atributos;
             retorno.push(temp);
         }
         return retorno;
@@ -77,8 +77,8 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
         var caracteres = ["[", "]", '"', '.', "'"];
         var retorno = '';
         for (var i = 0; i < modelo.length; i++) {
-            let caracter = modelo.substr(i, 1);
-            let sequencia = modelo.substr(i + 1, 1);
+            var caracter = modelo.substr(i, 1);
+            var sequencia = modelo.substr(i + 1, 1);
             var substituir = caracteres.indexOf(caracter) >= 0;
 
             //Fiz essa comparacao para não alterar o $parent.$index
@@ -94,16 +94,16 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
         return retorno;
     }
 
-    let _trocarCampoModelo = (event, modelo, campoAtual, campoNovo) => {
-        let retorno = _indexPorNumero(event, modelo);
+    var _trocarCampoModelo = (event, modelo, campoAtual, campoNovo) => {
+        var retorno = _indexPorNumero(event, modelo);
         retorno = retorno.replace(campoAtual, campoNovo);
         return retorno;
     }
 
-    let _indexPorNumero = (event, modelo) => {
-        let indice = $(event.target).attr('indice');
-        let indiceSuperior = $(event.target).attr('indice-superior');
-        let retorno = '';
+    var _indexPorNumero = (event, modelo) => {
+        var indice = $(event.target).attr('indice');
+        var indiceSuperior = $(event.target).attr('indice-superior');
+        var retorno = '';
         //return modelo.replace('[$index]', `[${indice}]`).replace('[$parent.$index]', `[${indiceSuperior}]`);
         if (indice == undefined || indice == '') {
             retorno = modelo;
@@ -147,11 +147,11 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
             if (_eBloco(campo) && val.nome == undefined) {
                 retornoMCFC = _montarCamposFiltroConsulta(val.campos, camposFiltroPesquisa, retornoMCFC);
             } else if (val.tipo != 'oculto' && val.tipo != 'area-texto' && campo.substr(0, 5) != 'botao' && !_eBloco(campo) && val.tipo != 'diretiva') {
-                let cF = estrutura.camposFiltroPesquisa;
-                let ocultarCampoFiltro = estrutura.camposOcultarFiltroPesquisa != undefined && APIServ.valorExisteEmVariavel(estrutura.camposOcultarFiltroPesquisa, campo);
+                var cF = estrutura.camposFiltroPesquisa;
+                var ocultarCampoFiltro = estrutura.camposOcultarFiltroPesquisa != undefined && APIServ.valorExisteEmVariavel(estrutura.camposOcultarFiltroPesquisa, campo);
 
                 if (!ocultarCampoFiltro) {
-                    let tempItem = {};
+                    var tempItem = {};
                     tempItem['texto'] = cF != undefined && cF[campo] != undefined && cF[campo]['texto'] != undefined ? cF[campo]['texto'] : val.texto;
                     tempItem['tipo'] = val.tipo;
 
@@ -185,7 +185,7 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
                     retorno = _novaVariavelRaizModelo(valores, retorno);
                 }
             } else if (campo != 'botao') {
-                let valor = '';
+                var valor = '';
                 if (valores.padrao == 'data') {
                     valor = APIAjuFor.dataAtual();
                 } else if (valores.padrao == 'hora') {
@@ -200,12 +200,12 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
         return retorno;
     }
 
-    let _adicionarItemRepeticao = function ($scope, nomeBloco, obj, valor) {
+    var _adicionarItemRepeticao = function ($scope, nomeBloco, obj, valor) {
         var obj = obj != undefined ? obj : this;
         var dadosBloco = APIServ.buscarValorVariavel($scope.estrutura.campos, nomeBloco);
 
         //var raizModelo = $scope.estrutura.raizModelo;
-        let raizModelo = dadosBloco.raizModeloBloco != undefined ? dadosBloco.raizModeloBloco : $scope.estrutura.raizModelo;
+        var raizModelo = dadosBloco.raizModeloBloco != undefined ? dadosBloco.raizModeloBloco : $scope.estrutura.raizModelo;
 
         var variavelSalvar = dadosBloco.variavelSalvar;
         var variavelSuperior = dadosBloco.variavelSuperior;
@@ -307,7 +307,7 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
         }
         // Função para remoção remota (backend)
         var _funcaoRemoverRemoto = function () {
-            let parametros = {
+            var parametros = {
                 campo_chave: dadosBloco.campoChave,
                 tabela: dadosBloco.tabela,
                 chave: variavelRepeticao[indice][dadosBloco.campoChave],

@@ -31,7 +31,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
 
             if (temp1.length > 1) { //Se e solicitacao GET
                 //Neste caso a url esta separada pro barras /
-                let te = temp1[0].split('/');
+                var te = temp1[0].split('/');
                 if (temp1[1].split('/').length > 1) {
                     var retornoTemp = temp1[1].split('/');
 
@@ -42,7 +42,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
                     });
                 } else if (temp1[1].split('&').length > 1) {
                     //Nesse caso esta separado pro & e tem os nomes pagina e acao
-                    let retornoTemp = temp1[1].split('&');
+                    var retornoTemp = temp1[1].split('&');
                     angular.forEach(retornoTemp, function (value, key) {
                         retorno.push(value.split('=')[1]);
                     })
@@ -396,9 +396,9 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
             return retorno;
         }
 
-        let _excluriKeyArray = (array, key) => {
-            let nova = [];
-            for (let k in array) {                //console.log(k);
+        var _excluriKeyArray = (array, key) => {
+            var nova = [];
+            for (var k in array) {                //console.log(k);
                 //console.log(key);
 
 
@@ -414,7 +414,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
                 return variavel
             } else {
                 var retorno = valor;
-                for (let campo in variavel) {
+                for (var campo in variavel) {
                     if (campo == chave) {
                         retorno = variavel[campo];
                     } else if (angular.isObject(variavel[campo]) && retorno == '') {
@@ -463,7 +463,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
             return $base64.decode(texto);
         }
 
-        // let _abrirModal = function (template, valor, tabela, controller) {
+        // var _abrirModal = function (template, valor, tabela, controller) {
         //     $rS.valorAlteracao = $rS.valorAlteracao != undefined ? $rS.valorAlteracao : {};
         //     $rS.valorAlteracao[tabela] = valor;
         //     $mdDialog.show({
@@ -476,7 +476,7 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
         //     });
         // }
 
-        let _fecharModal = function () {
+        var _fecharModal = function () {
             $rS.valorAlteracao = {};
             $mdDialog.hide();
         }

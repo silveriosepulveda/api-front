@@ -190,7 +190,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
         //console.log('🔄 [menuPainel] abrirPopUpMenu: Migrando para novo sistema PopUpModal');
         
         // Construir rota baseada nos parâmetros
-        let rota = '';
+        var rota = '';
         if (parametros.pagina && parametros.acao) {
             rota = '/' + parametros.pagina + '/' + parametros.acao + '/cadastro';
         } else {
@@ -198,7 +198,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
             return;
         }
         
-        let titulo = 'Cadastro de ' + (parametros.item || parametros.acao || 'Item');
+        var titulo = 'Cadastro de ' + (parametros.item || parametros.acao || 'Item');
         
         // Usar o novo sistema PopUpModal
         if (typeof PopUpModal !== 'undefined') {
@@ -226,7 +226,7 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
             // Fallback para sistema antigo se PopUpModal não estiver disponível
             console.warn('⚠️ [menuPainel] PopUpModal não encontrado, usando sistema antigo');
             
-            let p = {
+            var p = {
                 pagina: parametros.pagina,
                 acao: parametros.acao,
                 subAcao: 'cadastro',
@@ -234,10 +234,10 @@ app.controller('menuPainelCtrl', function ($rootScope, $scope, APIServ, $locatio
                 largura: screen.availWidth
             }
 
-            let largura = p.largura != undefined ? p.largura : 800;
-            let altura = p.altura != undefined ? p.altura : 800;
+            var largura = p.largura != undefined ? p.largura : 800;
+            var altura = p.altura != undefined ? p.altura : 800;
 
-            let idPopUp = 'popUp_' + parseInt(Math.random() * 100);
+            var idPopUp = 'popUp_' + parseInt(Math.random() * 100);
             p['idPopUp'] = idPopUp;
             parametros = APIServ.criptografa(angular.toJson(p));
 

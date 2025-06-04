@@ -18,13 +18,13 @@ angular.module('directivesPadrao').directive('selectFiltrosPesquisaOriginal', ['
                     var indice = scope.$index;
                     var campo = scope.filtros[indice]['campo'];
                     //Juntando os valores do campo nos tres locais possiveis, campo, campos filtro pesquisa e campos filtros padrao
-                    let dadosCampo = APIServ.buscarValorVariavel(scope.estrutura.campos, campo);
-                    let dadosCampoFiltroPesquisa = scope.estrutura.camposFiltroPesquisa != undefined && scope.estrutura.camposFiltroPesquisa[campo] != undefined ? scope.estrutura.camposFiltroPesquisa[campo] : {};
-                    let dadosCampoFiltroPadrao = scope.estrutura.filtrosPadrao != undefined && scope.estrutura.filtrosPadrao[campo] != undefined ? scope.estrutura.filtrosPadrao[campo] : {};
-                    let dadosFiltro = Object.assign({}, dadosCampoFiltroPadrao, dadosCampo, dadosCampoFiltroPesquisa);
+                    var dadosCampo = APIServ.buscarValorVariavel(scope.estrutura.campos, campo);
+                    var dadosCampoFiltroPesquisa = scope.estrutura.camposFiltroPesquisa != undefined && scope.estrutura.camposFiltroPesquisa[campo] != undefined ? scope.estrutura.camposFiltroPesquisa[campo] : {};
+                    var dadosCampoFiltroPadrao = scope.estrutura.filtrosPadrao != undefined && scope.estrutura.filtrosPadrao[campo] != undefined ? scope.estrutura.filtrosPadrao[campo] : {};
+                    var dadosFiltro = Object.assign({}, dadosCampoFiltroPadrao, dadosCampo, dadosCampoFiltroPesquisa);
                     scope.filtros[indice]['texto'] = this.options[this.selectedIndex].innerHTML;
                     scope.filtros[indice]['valor'] = dadosFiltro['padrao'] != undefined ? dadosFiltro['padrao'] : dadosFiltro['valor'] != undefined ? dadosFiltro['valor'] : '';
-                    let tipoFiltro = dadosFiltro.tipoFiltro != undefined ? dadosFiltro.tipoFiltro : dadosFiltro.tipo != undefined ? dadosFiltro.tipo : '';
+                    var tipoFiltro = dadosFiltro.tipoFiltro != undefined ? dadosFiltro.tipoFiltro : dadosFiltro.tipo != undefined ? dadosFiltro.tipo : '';
                     scope.filtros[indice]['tipo'] = tipoFiltro;
                     //Pondo este elemente para ver se ele ira fazer o blur ao clicar
                     elem.attr('tipoFiltro', tipoFiltro);
@@ -32,9 +32,9 @@ angular.module('directivesPadrao').directive('selectFiltrosPesquisaOriginal', ['
                     angular.element('#filtros_' + indice + '_campo').val('string:' + campo);
                     scope.filtros[indice]['campo'] = campo;
                     if (tipoFiltro != 'intervaloDatas') {
-                        let cF = dadosFiltro; // scope.estrutura.camposFiltroPesquisa;
-                        let campos = scope.estrutura.campos;
-                        let mascara = '';
+                        var cF = dadosFiltro; // scope.estrutura.camposFiltroPesquisa;
+                        var campos = scope.estrutura.campos;
+                        var mascara = '';
                         if (cF['tipo'] != undefined && cF['tipo'] != 'texto') {
                             mascara = cF['tipo'];
                         } else if (campo != undefined && campos[campo] != undefined && campos[campo]['tipo'] != undefined && campos[campo]['tipo'] != 'texto') {
@@ -42,7 +42,7 @@ angular.module('directivesPadrao').directive('selectFiltrosPesquisaOriginal', ['
                         }
                         var valorMascara = '';
                         if (campo != '' && campo != null) {
-                            let keyArray = angular.element(elem).attr('keyArray');
+                            var keyArray = angular.element(elem).attr('keyArray');
                             valorMascara = cF['valor'] != undefined ? cF['valor'] : '';
                             if (valorMascara == 'data' && typeof APIAjuFor !== 'undefined' && APIAjuFor.dataAtual) {
                                 valorMascara = APIAjuFor.dataAtual();
@@ -50,12 +50,12 @@ angular.module('directivesPadrao').directive('selectFiltrosPesquisaOriginal', ['
                             if (keyArray && scope.filtros[keyArray]) {
                                 scope.filtros[keyArray]['valoresMascara'] = valorMascara;
                                 var valor = angular.isObject(valorMascara) ? valorMascara[0] : valorMascara;
-                                let operador = cF.operador != undefined ? cF.operador : 'like';
+                                var operador = cF.operador != undefined ? cF.operador : 'like';
                                 scope.filtros[keyArray]['operador'] = operador;
                             }
                         }
                         try {
-                            let div = null;
+                            var div = null;
                             if (elem.closest('.linhaFiltro').length > 0) {
                                 div = elem.closest('.linhaFiltro').find('.divValorConsulta');
                             }
@@ -68,7 +68,7 @@ angular.module('directivesPadrao').directive('selectFiltrosPesquisaOriginal', ['
                             if (div && div.length > 0) {
                                 angular.element(div).html('');
                                 div.removeClass('input-group').addClass('form-group');
-                                let inputValor = '';
+                                var inputValor = '';
                                 if (!angular.isObject(valorMascara)) {
                                     inputValor = `<input type="text" ng-model="filtros[${indice}]['valor']" id="filtros_${indice}_valor" class="form-control valorConsulta" placeholder="Defina o Valor">`;
                                 } else {
@@ -82,7 +82,7 @@ angular.module('directivesPadrao').directive('selectFiltrosPesquisaOriginal', ['
                         }
                     } else if (scope.filtros[indice]['tipo'] == 'intervaloDatas') {
                         try {
-                            let div = null;
+                            var div = null;
                             if (elem.closest('.linhaFiltro').length > 0) {
                                 div = elem.closest('.linhaFiltro').find('.divValorConsulta');
                             }
@@ -95,7 +95,7 @@ angular.module('directivesPadrao').directive('selectFiltrosPesquisaOriginal', ['
                             if (div && div.length > 0) {
                                 angular.element(div).html('');
                                 div.removeClass('input-group').addClass('form-group');
-                                let inputValor = `<div class="input-group"><span class="input-group-addon">Data Inicial</span><input type="text" class="data form-control" ng-model="filtros[${indice}].di" ui-data placeholder="Data Inicial"><span class="input-group-addon">Data Final</span><input type="text" class="data form-control" ng-model="filtros[${indice}].df" ui-data placeholder="Data Final"></div>`;
+                                var inputValor = `<div class="input-group"><span class="input-group-addon">Data Inicial</span><input type="text" class="data form-control" ng-model="filtros[${indice}].di" ui-data placeholder="Data Inicial"><span class="input-group-addon">Data Final</span><input type="text" class="data form-control" ng-model="filtros[${indice}].df" ui-data placeholder="Data Final"></div>`;
                                 div.append(inputValor);
                                 $compile(div.contents())(scope);
                                 if (!scope.filtros[indice].di && typeof APIAjuFor !== 'undefined' && APIAjuFor.primeiroDiaMes) {

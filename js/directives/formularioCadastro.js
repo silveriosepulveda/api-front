@@ -5,17 +5,17 @@ directivesPadrao.directive('formularioCadastro', ['$compile', 'APIServ', 'APIAju
         template: '',
         link: function (scope, elem) {            
             var parametros = scope.estrutura;            
-            let nomeForm = 'formCad' + parametros.raizModelo;
-            let funcaoSalvar = parametros.funcaoSalvar != undefined ? parametros.funcaoSalvar : 'salvar';
-            let textoSalvar = parametros.textoBotaoSalvar != undefined ? parametros.textoBotaoSalvar : 'Salvar';
-            let classesSalvar = parametros.classesBotaoSalvar != undefined ? parametros.classesBotaoSalvar : 'btn-success input-lg col-xs-12 col-md-6 col-md-offset-2';
-            let tiposAnexos = parametros.anexos != undefined && parametros.anexos.tipoAnexos != undefined ? parametros.anexos.tipoAnexos : 'padrao';
+            var nomeForm = 'formCad' + parametros.raizModelo;
+            var funcaoSalvar = parametros.funcaoSalvar != undefined ? parametros.funcaoSalvar : 'salvar';
+            var textoSalvar = parametros.textoBotaoSalvar != undefined ? parametros.textoBotaoSalvar : 'Salvar';
+            var classesSalvar = parametros.classesBotaoSalvar != undefined ? parametros.classesBotaoSalvar : 'btn-success input-lg col-xs-12 col-md-6 col-md-offset-2';
+            var tiposAnexos = parametros.anexos != undefined && parametros.anexos.tipoAnexos != undefined ? parametros.anexos.tipoAnexos : 'padrao';
 
 
-            let varVerSub = parametros.variavelValidarAoSubmeter != undefined ? parametros.variavelValidarAoSubmeter : undefined;
+            var varVerSub = parametros.variavelValidarAoSubmeter != undefined ? parametros.variavelValidarAoSubmeter : undefined;
             varVerSub = varVerSub != undefined ? ` && ${varVerSub} != undefined && ${varVerSub} ` : '';
 
-            let html =
+            var html =
                 `<form name="${nomeForm}" id="${nomeForm}" ng-submit="${nomeForm}.$valid ${varVerSub} && ${funcaoSalvar}(${parametros.raizModelo}, ${nomeForm})" 
                         ng-if="tela == 'cadastro'" valida-Formulario novalidate enctype="multipart/form-data" autocomplete="off">
                         <input type="search" autocomplete="off" name="hidden" type="text" style="display:none;">
@@ -38,7 +38,7 @@ directivesPadrao.directive('formularioCadastro', ['$compile', 'APIServ', 'APIAju
 
             //MONTANDO OS CAMPOS DO FORMULARIO
 
-            let parametrosLocal = APIServ.buscaDadosLocais('parametrosUrl');
+            var parametrosLocal = APIServ.buscaDadosLocais('parametrosUrl');
 
             //Vendo se tem tabelas relacionadas, para criar os campos na estrutura, e criar os campos hidden na tela
             if (parametrosLocal != undefined && parametrosLocal.tabelasRelacionadas != undefined) {
@@ -46,11 +46,11 @@ directivesPadrao.directive('formularioCadastro', ['$compile', 'APIServ', 'APIAju
                 scope.estrutura['tabelasRelacionadas'] = Object.assign({}, scope.estrutura.tabelasRelacionadas, parametrosLocal.tabelasRelacionadas);
 
                 Object.keys(parametrosLocal.tabelasRelacionadas).map(key => {
-                    let pL = parametrosLocal;
-                    let tR = pL.tabelasRelacionadas[key];
+                    var pL = parametrosLocal;
+                    var tR = pL.tabelasRelacionadas[key];
 
-                    let campo_relacionamento = tR['campo_relacionamento'];
-                    let valorChaveRelacionamento = tR['valor_chave_relacionamento'];
+                    var campo_relacionamento = tR['campo_relacionamento'];
+                    var valorChaveRelacionamento = tR['valor_chave_relacionamento'];
                     parametros.campos[campo_relacionamento] = {
                         padrao: valorChaveRelacionamento,
                         tipo: "oculto"
@@ -59,9 +59,9 @@ directivesPadrao.directive('formularioCadastro', ['$compile', 'APIServ', 'APIAju
 
                     if (tR.tabelasSubRelacionadas != undefined) {
                         Object.keys(tR.tabelasSubRelacionadas).map(keySR => {
-                            let tSR = tR.tabelasSubRelacionadas[keySR];
-                            let campo_subRelacinamento = tSR['campo_relacionamento'];
-                            let valorChaveSubRelacionada = tSR['valor_chave_relacionamento'];
+                            var tSR = tR.tabelasSubRelacionadas[keySR];
+                            var campo_subRelacinamento = tSR['campo_relacionamento'];
+                            var valorChaveSubRelacionada = tSR['valor_chave_relacionamento'];
 
                             parametros.campos[campo_subRelacinamento] = {
                                 padrao: valorChaveSubRelacionada,
@@ -74,19 +74,19 @@ directivesPadrao.directive('formularioCadastro', ['$compile', 'APIServ', 'APIAju
             }
 
             //APIServ.apagaDadosLocais('parametrosUrl');
-            let foco = false;
+            var foco = false;
             
             angular.forEach(parametros.campos, function (propriedades, campo) {
                 if (campo.substr(0, 5) == "botao") {
                     html += `<input-botao parametros="${campo}"></input-botao>`;
                 } else if (propriedades.tipo == 'diretiva' || propriedades == 'diretiva') {
-                    let atributos = propriedades.atributos_diretiva != undefined ? EGFuncoes.montarAtributos(propriedades.atributos_diretiva) : [];
+                    var atributos = propriedades.atributos_diretiva != undefined ? EGFuncoes.montarAtributos(propriedades.atributos_diretiva) : [];
 
-                    let nomeDiretiva = propriedades.nomeDiretiva != undefined ? APIAjuFor.variavelParaDiretiva(propriedades.nomeDiretiva) : APIAjuFor.variavelParaDiretiva(campo);
+                    var nomeDiretiva = propriedades.nomeDiretiva != undefined ? APIAjuFor.variavelParaDiretiva(propriedades.nomeDiretiva) : APIAjuFor.variavelParaDiretiva(campo);
                     //html += `<${APIAjuFor.variavelParaDiretiva(campo)} ${atributos.join(' ')}></${APIAjuFor.variavelParaDiretiva(campo)}>`;
                     html += `<${nomeDiretiva} ${atributos.join(' ')}></${nomeDiretiva}>`;
                 } else if (campo.substr(0, 5) != "bloco") {            
-                    let incluirFoco = '';
+                    var incluirFoco = '';
                     if (propriedades.tipo != 'oculto') {
                         incluirFoco = !foco ? 'foco' : '';
                         foco = true;

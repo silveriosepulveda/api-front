@@ -7,52 +7,52 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
             var p = scope.estrutura;
             var nomeBloco = elem.attr('nome-bloco');
 
-            let bloco = APIServ.buscarValorVariavel(scope.estrutura, nomeBloco);
+            var bloco = APIServ.buscarValorVariavel(scope.estrutura, nomeBloco);
 
             if (bloco.campos == undefined || Object.keys(bloco.campos).length == 0) {
                 return false;
             }
 
-            let repeticao = bloco.repeticao != undefined ? bloco.repeticao : undefined;
-            let temPosicao = repeticao != undefined && repeticao.temPosicao != undefined && repeticao.temPosicao;
-            let tamanhoDivCampos = repeticao != undefined && repeticao.tamanhoDivCampos != undefined ? repeticao.tamanhoDivCampos : 'col-md-10';
-            let tamanhoDivBotoes = repeticao != undefined && repeticao.tamanhoDivBotoes != undefined ? repeticao.tamanhoDivCampos : 'col-md-2';
-            let baixarBotao = '';
+            var repeticao = bloco.repeticao != undefined ? bloco.repeticao : undefined;
+            var temPosicao = repeticao != undefined && repeticao.temPosicao != undefined && repeticao.temPosicao;
+            var tamanhoDivCampos = repeticao != undefined && repeticao.tamanhoDivCampos != undefined ? repeticao.tamanhoDivCampos : 'col-md-10';
+            var tamanhoDivBotoes = repeticao != undefined && repeticao.tamanhoDivBotoes != undefined ? repeticao.tamanhoDivCampos : 'col-md-2';
+            var baixarBotao = '';
 
             var variavelSuperior = bloco.variavelSuperior;
             var variavelSalvar = bloco.variavelSalvar;
 
-            let classesDiv = bloco.classes != undefined ? bloco.classes : '';
-            let atributosBloco = bloco.atributosBloco != undefined ? bloco.atributosBloco :
+            var classesDiv = bloco.classes != undefined ? bloco.classes : '';
+            var atributosBloco = bloco.atributosBloco != undefined ? bloco.atributosBloco :
                 bloco.atributos_bloco != undefined ? bloco.atributos_bloco : undefined;
 
             atributosBloco = atributosBloco != undefined ? EGFuncoes.montarAtributos(atributosBloco) : [];
 
-            let htmlCompleto = '';
+            var htmlCompleto = '';
             
 
             var acao = scope.acao != undefined ? scope.acao : APIServ.parametrosUrl()[1];
 
-            let verificarPerfil = bloco.verificarPerfil != undefined && bloco.verificarPerfil;                        
+            var verificarPerfil = bloco.verificarPerfil != undefined && bloco.verificarPerfil;                        
 
-            let temAcao = $rS[acao] != undefined && $rS[acao]['campos'] != undefined && $rS[acao]['campos'][nomeBloco] != undefined;
+            var temAcao = $rS[acao] != undefined && $rS[acao]['campos'] != undefined && $rS[acao]['campos'][nomeBloco] != undefined;
 
             //console.log(nomeBloco, temAcao);
 
-            let botaoComprimir = bloco.opcaoComprimir == undefined || bloco.opcaoComprimir == true ? `<expande-comprime-bloco nome-bloco="${nomeBloco}"></expande-comprime-bloco>` : '<div class="col-xs-1"></div>';
-            let botaoAdicionar = bloco.variavelSalvar != undefined && bloco.repeticao != undefined &&
+            var botaoComprimir = bloco.opcaoComprimir == undefined || bloco.opcaoComprimir == true ? `<expande-comprime-bloco nome-bloco="${nomeBloco}"></expande-comprime-bloco>` : '<div class="col-xs-1"></div>';
+            var botaoAdicionar = bloco.variavelSalvar != undefined && bloco.repeticao != undefined &&
                 (bloco.repeticao.ocultarBotaoAdicionar == undefined || bloco.repeticao.ocultarBotaoAdicionar == false) ?
                 `<button type="button" class="btn btn-primary btn-modern input-lg glyphicon glyphicon-plus botaoAdicionarItemRepeticao"  ng-click="adicionarItemRepeticao('${nomeBloco}')"></button>` : '';
 
-            let atributosBotaoExcluir = bloco.repeticao != undefined && bloco.repeticao.atributosBotaoExcluir != undefined ? EGFuncoes.montarAtributos(bloco.repeticao.atributosBotaoExcluir) : [];
-            let botaoExcluir = bloco.variavelSalvar != undefined && bloco.repeticao != undefined && (bloco.repeticao.ocultarBotaoExcluir == undefined || bloco.repeticao.ocultarBotaoExcluir == false) ?
+            var atributosBotaoExcluir = bloco.repeticao != undefined && bloco.repeticao.atributosBotaoExcluir != undefined ? EGFuncoes.montarAtributos(bloco.repeticao.atributosBotaoExcluir) : [];
+            var botaoExcluir = bloco.variavelSalvar != undefined && bloco.repeticao != undefined && (bloco.repeticao.ocultarBotaoExcluir == undefined || bloco.repeticao.ocultarBotaoExcluir == false) ?
                 `<button type="button" class="btn btn-danger btn-modern input-lg glyphicon glyphicon-trash botaoRemoverItemRepeticao ${baixarBotao} col-md-3" indice="{{$index}}" 
                     indice-parent="{{this.$parent.$index}}" ng-click="removerItemRepeticao('${nomeBloco}')" ${atributosBotaoExcluir.join(' ')}></button>` : '';
 
-            let botaoAddTodos = botaoAdicionar != '' && bloco.repeticao.adicionarTodos ?
+            var botaoAddTodos = botaoAdicionar != '' && bloco.repeticao.adicionarTodos ?
                 `<button type="button" class="btn btn-primary btn-modern input-lg glyphicon glyphicon-plus"  ng-click="adicionarTodosItensRepeticao('${nomeBloco}')">Todos</button>` : '';
 
-            let htmlTitulo = bloco.titulo != undefined ? `
+            var htmlTitulo = bloco.titulo != undefined ? `
                 <div class="row tituloBloco">
                     ${botaoComprimir}
                     <h2 ng-if="!dispositivoMovel" id="titulo_${nomeBloco}" class="col-md-10 text-center">${bloco.titulo}</h2>
@@ -64,16 +64,16 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                 '';
 
 
-            //let htmlAbreRepeticao = `<div class="row conteudoBloco" id="${elem.attr('nome-bloco')}">`;
-            let htmlAbreRepeticao = '';
-            let htmlRepeticao = '';
-            let htmlSubRepeticao = '';
-            let htmlFechaRepeticao = '';
+            //var htmlAbreRepeticao = `<div class="row conteudoBloco" id="${elem.attr('nome-bloco')}">`;
+            var htmlAbreRepeticao = '';
+            var htmlRepeticao = '';
+            var htmlSubRepeticao = '';
+            var htmlFechaRepeticao = '';
 
-            let itemRepetir = '';
-            let htmlPosicao = '';
-            let htmlBotoesRepeticao = '';
-            let htmlNumeracao = '';
+            var itemRepetir = '';
+            var htmlPosicao = '';
+            var htmlBotoesRepeticao = '';
+            var htmlNumeracao = '';
 
             if (!repeticao) {
                 angular.forEach(bloco.campos, function (propriedades, campo) {
@@ -81,7 +81,7 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                     if (campo.substr(0, 5) == "botao") {
                         htmlRepeticao += `<input-botao parametros="${campo}"></input-botao>`; // EGFuncoes.montarBotao(propriedades);
                     } else if (propriedades.tipo == 'diretiva' || propriedades == 'diretiva') {
-                        let nomeDiretivaCampo = propriedades.nomeDiretiva != undefined ? APIAjuFor.variavelParaDiretiva(propriedades.nomeDiretiva) :
+                        var nomeDiretivaCampo = propriedades.nomeDiretiva != undefined ? APIAjuFor.variavelParaDiretiva(propriedades.nomeDiretiva) :
                             APIAjuFor.variavelParaDiretiva(campo);
                         htmlRepeticao += `<${nomeDiretivaCampo}></${nomeDiretivaCampo}>`;
                     } else if (campo == 'incluirTemplate') {
@@ -117,11 +117,11 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                 htmlNumeracao = bloco.repeticao.numerar != undefined && bloco.repeticao.numerar ? '<label class="numeracaoRepeticao">{{$index + 1}}º</label>' : '';
 
                 if (temPosicao) {
-                    let classePosicao = bloco.variavelSalvar + '_posicao';
+                    var classePosicao = bloco.variavelSalvar + '_posicao';
                     htmlPosicao = `<monta-html-posicao indice="{{$index}}" nome-bloco="${nomeBloco}" item-repetir="${itemRepetir}"></monta-html-posicao>`;
                 }
 
-                let classeRepeticao = temPosicao ? 'col-md-9' : tamanhoDivCampos;
+                var classeRepeticao = temPosicao ? 'col-md-9' : tamanhoDivCampos;
                 htmlRepeticao = `<div class="${classeRepeticao}">`;
                 angular.forEach(bloco.campos, function (propriedades, campo) {
 
@@ -205,9 +205,9 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                 var dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, nomeBloco);
                 var indice = elem.attr('indice');
                 var dados = scope.listaConsulta[indice]['detalhes']
-                let classesDiv = dadosBloco.titulo != undefined ? dadosBloco.classes : '';
-                let atributosBloco = dadosBloco.atributos_bloco != undefined ? EGFuncoes.montarAtributos(dadosBloco.atributos_bloco) : [''];
-                let titulo = dadosBloco.titulo != undefined ? `<h3 class="text-center">${dadosBloco.titulo}</h3>` : '';
+                var classesDiv = dadosBloco.titulo != undefined ? dadosBloco.classes : '';
+                var atributosBloco = dadosBloco.atributos_bloco != undefined ? EGFuncoes.montarAtributos(dadosBloco.atributos_bloco) : [''];
+                var titulo = dadosBloco.titulo != undefined ? `<h3 class="text-center">${dadosBloco.titulo}</h3>` : '';
 
                 var html = '';
 
@@ -218,7 +218,7 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                         if (campo.substr(0, 5) == 'bloco') {
                             html += `<bloco-html-detalhe nome-bloco="${nomeBloco}" indice="${indice}"></bloco-html-detalhe>`; //_montaBlocoHtmlDetalhes(campo, propriedades, html);
                         } else if (propriedades == 'diretiva') {
-                            let nomeDiretiva = APIAjuFor.variavelParaDiretiva(campo);
+                            var nomeDiretiva = APIAjuFor.variavelParaDiretiva(campo);
                             html += `<${nomeDiretiva} nome-bloco="${nomeBloco}" indice="$index" ></${nomeDiretiva}>`;
                         } else if ((propriedades.tipo == undefined || propriedades.tipo != 'oculto') && APIServ.chaveExisteEmVariavel(dadosBloco.campos, campo) && campo.substr(0, 5) != 'botao') {
                             var camposNaoMostrar = Object.keys(scope.estrutura.listaConsulta);
@@ -245,7 +245,7 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
             restrict: 'E',
             replace: true,
             link: function (scope, elem) {
-                let nomeBloco = elem.attr('nome-bloco');
+                var nomeBloco = elem.attr('nome-bloco');
                 var dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, nomeBloco);
 
                 var indice = elem.attr('indice');
@@ -277,10 +277,10 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
 
                     //var textoRI = Number.isInteger(key) ? '' : val.texto != undefined ? val.texto + ': ' : '';
                     var label = valores.texto != undefined && valores.texto != '' ? valores.texto + ': ' : '';
-                    let tamanho = EGFuncoes.montarTamanhos(valores);
+                    var tamanho = EGFuncoes.montarTamanhos(valores);
 
                     if (val == 'diretiva') {
-                        let nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
+                        var nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
                         html += `<${nomeDiretiva} nome-bloco="${dadosBloco['nomeBloco']}" indice="{{keyItemDetalhe}}" modelo="${dadosBloco.repeticao.nomeRepeticao}"></${nomeDiretiva}>`;
                     } else {
                         html += `   <div class="campoDetalheConsulta ${tamanho.join(' ')}">`;
@@ -306,10 +306,10 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                 }
 
 
-                let htmlAnexosBloco = '';
+                var htmlAnexosBloco = '';
                 if (dadosBloco.anexos != undefined) {
 
-                    let paramAnexo = typeof dadosBloco.anexos == 'string' ? dadosBloco.anexos : 'anexos';
+                    var paramAnexo = typeof dadosBloco.anexos == 'string' ? dadosBloco.anexos : 'anexos';
                     html += `<input-botao parametros="${paramAnexo}"></input-botao>`;
                     htmlAnexosBloco = `<arquivos-anexos tela="anexosBloco" item-repetir="${dadosBloco.repeticao.itemRepetir}" nome-bloco="${nomeBloco}"
                         ng-if="${dadosBloco.repeticao.itemRepetir}.exibirAnexos" parametros="${paramAnexo}" chave-array="key"></arquivos-anexos>`;
@@ -338,7 +338,7 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                 var campo = elem.attr('campo');
                 var dadosCampo = APIServ.buscarValorVariavel(bloco, campo);
                 var autoCompleta = dadosCampo['autoCompleta'];
-                let raizModeloBloco;
+                var raizModeloBloco;
 
                 if (bloco.variavelSuperior != undefined) {
                     //tenho que alterar esta rotina, pois pode ser um subbloco sem repeticao, como fiz para o relacionamento.
@@ -377,7 +377,7 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                     var id = EGFuncoes.modeloParaId(modelo);
                 }
 
-                let modeloChave = '';
+                var modeloChave = '';
                 if (autoCompleta) {
                     modeloChave = autoCompleta.objChave != undefined ? baseModelo + `['${autoCompleta.objChave}']` : baseModelo + `['${autoCompleta.campoChave}']`;
                     elem.attr('modelo-chave', modeloChave);

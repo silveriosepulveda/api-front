@@ -72,15 +72,15 @@ angular.module('directivesPadrao')
                     var campo = scope.filtros[indice]['campo'];
 
                     //Juntando os valores do campo nos tres locais possiveis, campo, campos filtro pesquisa e campos filtros padrao
-                    let dadosCampo = APIServ.buscarValorVariavel(scope.estrutura.campos, campo);
-                    let dadosCampoFiltroPesquisa = scope.estrutura.camposFiltroPesquisa != undefined && scope.estrutura.camposFiltroPesquisa[campo] != undefined ? scope.estrutura.camposFiltroPesquisa[campo] : {};
-                    let dadosCampoFiltroPadrao = scope.estrutura.filtrosPadrao != undefined && scope.estrutura.filtrosPadrao[campo] != undefined ? scope.estrutura.filtrosPadrao[campo] : {};
-                    let dadosFiltro = Object.assign({}, dadosCampoFiltroPadrao, dadosCampo, dadosCampoFiltroPesquisa);
+                    var dadosCampo = APIServ.buscarValorVariavel(scope.estrutura.campos, campo);
+                    var dadosCampoFiltroPesquisa = scope.estrutura.camposFiltroPesquisa != undefined && scope.estrutura.camposFiltroPesquisa[campo] != undefined ? scope.estrutura.camposFiltroPesquisa[campo] : {};
+                    var dadosCampoFiltroPadrao = scope.estrutura.filtrosPadrao != undefined && scope.estrutura.filtrosPadrao[campo] != undefined ? scope.estrutura.filtrosPadrao[campo] : {};
+                    var dadosFiltro = Object.assign({}, dadosCampoFiltroPadrao, dadosCampo, dadosCampoFiltroPesquisa);
 
                     scope.filtros[indice]['texto'] = this.options[this.selectedIndex].innerHTML;
                     scope.filtros[indice]['valor'] = dadosFiltro['padrao'] != undefined ? dadosFiltro['padrao'] : dadosFiltro['valor'] != undefined ? dadosFiltro['valor'] : '';
 
-                    let tipoFiltro = dadosFiltro.tipoFiltro != undefined ?
+                    var tipoFiltro = dadosFiltro.tipoFiltro != undefined ?
                         dadosFiltro.tipoFiltro : dadosFiltro.tipo != undefined ? dadosFiltro.tipo : '';
 
                     scope.filtros[indice]['tipo'] = tipoFiltro;
@@ -93,11 +93,11 @@ angular.module('directivesPadrao')
 
 
                     if (tipoFiltro != 'intervaloDatas') {
-                        let cF = dadosFiltro; // scope.estrutura.camposFiltroPesquisa;
+                        var cF = dadosFiltro; // scope.estrutura.camposFiltroPesquisa;
 
-                        let campos = scope.estrutura.campos;
+                        var campos = scope.estrutura.campos;
 
-                        let mascara = '';
+                        var mascara = '';
                         if (cF['tipo'] != undefined && cF['tipo'] != 'texto') {
                             mascara = cF['tipo'];
                         } else if (campo != undefined && campos[campo] != undefined && campos[campo]['tipo'] != undefined && campos[campo]['tipo'] != 'texto') {
@@ -106,7 +106,7 @@ angular.module('directivesPadrao')
 
                         var valorMascara = '';
                         if (campo != '' && campo != null) {
-                            let keyArray = angular.element(elem).attr('keyArray');
+                            var keyArray = angular.element(elem).attr('keyArray');
                             valorMascara = cF['valor'] != undefined ? cF['valor'] : '';
                             valorMascara = valorMascara == 'data' ? APIAjuFor.dataAtual() : valorMascara;
                             scope.filtros[keyArray]['valoresMascara'] = valorMascara;
@@ -115,11 +115,11 @@ angular.module('directivesPadrao')
                             //cF != undefined && cF[campo]['valor'] != undefined ? cF[campo]['valor'] : '';
 
                             //scope.filtros[keyArray]['valor'] = padrao;
-                            let operador = cF.operador != undefined ? cF.operador : 'like'; // cF != undefined && cF[campo]['operador'] != undefined ? cF[campo]['operador'] : 'like';
+                            var operador = cF.operador != undefined ? cF.operador : 'like'; // cF != undefined && cF[campo]['operador'] != undefined ? cF[campo]['operador'] : 'like';
                             scope.filtros[keyArray]['operador'] = operador;
                         }
 
-                        let div = angular.element(elem).parent('div').siblings('div.divValorConsulta');
+                        var div = angular.element(elem).parent('div').siblings('div.divValorConsulta');
                         angular.element(div).html('');
 
                         // if (scope.dispositivoMovel) {
@@ -130,7 +130,7 @@ angular.module('directivesPadrao')
                         div.removeClass('input-group').addClass('form-group');
                         //   }
 
-                        let inputValor = montaCampoValor(mascara, valorMascara, indice, campo);
+                        var inputValor = montaCampoValor(mascara, valorMascara, indice, campo);
                         div.append(inputValor);
 
                         //console.log(cF);

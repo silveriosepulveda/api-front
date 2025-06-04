@@ -4,17 +4,17 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
         replace: true,
         template: `<div class="col-xs-12 div6"></div>`,
         link: function (scope, element, attr) {
-            let tela = attr != undefined && attr.tela != undefined ? attr.tela : 'consulta';
-            let chaveArray = attr != undefined && attr.chaveArray != undefined ? attr.chaveArray : null;
-            let raizModelo = scope.estrutura.raizModelo;
+            var tela = attr != undefined && attr.tela != undefined ? attr.tela : 'consulta';
+            var chaveArray = attr != undefined && attr.chaveArray != undefined ? attr.chaveArray : null;
+            var raizModelo = scope.estrutura.raizModelo;
 
             //Vendo se esta usando estruturaGerencia ou se esta usando a diretiva diretamente na tela
             var anexos = attr.parametros != undefined ? APIServ.buscarValorVariavel(scope.estrutura, attr.parametros) : scope.estrutura.anexos;
-            let tiposAnexos = anexos.tipoAnexos != undefined ? anexos.tipoAnexos.split('-') : 'padrao';
+            var tiposAnexos = anexos.tipoAnexos != undefined ? anexos.tipoAnexos.split('-') : 'padrao';
 
-            let temUploadPadrao = tiposAnexos.indexOf('padrao') >= 0;
-            let temUplodaCopiarColar = tiposAnexos.indexOf('copiarColar') >= 0;
-            let temClassificacaoAnexosCopiarColar = scope.estrutura.anexos.opcoesClassificacaoAnexo != undefined;
+            var temUploadPadrao = tiposAnexos.indexOf('padrao') >= 0;
+            var temUplodaCopiarColar = tiposAnexos.indexOf('copiarColar') >= 0;
+            var temClassificacaoAnexosCopiarColar = scope.estrutura.anexos.opcoesClassificacaoAnexo != undefined;
 
             scope.$parent[raizModelo]['arquivosAnexosCopiarcolar'] = [];
             scope.$parent[raizModelo]['arquivosAnexosEnviarCopiarcolar'] = [];
@@ -48,24 +48,24 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
             var excluir = tela != 'detalhes' ? `<a href="#" class="col-xs-12 col-md-4 vermelho text-center" ng-click="excluirAnexo(${itemRepetir}, anexo, key)" 
                 ng-if="anexo.tipoAnexo != 'Relacionado'">Excluir</a>` : '';
 
-            let idArquivos = 'arquivos_' + chave;
+            var idArquivos = 'arquivos_' + chave;
 
             scope.trocarPosicao = (anexo) => {
-                let elemento = $(event.target);
-                let posicaoAtual = parseInt(elemento.attr('indice')) + 1;
-                let posicaoNova = anexo.posicao;
+                var elemento = $(event.target);
+                var posicaoAtual = parseInt(elemento.attr('indice')) + 1;
+                var posicaoNova = anexo.posicao;
 
-                let indiceAtual = elemento.attr('indice');
-                let indiceNovo = parseInt(posicaoNova) - 1;
+                var indiceAtual = elemento.attr('indice');
+                var indiceNovo = parseInt(posicaoNova) - 1;
 
-                let variavelRepeticao = eval('scope.' + itemRepetir);
+                var variavelRepeticao = eval('scope.' + itemRepetir);
 
-                let valorAtual = variavelRepeticao[indiceAtual];
+                var valorAtual = variavelRepeticao[indiceAtual];
                 valorAtual['posicao'] = parseInt(posicaoNova);
-                let valorNovo = variavelRepeticao[indiceNovo];
+                var valorNovo = variavelRepeticao[indiceNovo];
                 valorNovo['posicao'] = parseInt(posicaoAtual);
 
-                let parametrosAlteracao = {
+                var parametrosAlteracao = {
                     chave1: valorAtual.chave_anexo,
                     posicao1: posicaoNova,
                     chave2: valorNovo.chave_anexo,
@@ -81,7 +81,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                 })
             }
 
-            let htmlConsultaPadrao = `
+            var htmlConsultaPadrao = `
                 <form name="${idForm}" id="${idForm}" ng-submit="${idForm}.$valid && anexarArquivos(item)" novalidade valida-Formulario enctype="multipart/form-data">
                     <div class="row">
                         <input type="file"  name="arquivos" input-file="pegarArquivos($files)" tipo="anexos" multiple class="input-lg col-md-6">
@@ -90,7 +90,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                     </div>
                 </form>`;
 
-            let htmlBloco = `
+            var htmlBloco = `
                 <form name="${idForm}" id="${idForm}" ng-submit="${idForm}.$valid && anexarArquivos(${attr.itemRepetir})" novalidade valida-Formulario enctype="multipart/form-data">
                     <div class="row">
                         <input type="file"  name="arquivos" input-file="pegarArquivos($files)" required tipo="anexos" multiple class="input-lg col-md-6">
@@ -100,14 +100,14 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                 </form>`;
 
 
-            let htmlCadastroPadrao = `
+            var htmlCadastroPadrao = `
                 <div class="row form-group">
                     <h4 class="text-center">${titulo}</h4>
                     <input type="file"  name="arquivos" ng-model="arquivos" input-file="pegarArquivos($files)" tipo="anexos" multiple class="input-lg form-control">
                 </div>`;
             //htmlCadastro = '';
 
-            let htmlListaQuadros = temUplodaCopiarColar && tela != 'detalhes' ? `
+            var htmlListaQuadros = temUplodaCopiarColar && tela != 'detalhes' ? `
                 <div class="row div2 divListaQuadros" >
                     <div class="col-md-3 quadroColarImagem tc" style="overflow: auto"
                         ng-click="aoClicarQuadro($event)" ng-repeat="(key, quadro) in ${raizModelo}['arquivosAnexosCopiarcolar']"
@@ -119,17 +119,17 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                     </div>                    
                 </div>` : '';
 
-            let htmlListaQuadrosDentro = (scope.estrutura.detalhesExibirAnexos != undefined && !scope.estrutura.detalhesExibirAnexos) || tela == 'detalhes' ?
+            var htmlListaQuadrosDentro = (scope.estrutura.detalhesExibirAnexos != undefined && !scope.estrutura.detalhesExibirAnexos) || tela == 'detalhes' ?
                 htmlListaQuadros : '';
 
-            let htmlListaQuadrosFora = (scope.estrutura.detalhesExibirAnexos == undefined || scope.estrutura.detalhesExibirAnexos) || tela != 'detalhes' ?
+            var htmlListaQuadrosFora = (scope.estrutura.detalhesExibirAnexos == undefined || scope.estrutura.detalhesExibirAnexos) || tela != 'detalhes' ?
                 htmlListaQuadros : '';
 
-            let htmlBotoesAuxiliaresCopiarColar = temUplodaCopiarColar && !temUploadPadrao ? `
+            var htmlBotoesAuxiliaresCopiarColar = temUplodaCopiarColar && !temUploadPadrao ? `
                 <button type="submit" form="${idForm}" class="btn btn-modern btn-primary col-xs-12 col-md-2">Enviar</button>
                 <button type="button" class="btn btn-modern btn-outline-secondary col-xs-12 col-md-2" ng-click="item.exibirAnexos = false">Fechar Anexos</button>` : '';
 
-            let htmlConsultaCopiarColar = `
+            var htmlConsultaCopiarColar = `
                 <form name="${idForm}" id="${idForm}" ng-submit="${idForm}.$valid && anexarArquivos(item)" novalidade valida-Formulario enctype="multipart/form-data">
                     <div class="col-xs-12 div5 bordaArredondada">
                         <div class="row div4">
@@ -141,7 +141,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                     </div>                 
                 </form>`;
 
-            let htmlCadastroCopiarColar = `
+            var htmlCadastroCopiarColar = `
             <div class="col-xs-12 div5 bordaArredondada 123">
                 <div class="row div4">
                     <h3 class="col-xs-8">Copiar e Colar Imagens para Anexar</h3>
@@ -151,7 +151,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
             </div>
             `;
 
-            let htmlCliente = `
+            var htmlCliente = `
                 <form name="${idForm}" id="${idForm}" ng-submit="${idForm}.$valid && anexarArquivos(cliente)" novalidade valida-Formulario enctype="multipart/form-data">
                     <div class="row">
                         <h4 class="text-center">${titulo}</h4>
@@ -161,7 +161,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                 </form>`;
 
 
-            let html = '';
+            var html = '';
 
             if (tela == 'cadastro') {
                 if (temUploadPadrao && temUplodaCopiarColar) {
@@ -181,9 +181,9 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                 }
             }
 
-            //let html = tela == 'consulta' ? htmlConsulta : tela == 'cadastro' ? htmlCadastro : tela == 'anexosBloco' ? htmlBloco : tela == 'cliente' ? htmlCliente : '';
+            //var html = tela == 'consulta' ? htmlConsulta : tela == 'cadastro' ? htmlCadastro : tela == 'anexosBloco' ? htmlBloco : tela == 'cliente' ? htmlCliente : '';
 
-            let idDivLista = "divListaAnexos_{{$index}}";
+            var idDivLista = "divListaAnexos_{{$index}}";
 
             if ((scope.estrutura.detalhesExibirAnexos == undefined || scope.estrutura.detalhesExibirAnexos) || tela != 'detalhes') {
                 html += `
@@ -198,15 +198,15 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
 
 
                 scope.montaArrayPosicoes = (qtd) => {
-                    let retorno = {};
-                    for (let i = 0; i < qtd; i++) {
+                    var retorno = {};
+                    for (var i = 0; i < qtd; i++) {
                         retorno[i + 1] = i + 1;
                     }
                     return retorno;
 
                 }
                 if (scope.usarNome && tela != 'detalhes') {
-                    let idSelectPos = "anexo_{{$index}}";
+                    var idSelectPos = "anexo_{{$index}}";
 
                     html += `
                             <div class="form-group form-group-modern" ng-class="{'col-xs-9' : usarPosicao, 'col-xs-11': !usarPosicao}">
@@ -235,7 +235,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
             html += tela == 'cadastro' ? '<div class="col-xs-12 alt20"></div>' : '';
 
             scope.salvarNomeAnexo = function (anexo) {
-                let parametros = new FormData();
+                var parametros = new FormData();
                 parametros.append('chave_anexo', anexo.chave_anexo);
                 parametros.append('nome', anexo.nome);
 
@@ -249,7 +249,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
             }
 
             scope.anexarArquivos = function (item) {
-                let form = $(event.target).attr('id');
+                var form = $(event.target).attr('id');
                 var fd = new FormData();
                 fd.append('tabela', scope.estrutura.tabela);
                 fd.append('campo_chave', scope.estrutura.campo_chave);
@@ -259,7 +259,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                 fd.append('larguraThumb', scope.estrutura.anexos.larguraThumb);
                 fd.append('alturaThumb', scope.estrutura.anexos.alturaThumb);
 
-                let enviar = false;
+                var enviar = false;
 
                 angular.forEach($rootScope.$files, function (value, key) {
                     //var fd = scope.fd != undefined ? scope.fd : new FormData();                   
@@ -343,7 +343,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
 
             if (scope.excluirAnexo == undefined) {
                 scope.excluirAnexo = function (item, anexo, key) {
-                    let excluir = function () {
+                    var excluir = function () {
                         APIServ.executaFuncaoClasse('classeGeral', 'excluirAnexo', anexo).success(function (data) {
                             console.log(data);
                             if (data.sucesso =! undefined) {
@@ -362,9 +362,9 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
             }
 
             scope.rotacionarImagem = (anexo, key) => {
-                let elementoImagem = $(event.target).closest('div.arquivoAnexo').find('img');
-                let copia = elementoImagem;
-                let caminho = $(elementoImagem).attr('ng-src');
+                var elementoImagem = $(event.target).closest('div.arquivoAnexo').find('img');
+                var copia = elementoImagem;
+                var caminho = $(elementoImagem).attr('ng-src');
 
                 APIServ.executaFuncaoClasse('classeGeral', 'rotacionarImagem', anexo.chave_anexo).success(retorno => {
                     //scope.buscarAnexos(item);
@@ -403,9 +403,9 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
             }
 
             scope.adicionarQuadro = () => {
-                let htmlQuadro = `<div class="col-md-4 quadroColarImagem" ng-model="${raizModelo}['arquivosAnexosCopiarcolar'][0]" style="overflow: auto"></div>`;
+                var htmlQuadro = `<div class="col-md-4 quadroColarImagem" ng-model="${raizModelo}['arquivosAnexosCopiarcolar'][0]" style="overflow: auto"></div>`;
                 //console.log(scope.$parent[raizModelo]);
-                let indice = scope.$parent[raizModelo]['arquivosAnexosCopiarcolar'] != undefined ?
+                var indice = scope.$parent[raizModelo]['arquivosAnexosCopiarcolar'] != undefined ?
                     Object.keys(scope.$parent[raizModelo]['arquivosAnexosCopiarcolar']).length : 0;
 
                 scope.$parent[raizModelo]['arquivosAnexosCopiarcolar'][indice] = [];
@@ -468,7 +468,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                                     reader.onload = function (evt) {
 
                                         if (scope.tela == 'cadastro') {
-                                            let indice = $(event.target).attr('indice');
+                                            var indice = $(event.target).attr('indice');
                                             scope.$parent[raizModelo]['arquivosAnexosEnviarCopiarcolar'][indice] = evt.target.result;
                                             scope.$apply();
                                         } else if (tela == 'consulta') {

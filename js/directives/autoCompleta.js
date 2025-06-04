@@ -2,8 +2,8 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
     return {
         restrict: "A",
         link: function (scope, elem, attr) {
-            let e = scope.estrutura;
-            let campo = elem.attr('auto-completa');
+            var e = scope.estrutura;
+            var campo = elem.attr('auto-completa');
 
             // Função auxiliar para acessar valores dinâmicos de forma segura
             function getScopeValue(expr) {
@@ -23,7 +23,7 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
 
             // Função debounce para evitar execuções excessivas
             function debounce(func, wait) {
-                let timeout;
+                var timeout;
                 return function() {
                     const context = this, args = arguments;
                     clearTimeout(timeout);
@@ -31,22 +31,22 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 };
             }
 
-            let temCampoFiltros = e.camposFiltroPesquisa != undefined && e.camposFiltroPesquisa[campo] != undefined;
-            let temCampoCampos = APIServ.buscarValorVariavel(scope.estrutura.campos, campo);
+            var temCampoFiltros = e.camposFiltroPesquisa != undefined && e.camposFiltroPesquisa[campo] != undefined;
+            var temCampoCampos = APIServ.buscarValorVariavel(scope.estrutura.campos, campo);
 
-            let buscarCampoCompleto = (campo, nomeBloco) => {
+            var buscarCampoCompleto = (campo, nomeBloco) => {
                 //Vendo de onde buscar o campo completo
-                let campoFiltro = temCampoFiltros && (scope.tela == undefined || scope.tela == 'consulta') ? scope.estrutura.camposFiltroPesquisa[campo] : [];
-                let campoCampos;
+                var campoFiltro = temCampoFiltros && (scope.tela == undefined || scope.tela == 'consulta') ? scope.estrutura.camposFiltroPesquisa[campo] : [];
+                var campoCampos;
 
                 if (nomeBloco != undefined && nomeBloco != '') {
-                    let dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, nomeBloco);
+                    var dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, nomeBloco);
                     campoCampos = APIServ.buscarValorVariavel(dadosBloco.campos, campo);
                 } else {
                     campoCampos = temCampoCampos ? APIServ.buscarValorVariavel(scope.estrutura.campos, campo) : [];
                 }
 
-                let retorno;// = Object.assign(campoFiltro, campoCampos);;
+                var retorno;// = Object.assign(campoFiltro, campoCampos);;
 
                 if (scope.tela == 'consulta' && scope.estrutura.camposFiltroPersonalizado != undefined) {
                     retorno = Object.assign(campoFiltro, campoCampos, scope.estrutura.camposFiltroPersonalizado[campo]);
@@ -58,21 +58,21 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 return retorno;
             }
 
-            let modeloChave;
-            let objValor2 = '';
-            let objValor3 = '';
-            let objValor4 = '';
+            var modeloChave;
+            var objValor2 = '';
+            var objValor3 = '';
+            var objValor4 = '';
 
-            let campoCompleto = buscarCampoCompleto(campo, attr.nomeBloco);
+            var campoCompleto = buscarCampoCompleto(campo, attr.nomeBloco);
 
-            let dAC = campoCompleto.autoCompleta;
+            var dAC = campoCompleto.autoCompleta;
             dAC.nomeBloco = attr.nomeBloco != undefined ? attr.nomeBloco : '';
-            let temBloco = attr.nomeBloco != undefined;
+            var temBloco = attr.nomeBloco != undefined;
 
-            let dC;
-            let dB = APIServ.buscarValorVariavel(e.campos, dAC.nomeBloco);
+            var dC;
+            var dB = APIServ.buscarValorVariavel(e.campos, dAC.nomeBloco);
 
-            let limparElemento = (dadosAC, modeloValor, modeloChave, modeloValor2, modeloValor3, modeloValor4) => {
+            var limparElemento = (dadosAC, modeloValor, modeloChave, modeloValor2, modeloValor3, modeloValor4) => {
                 if (dadosAC.funcaoLimpar != undefined) {
                     // Preferência por $parse ao invés de eval
                     setScopeValue(dadosAC.funcaoLimpar + '()', undefined);
@@ -100,19 +100,19 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
 
             elem.bind('keyup', debounce((event) => {
                 if (!elem.hasClass('valorConsulta')) {
-                    let campoChaveControle = scope.estrutura.campoChave != undefined ? scope.estrutura.campoChave : scope.estrutura.campo_chave;
+                    var campoChaveControle = scope.estrutura.campoChave != undefined ? scope.estrutura.campoChave : scope.estrutura.campo_chave;
 
-                    let elemAC = elem; // Usar elem diretamente é mais seguro
+                    var elemAC = elem; // Usar elem diretamente é mais seguro
                     elemAC.val(elemAC.val().toUpperCase());
 
-                    let indice = elem.attr('indice');
-                    let temp = elemAC.attr('modelo-chave').split('.');
-                    let campoChave = temp[temp.length - 1];
-                    let modeloChaveAC = elemAC.attr('modelo-chave').replace('$index', indice);
+                    var indice = elem.attr('indice');
+                    var temp = elemAC.attr('modelo-chave').split('.');
+                    var campoChave = temp[temp.length - 1];
+                    var modeloChaveAC = elemAC.attr('modelo-chave').replace('$index', indice);
 
-                    let oldChave = getScopeValue(modeloChaveAC) != undefined ? getScopeValue(modeloChaveAC) : 0;
+                    var oldChave = getScopeValue(modeloChaveAC) != undefined ? getScopeValue(modeloChaveAC) : 0;
 
-                    let parametros = {
+                    var parametros = {
                         tabela: dAC.tabela,
                         //campo: campo,
                         campo: dAC.campoValor,
@@ -129,12 +129,12 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
             }, 250)); // 250ms debounce
 
             elem.bind("change", () => {
-                let campo = elem.attr('auto-completa');
-                let dadosAC = buscarCampoCompleto(campo, attr.nomeBloco)['autoCompleta'];
+                var campo = elem.attr('auto-completa');
+                var dadosAC = buscarCampoCompleto(campo, attr.nomeBloco)['autoCompleta'];
 
                 if (dadosAC.camposLimparAoMudar != undefined) {
-                    for (let keyCampoApagar in dadosAC.camposLimparAoMudar) {
-                        let modeloApagar = elem.attr('ng-model').replace(elem.attr("campo"), dadosAC.camposLimparAoMudar[keyCampoApagar])
+                    for (var keyCampoApagar in dadosAC.camposLimparAoMudar) {
+                        var modeloApagar = elem.attr('ng-model').replace(elem.attr("campo"), dadosAC.camposLimparAoMudar[keyCampoApagar])
                         $parse(modeloApagar).assign(scope, undefined);
                     }
                 }
@@ -146,85 +146,85 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                     return false;
                 }
 
-                let indice = 0;
+                var indice = 0;
                 if (temBloco) {
                     indice = elem.attr('indice');
                 }
 
-                let elemAC = elem;
+                var elemAC = elem;
 
                 //Se estiver vazio, e tiver o modelo da chave, seto 0
-                let campoChaveControle = scope.estrutura.campoChave != undefined ? scope.estrutura.campoChave : scope.estrutura.campo_chave;
-                let temp = elemAC.attr('modelo-chave').split('.');
-                let campoChave = temp[temp.length - 1];
+                var campoChaveControle = scope.estrutura.campoChave != undefined ? scope.estrutura.campoChave : scope.estrutura.campo_chave;
+                var temp = elemAC.attr('modelo-chave').split('.');
+                var campoChave = temp[temp.length - 1];
 
-                let modeloAC = EGFuncoes.indexPorNumero(event, elemAC.attr('ng-model'));
-                let campo = elemAC.attr('campo');
+                var modeloAC = EGFuncoes.indexPorNumero(event, elemAC.attr('ng-model'));
+                var campo = elemAC.attr('campo');
 
-                let modeloChaveAC = elemAC.attr('nome-bloco') != undefined ? elemAC.attr('modelo-chave').replace('$index', indice) :
+                var modeloChaveAC = elemAC.attr('nome-bloco') != undefined ? elemAC.attr('modelo-chave').replace('$index', indice) :
                     modeloAC.replace("'" + campo + "'", "'" + campoChave + "'");
 
-                let modeloValor2 = elemAC.attr('modelo-valor2') != undefined ? elemAC.attr('modelo-valor2').replace('$index', indice) : undefined;
+                var modeloValor2 = elemAC.attr('modelo-valor2') != undefined ? elemAC.attr('modelo-valor2').replace('$index', indice) : undefined;
 
-                let valorElemento = getScopeValue(modeloAC);
+                var valorElemento = getScopeValue(modeloAC);
 
-                let campoCompleto = buscarCampoCompleto(campo, attr.nomeBloco);
-                let aC = campoCompleto['autoCompleta'];
+                var campoCompleto = buscarCampoCompleto(campo, attr.nomeBloco);
+                var aC = campoCompleto['autoCompleta'];
 
                 //Valor vazio ou undefined limpo os campos
                 if (valorElemento == '' || valorElemento == undefined) {
                     limparElemento(aC, modeloAC, modeloChaveAC, modeloValor2)
                 } else { //if (aC.permitirValorInvalido == undefined || aC.permitirValorInvalido == false) {
                     //Se nao, se tem valor vejo se o valor existe
-                    let parametrosBuscaChave = {
+                    var parametrosBuscaChave = {
                         tabela: aC.tabela,
                         tabelaOrigem: aC.tabelaOrigem,
                         campos: [aC.campoValor],
                         valores: aC.complementoValor != undefined ? [getScopeValue(modeloAC).split('--')[0]] : [getScopeValue(modeloAC)]
                     }
 
-                    let fd = new FormData();
+                    var fd = new FormData();
                     fd.append('dados', JSON.stringify(parametrosBuscaChave));
                     //APIServ.executaFuncaoClasse('classeGeral', 'buscarChavePorCampos', fd, 'post').then(retorno => {
-                        let fd2 = new FormData();
+                        var fd2 = new FormData();
                         fd2.append('dados', JSON.stringify(parametrosBuscaChave));
                         APIServ.executaFuncaoClasse('classeGeral', 'buscarChavePorCampos', fd2, 'post').then(retorno => {
                             console.log(retorno.data);
                         //Nesse caso nao existe e verifico se e para salvar
 
                         if (retorno.data == '' || (getScopeValue(modeloChaveAC) == 0 || !getScopeValue(modeloChaveAC))) {
-                            let permitirValorInvalido = aC.permitirValorInvalido != undefined && aC.permitirValorInvalido;
+                            var permitirValorInvalido = aC.permitirValorInvalido != undefined && aC.permitirValorInvalido;
 
                             if (aC.salvarAoSair != undefined && aC.salvarAoSair) {
-                                let conf = {
+                                var conf = {
                                     tabela: 'listas'
                                 }
-                                let dados = {
+                                var dados = {
                                     nome: campo,
                                     descricao: valorElemento,
                                     nome_apresentar: aC.nomeApresentar != undefined ? aC.nomeApresentar : ''
                                 }
 
-                                let fd = new FormData();
+                                var fd = new FormData();
                                 fd.append('configuracoes', JSON.stringify(conf));
                                 fd.append('dados', JSON.stringify(dados));
 
-                                let parametros = {
+                                var parametros = {
                                     configuracoes: conf,
                                     dados: dados
                                 }
-                                let funcaoSalvar = () => {
+                                var funcaoSalvar = () => {
                                     APIServ.executaFuncaoClasse('classeGeral', 'manipula', fd, 'post').success(retorno => {
                                         if (retorno.chave > 0) {
                                             setScopeValue(modeloChaveAC, retorno.chave);
                                         }
                                     })
                                 }
-                                let funcaoNaoSalvar = () => {
+                                var funcaoNaoSalvar = () => {
                                     limparElemento(aC, modeloAC, modeloChaveAC, modeloValor2);
                                 }
 
-                                let nomeApresentar = aC.nomeApresenta != undefined ? aC.nomeApresenta : 'Ítem';
+                                var nomeApresentar = aC.nomeApresenta != undefined ? aC.nomeApresenta : 'Ítem';
                                 APIServ.dialogoSimples('Informação', nomeApresentar + ' Não existe. Salvá-lo', 'Sim', 'Não', funcaoSalvar, funcaoNaoSalvar);
 
                             } else if (retorno.data == '' && campoChaveControle != campoChave && !permitirValorInvalido) {
@@ -248,9 +248,9 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 }
 
                 //Vendo de onde buscar o campo completo                
-                let campoCompleto = buscarCampoCompleto(campo, attr.nomeBloco);
+                var campoCompleto = buscarCampoCompleto(campo, attr.nomeBloco);
 
-                let aC = campoCompleto.autoCompleta;
+                var aC = campoCompleto.autoCompleta;
 
                 var campoChave = aC.objChave != undefined ? aC.objChave : aC.campoChave != undefined ? aC.campoChave : e.campo_chave;
 
@@ -259,9 +259,9 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
 
                         var indice = scope.$parent.$index;
                         var indice2 = scope.$index;
-                        let modeloValor2;
-                        let modeloValor3;
-                        let modeloValor4;
+                        var modeloValor2;
+                        var modeloValor3;
+                        var modeloValor4;
 
                         //Depois tenho que fazer uma comparacao igual fiz em baixo, pois pode nao haver repeticao no bloco e neste caso nao precisaria do indice2
                         modeloChave = e.raizModelo + '.' + dB.variavelSuperior + '[' + indice + ']["' + dB.nomeBloco + '"][' + indice2 + ']["' + campoChave + '"]';
@@ -284,7 +284,7 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                             modeloValor2 = objValor2 != '' ? e.raizModelo + "['" + dB.nomeBloco + "'][$index]['" + aC.objValor2 + "']" : '';
 
                             if (objValor2 != '') {
-                                let objValor2Temp = $('#' + objValor2).attr('ng-model') != undefined ? $('#' + objValor2).attr('ng-model') : modeloValor2;
+                                var objValor2Temp = $('#' + objValor2).attr('ng-model') != undefined ? $('#' + objValor2).attr('ng-model') : modeloValor2;
                                 //$('#' + attr.id).attr('modelo-valor2', $('#' + objValor2).attr('ng-model'));
                                 $('#' + attr.id).attr('modelo-valor2', objValor2Temp);
                             }
@@ -292,7 +292,7 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                             objValor3 = aC.objValor3 != undefined ? e.raizModelo + '_' + dB.nomeBloco + '_' + indice + '_' + aC.objValor3 : '';
                             modeloValor3 = objValor3 != '' ? e.raizModelo + "['" + dB.nomeBloco + "'][$index]['" + aC.objValor3 + "']" : '';
                             if (objValor3 != '') {
-                                let objValor3Temp = $('#' + objValor3).attr('ng-model') != undefined ? $('#' + objValor3).attr('ng-model') : modeloValor3;
+                                var objValor3Temp = $('#' + objValor3).attr('ng-model') != undefined ? $('#' + objValor3).attr('ng-model') : modeloValor3;
                                 //$('#' + attr.id).attr('modelo-valor3', $('#' + objValor3).attr('ng-model'));
                                 $('#' + attr.id).attr('modelo-valor3', objValor3Temp);
                             }
@@ -300,7 +300,7 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                             objValor4 = aC.objValor4 != undefined ? e.raizModelo + '_' + dB.nomeBloco + '_' + indice + '_' + aC.objValor4 : '';
                             modeloValor4 = objValor4 != '' ? e.raizModelo + "['" + dB.nomeBloco + "'][$index]['" + aC.objValor4 + "']" : '';
                             if (objValor4 != '') {
-                                let objValor4Temp = $('#' + objValor4).attr('ng-model') != undefined ? $('#' + objValor4).attr('ng-model') : modeloValor4;
+                                var objValor4Temp = $('#' + objValor4).attr('ng-model') != undefined ? $('#' + objValor4).attr('ng-model') : modeloValor4;
                                 $('#' + attr.id).attr('modelo-valor4', objValor4Temp);
                             }
                         } else {
@@ -353,10 +353,10 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                     $parse(elem.attr('ng-model')).assign(scope, '');
                     $parse(modeloChave).assign(scope, '');
                     if (objValor2 != undefined && objValor2 != '') {
-                        let elemento2 = angular.element('#' + EGFuncoes.modeloParaId(objValor2));
+                        var elemento2 = angular.element('#' + EGFuncoes.modeloParaId(objValor2));
                         elemento2.val('');
                         $parse(elemento2.attr('ng-model')).assign(scope, '');
-                        let chaveElemento2 = elemento2.siblings('.chave_auto_completa');
+                        var chaveElemento2 = elemento2.siblings('.chave_auto_completa');
                         chaveElemento2.val('');
                         $parse(chaveElemento2.attr('ng-model')).assign(scope, '');
                     }
@@ -367,23 +367,23 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 }
 
 
-                let chave2;
+                var chave2;
                 if (aC.campoChave2 != undefined) {
                     //Primeiro vejo se a chave 2 esta setada na estrutura
                     if (aC.chave2 != undefined) {
                         chave2 = aC.chave2;
                     } else {
                         //Vendo se tem a chave2 no mesmo nivel do auto completaca
-                        let variavelCampoChave2 = EGFuncoes.trocarCampoModelo(event, modeloChave, campoChave, aC.campoChave2);
+                        var variavelCampoChave2 = EGFuncoes.trocarCampoModelo(event, modeloChave, campoChave, aC.campoChave2);
 
-                        let chave2MesmoNivel = eval('scope.' + variavelCampoChave2);
-                        let chave2Raiz = eval('scope.' + e.raizModelo + '.' + aC.campoChave2);
+                        var chave2MesmoNivel = eval('scope.' + variavelCampoChave2);
+                        var chave2Raiz = eval('scope.' + e.raizModelo + '.' + aC.campoChave2);
 
                         if (indice != undefined && aC.objChave2 != undefined) {
                             aC.objChave2 = aC.objChave2.replace("$index", indice);
                         }
 
-                        let chave2Objeto = eval('scope' + '.' + aC.objChave2) != undefined ? eval('scope' + '.' + aC.objChave2) :
+                        var chave2Objeto = eval('scope' + '.' + aC.objChave2) != undefined ? eval('scope' + '.' + aC.objChave2) :
                             eval('$rootScope' + '.' + aC.objChave2) != undefined ? eval('$rootScope' + '.' + aC.objChave2) : undefined;
 
                         chave2 = chave2MesmoNivel ? chave2MesmoNivel : chave2Raiz ? chave2Raiz :
@@ -392,27 +392,27 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 }
 
 
-                let chave3 = '';
+                var chave3 = '';
                 if (aC.campoChave3 != undefined) {
                   // console.log(aC);
                     if (aC.chave3 != undefined) {
                         chave3 = aC.chave3;
                     } else {
                         //chave3 = aC.chave3 != undefined ? aC.chave3 : eval('scope.' + EGFuncoes.trocarCampoModelo(event, modeloChave, campoChave, aC.campoChave3));
-                        let variavelCampoChave3 = EGFuncoes.trocarCampoModelo(event, modeloChave, campoChave, aC.campoChave3);
+                        var variavelCampoChave3 = EGFuncoes.trocarCampoModelo(event, modeloChave, campoChave, aC.campoChave3);
 
-                        let chave3MesmoNivel = eval('scope.' + variavelCampoChave3);
-                        let chave3Raiz = eval('scope.' + e.raizModelo + '.' + aC.campoChave3);
+                        var chave3MesmoNivel = eval('scope.' + variavelCampoChave3);
+                        var chave3Raiz = eval('scope.' + e.raizModelo + '.' + aC.campoChave3);
 
-                        let idChaveObjeto = EGFuncoes.indexPorNumero(event, aC.objChave3);
+                        var idChaveObjeto = EGFuncoes.indexPorNumero(event, aC.objChave3);
                         
-                        let chave3Objeto = eval('scope' + '.' + idChaveObjeto) != undefined ? eval('scope' + '.' + idChaveObjeto) :
+                        var chave3Objeto = eval('scope' + '.' + idChaveObjeto) != undefined ? eval('scope' + '.' + idChaveObjeto) :
                             eval('$rootScope' + '.' + idChaveObjeto) != undefined ? eval('$rootScope' + '.' + idChaveObjeto) : 
                             eval('scope.' + e.raizModelo + '.' + idChaveObjeto) != undefined ? eval('scope.' + e.raizModelo + '.' + idChaveObjeto) : undefined;
 
                         //console.log( eval('scope.' + e.raizModelo), idChaveObjeto, chave3Objeto);
 
-                        // let chave3Objeto = eval('scope' + '.' + aC.objChave3) != undefined ? eval('scope' + '.' + aC.objChave3) :
+                        // var chave3Objeto = eval('scope' + '.' + aC.objChave3) != undefined ? eval('scope' + '.' + aC.objChave3) :
                         //     eval('$rootScope' + '.' + aC.objChave3) != undefined ? eval('$rootScope' + '.' + aC.objChave3) : undefined;
                         
                         chave3 = chave3MesmoNivel ? chave3MesmoNivel : chave3Raiz ? chave3Raiz :
@@ -460,7 +460,7 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 }
 
 
-                let idElemento = '#' + attr.id; // EGFuncoes.modeloParaId(elem.attr('ng-model'));
+                var idElemento = '#' + attr.id; // EGFuncoes.modeloParaId(elem.attr('ng-model'));
 
                 $(idElemento).autocompletaAngular(autoCompleta);
 
@@ -484,8 +484,8 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                             parametrosBusca['term'] = parametrosBusca.limparNoFoco ? '' : request.term;
                             console.log(parametrosBusca.limparNoFoco, parametrosBusca['term']);                             
 
-                            let fd = new FormData();
-                            for (let i in parametrosBusca) {
+                            var fd = new FormData();
+                            for (var i in parametrosBusca) {
                                 fd.append(i, parametrosBusca[i]);
                             }
                             fd.append('term', parametrosBusca.term);
@@ -537,31 +537,31 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                                 });
                         },
                         select: function (event, ui) {
-                            let elemAC = $(event.target);
-                            let indice = $(event.target).attr('indice');
-                            let campo = elemAC.attr('campo');
+                            var elemAC = $(event.target);
+                            var indice = $(event.target).attr('indice');
+                            var campo = elemAC.attr('campo');
 
 
-                            let eConsulta = elem.hasClass('valorConsulta');
+                            var eConsulta = elem.hasClass('valorConsulta');
 
-                            let modeloAC = eConsulta ? elemAC.attr('ng-model') : EGFuncoes.indexPorNumero(event, elemAC.attr('ng-model'));// elemAC.attr('ng-model').replace('$index', indice);
-                            let eItemConsulta = modeloAC.substr(0, 4) == 'item';
-                            let raizModelo = eItemConsulta ? 'item' : e.raizModelo;
+                            var modeloAC = eConsulta ? elemAC.attr('ng-model') : EGFuncoes.indexPorNumero(event, elemAC.attr('ng-model'));// elemAC.attr('ng-model').replace('$index', indice);
+                            var eItemConsulta = modeloAC.substr(0, 4) == 'item';
+                            var raizModelo = eItemConsulta ? 'item' : e.raizModelo;
 
                             $parse(modeloAC).assign(scope, ui.item.label);
 
-                            let modeloValor2;
-                            let modeloValor3;
-                            let modeloValor4;
-                            let modeloChaveAC;
+                            var modeloValor2;
+                            var modeloValor3;
+                            var modeloValor4;
+                            var modeloChaveAC;
 
                             if (!eConsulta) {
-                                let modeloChaveACtemp = EGFuncoes.indexPorNumero(event, elemAC.attr('modelo-chave'));
-                                let tamanhoRaizModelo = raizModelo.length;
+                                var modeloChaveACtemp = EGFuncoes.indexPorNumero(event, elemAC.attr('modelo-chave'));
+                                var tamanhoRaizModelo = raizModelo.length;
 
-                                let temRaizModelo = !eItemConsulta && (modeloChaveACtemp.substr(0, tamanhoRaizModelo) == raizModelo || modeloChaveACtemp.substr(0, 4) == 'item');
+                                var temRaizModelo = !eItemConsulta && (modeloChaveACtemp.substr(0, tamanhoRaizModelo) == raizModelo || modeloChaveACtemp.substr(0, 4) == 'item');
 
-                                let substituirCampoPorChave = elem.attr('substituir-modelo-chave') != undefined;
+                                var substituirCampoPorChave = elem.attr('substituir-modelo-chave') != undefined;
 
                                 //modeloChaveAC = temRaizModelo ? modeloChaveACtemp : e.raizModelo + '.' + modeloChaveACtemp;                                
                                 if (substituirCampoPorChave) {
@@ -618,8 +618,8 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                             elemAC.popover('hide');
 
                             if (modeloValor2 != undefined) {
-                                let elementoValor2 = $('#' + EGFuncoes.modeloParaId(modeloValor2));
-                                let elementoPaiValor2 = elementoValor2.closest('div.form-group');
+                                var elementoValor2 = $('#' + EGFuncoes.modeloParaId(modeloValor2));
+                                var elementoPaiValor2 = elementoValor2.closest('div.form-group');
                                 elementoValor2.removeClass('erro');
                                 elementoPaiValor2.removeClass('erro');
                             }
@@ -629,8 +629,8 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                     })
                         .data("ui-autocomplete")._renderItem = function (ul, item) {
                             //return $("<li>").append("<a>"+item.label+"</a>").appendTo(ul);
-                            let htmlImagem = item.imagem != '' ? '<img width="80" class="col-xs-12 col-md-2" src="' + item.imagem + '">' : '';
-                            let classesA = item.imagem != '' ? 'col-xs-12 col-md-9' : 'col-xs-12';
+                            var htmlImagem = item.imagem != '' ? '<img width="80" class="col-xs-12 col-md-2" src="' + item.imagem + '">' : '';
+                            var classesA = item.imagem != '' ? 'col-xs-12 col-md-9' : 'col-xs-12';
                             return $('<li class="row bordadebaixo"> ' + htmlImagem + ' <a class="' + classesA + '">' + item.label + "</a></li>").appendTo(ul)
                         }
                 };

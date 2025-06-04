@@ -7,21 +7,21 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
             var acao = scope.acao != undefined ? scope.acao : APIServ.parametrosUrl()[1];
             var parametros = scope.estrutura;
 
-            let posicaoBotoes = scope.estrutura.botoesAcoesItensConsultaPosicao != undefined ? scope.estrutura.botoesAcoesItensConsultaPosicao : 'esquerda';
-            let classeBotoes = posicaoBotoes == 'superior' || posicaoBotoes == 'inferior' ? 'col-xs-12' : 'col-xs-12 col-md-2';
-            let classeLista = posicaoBotoes == 'superior' || posicaoBotoes == 'inferior' ? 'col-xs-12' : 'col-xs-12 col-md-10';
-            let habilitarSalvar = false;
+            var posicaoBotoes = scope.estrutura.botoesAcoesItensConsultaPosicao != undefined ? scope.estrutura.botoesAcoesItensConsultaPosicao : 'esquerda';
+            var classeBotoes = posicaoBotoes == 'superior' || posicaoBotoes == 'inferior' ? 'col-xs-12' : 'col-xs-12 col-md-2';
+            var classeLista = posicaoBotoes == 'superior' || posicaoBotoes == 'inferior' ? 'col-xs-12' : 'col-xs-12 col-md-10';
+            var habilitarSalvar = false;
 
             scope.aoEntrarInputConsulta = (item, event) => {
-                let campo = $(event.target).attr('campo');
+                var campo = $(event.target).attr('campo');
 
                 item.valoresOriginais = item.valoresOriginais != undefined ? item.valoresOriginais : {};
                 item.valoresOriginais[campo] = item.valoresOriginais != undefined && item.valoresOriginais[campo] != undefined ? item.valoresOriginais[campo] : item[campo];
             }
 
             scope.alteracaoItemConsulta = (item, event) => {
-                let elemento = $(event.target);
-                let campo = elemento.attr('campo');
+                var elemento = $(event.target);
+                var campo = elemento.attr('campo');
 
                 if (item.valoresOriginais[campo] != undefined && item.valoresOriginais[campo] != item[campo]) {
                     $(event.target).closest('.itemConsulta').addClass('fundoVermelho');
@@ -35,15 +35,15 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
             }
 
             scope.salvarAlteracoesItem = (item, event) => {
-                let elemento = $(event.target);
+                var elemento = $(event.target);
 
-                let parametrosAlteracao = {
+                var parametrosAlteracao = {
                     tabela: parametros.tabela,
                     campoChave: parametros.campo_chave,
                     dados: item
                 }
 
-                let fd = new FormData();
+                var fd = new FormData();
                 fd.append('parametros', JSON.stringify(parametrosAlteracao));
 
                 APIServ.executaFuncaoClasse('classeGeral', 'alterarItemConsulta', fd, 'post').success(retorno => {
@@ -63,7 +63,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
 
             scope.cancelarAlteracoesItem = (item, event) => {
                 console.log(item);
-                for (let v in item) {
+                for (var v in item) {
                     item[v] = item.valoresOriginais != undefined && item.valoresOriginais[v] != undefined ? item.valoresOriginais[v] : item[v];
                 }
 
@@ -74,7 +74,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
 
 
             /************************ CRIANDO OS CAMPOS DA LISTA **********************/
-            let htmlCamposLista = `
+            var htmlCamposLista = `
             <div class="${classeLista}">
                 <div class="row">`;
 
@@ -82,7 +82,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
             //Aqui, ao inves de usar o repeat do angular, crio todos os elementos pois as informacoes sobre o campo estao no template js
             angular.forEach(parametros.listaConsulta, function (val, key) {
 
-                let classesDivItemConsulta = val.classesDiv ? val.classesDiv : '';
+                var classesDivItemConsulta = val.classesDiv ? val.classesDiv : '';
                 habilitarSalvar = val.habilitarEdicao || habilitarSalvar;
 
                 val = val != 'diretiva' ? $.extend({}, APIServ.buscarValorVariavel(parametros.campos, key), val) : val;
@@ -91,13 +91,13 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
                 val.texto = val.texto != undefined ? val.texto : '';
 
                 //Testando por ng-model nos itens da lista
-                let modelo = val.usarModelo != undefined ? 'ng-model="item.' + key + '"' : '';
+                var modelo = val.usarModelo != undefined ? 'ng-model="item.' + key + '"' : '';
                 //Fazendo esta comparação somente para o ng-class, posteriormente incluir rotina para qualquer atributo
-                let ngClasses = val.atributosDiv != undefined && val.atributosDiv['ng-class'] ? `ng-class="${val.atributosDiv['ng-class']}"` : ""
+                var ngClasses = val.atributosDiv != undefined && val.atributosDiv['ng-class'] ? `ng-class="${val.atributosDiv['ng-class']}"` : ""
 
                 var tamanho = EGFuncoes.montarTamanhos(val);
 
-                let atributosDivCampoConsulta = val.atributos_div != undefined ? EGFuncoes.montarAtributos(val.atributos_div) : [];
+                var atributosDivCampoConsulta = val.atributos_div != undefined ? EGFuncoes.montarAtributos(val.atributos_div) : [];
 
                 if (val.tipo != "oculto") {
                     if (val.tipo == 'caixaSelecao') {
@@ -112,7 +112,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
                         htmlCamposLista += `<img ng-src="{{item.${key}}}" class="img-responsive" style="max-height:120px !important" imagem-dinamica></div>`;
                     } else if (val == 'diretiva') {
                         //console.log('diretiva');
-                        let nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
+                        var nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
                         htmlCamposLista += `<${nomeDiretiva}></${nomeDiretiva}>`;
                     } else if (val.tipo == 'select') {
                         htmlCamposLista += `<monta-html campo="${key}"></monta-html>`;// '{{item.ordem}}';
@@ -141,29 +141,29 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
 
 
             /******************CRIANDO OS BOTOES DAS FUNCOES *******************************************/
-            let htmlBotoes = `
+            var htmlBotoes = `
                 <div class="${classeBotoes}"> `
 
             if ((parametros.funcaoDetalhar == undefined || parametros.funcaoDetalhar != 'desativada') && (parametros.ocultarDetalhes == undefined || !parametros.ocultarDetalhes)) {
-                let funcaoDet = parametros.funcaoDetalhar != undefined ? parametros.funcaoDetalhar : 'detalhar';
+                var funcaoDet = parametros.funcaoDetalhar != undefined ? parametros.funcaoDetalhar : 'detalhar';
                 htmlBotoes += `<button type="button" name="button" class="btn btn-modern btn-outline-secondary glyphicon"
                 ng-class="{'glyphicon-plus' : !item.exibirDetalhes, 'glyphicon-minus':item.exibirDetalhes}" title="Ver Detalhes"  ng-click=${funcaoDet}(item)></button>`;
             }
 
             if ((parametros.funcaoAlterar == undefined || parametros.funcaoAlterar != 'desativada') && ($rS[acao] != undefined && $rS[acao]['acoes']['Alterar'])) {
-                let funcaoAlt = parametros.funcaoAlterar != undefined ? parametros.funcaoAlterar : 'alterar';
-                let textoBotaoAlterar = parametros.textoBotaoAlterar != undefined ? parametros.textoBotaoAlterar : '';
-                let iconeBotaoAlterar = parametros.ocultarIconeBotaoAlterar == undefined || !parametros.ocultarIconeBotaoAlterar ? 'glyphicon-pencil glyphicon' : '';
-                let classesBotaoAlterar = parametros.classesBotaoAlterar == undefined || !parametros.classesBotaoAlterar ? 'btn-modern btn-outline-primary' : parametros.classesBotaoAlterar;
-                let ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar}"` : '';
+                var funcaoAlt = parametros.funcaoAlterar != undefined ? parametros.funcaoAlterar : 'alterar';
+                var textoBotaoAlterar = parametros.textoBotaoAlterar != undefined ? parametros.textoBotaoAlterar : '';
+                var iconeBotaoAlterar = parametros.ocultarIconeBotaoAlterar == undefined || !parametros.ocultarIconeBotaoAlterar ? 'glyphicon-pencil glyphicon' : '';
+                var classesBotaoAlterar = parametros.classesBotaoAlterar == undefined || !parametros.classesBotaoAlterar ? 'btn-modern btn-outline-primary' : parametros.classesBotaoAlterar;
+                var ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar}"` : '';
                 htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)"
                     ${ocultarAlterar}>${textoBotaoAlterar}</button>`;
                 //htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)">${textoBotaoAlterar}</button>`;
 
             }
             if ((parametros.funcaoExcluir == undefined || parametros.funcaoExcluir != 'desativada') && ($rS[acao] != undefined && $rS[acao]['acoes']['Excluir'])) {
-                let funcaoExc = parametros.funcaoExcluir != undefined ? parametros.funcaoExcluir : 'excluir';
-                let ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir}"`  : '';
+                var funcaoExc = parametros.funcaoExcluir != undefined ? parametros.funcaoExcluir : 'excluir';
+                var ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir}"`  : '';
                 htmlBotoes += `<button type="button" class="btn btn-modern btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"
                     ${ocultarExcluir}></button>`;
                 //htmlBotoes += `<button type="button" class="btn btn-default glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"></button>`;
@@ -183,7 +183,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
                     if (val == 'anexos') {
                         htmlBotoes += `<input-botao parametros="${val}"></input-botao>`; // EGFuncoes.montarBotao(parametros.anexos);
                     } else if (val == 'diretiva' || (val.tipo != undefined && val.tipo == 'diretiva')) {
-                        let nomeDiretiva = val.nomeDiretiva != undefined ? val.nomeDiretiva : key;
+                        var nomeDiretiva = val.nomeDiretiva != undefined ? val.nomeDiretiva : key;
                         nomeDiretiva = APIAjuFor.variavelParaDiretiva(nomeDiretiva);
                         htmlBotoes += `<${nomeDiretiva} campo="${key}"></${nomeDiretiva}>`;
                     } else if (val.tipo == 'caixaSelecao') {
@@ -219,11 +219,11 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
 
 
 
-            let filtro = '';
+            var filtro = '';
             if (scope.estrutura.camposFiltroPersonalizado != undefined && Object.keys(scope.estrutura.camposFiltroPersonalizado).length > 0) {
                 filtro = '{';
-                let cont = 1;
-                for (let i in scope.estrutura.camposFiltroPersonalizado) {
+                var cont = 1;
+                for (var i in scope.estrutura.camposFiltroPersonalizado) {
                     filtro += i + ':' + scope.estrutura.raizModelo + '.' + i;
 
                     filtro += cont < Object.keys(scope.estrutura.camposFiltroPersonalizado).length ? ',' : '';
@@ -245,7 +245,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
             //     console.log(item);
             // }
 
-            let html = `            
+            var html = `            
             <div ng-if="tela == 'consulta'">            
                 <div class="itemConsulta col-xs-12 bg-danger text-center" ng-if="listaConsulta.length == 0 && tela != 'cadastro'">
                     <h3>Nenhum Ítem Encontrado</h3>
@@ -263,7 +263,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
                 html += htmlCamposLista + htmlBotoes;
             }
             
-            let textoDetalhes = parametros.textoDetalhesConsulta != undefined ? parametros.textoDetalhesConsulta : 'Mais Informações';
+            var textoDetalhes = parametros.textoDetalhesConsulta != undefined ? parametros.textoDetalhesConsulta : 'Mais Informações';
             html += `
                 <div class="col-xs-12 fundoDetalheConsulta" ng-if="item.exibirDetalhes">
                     <div class="row">
@@ -271,7 +271,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
 
             //html += `<ng-bind-html class="col-xs-12 div2" ng-bind-html="item.htmlDetalhe"></ng-bind-html>`;
             //html +=  `<detalhes-item-consulta></detalhes-item-consulta>`;
-            let diretivaDetalhes = parametros.diretivaDetalhesConsulta != undefined ? parametros.diretivaDetalhesConsulta : 'detalhes-item-consulta';
+            var diretivaDetalhes = parametros.diretivaDetalhesConsulta != undefined ? parametros.diretivaDetalhesConsulta : 'detalhes-item-consulta';
             html += `<${diretivaDetalhes}></${diretivaDetalhes}>`;
 
             if (parametros.anexos != undefined) {
@@ -305,7 +305,7 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
         return {
             restrict: 'E',
             link: (scope, elem, attr) => {
-                let html = '';
+                var html = '';
                 if (scope.filtroResultado.length > 0) {
                     html = `Itens na Consulta: <span id="qtdconsulta">{{(listaConsulta|filter:${scope.filtroResultado}).length}}</span>`;
                 } else {
