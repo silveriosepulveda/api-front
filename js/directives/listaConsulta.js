@@ -250,10 +250,9 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
                 <div class="itemConsulta col-xs-12 bg-danger text-center" ng-if="listaConsulta.length == 0 && tela != 'cadastro'">
                     <h3>Nenhum Ítem Encontrado</h3>
                 </div>
-                <estrutura-paginacao></estrutura-paginacao>                
-                <div class="conteudoBusca col-xs-12">                        
-                    <div class="row itemConsulta" dir-paginate="(key, item) in listaConsulta | filter:${filtro} | itemsPerPage:itensPagina"
-                     ng-if="tela != 'cadastro'" indice="{{key}}" id="divItemConsulta_{{key}}"> `;
+                <div class="conteudoBusca col-xs-12" lazy-load-container>                        
+                    <div class="row itemConsulta" ng-repeat="item in listaConsultaVisivel track by $index"
+                     ng-if="tela != 'cadastro'" indice="{{$index}}" id="divItemConsulta_{{$index}}"> `;
 
             if (posicaoBotoes == 'superior') {
                 html += htmlBotoes + htmlCamposLista;
@@ -292,11 +291,289 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
                 html += "<hr>"
             }
             html += '</div>';
-            html += `<estrutura-paginacao></estrutura-paginacao>
-                </div>`;
+            html += `
+                <!-- Indicador de carregamento -->
+                <div class="lazy-loading-indicator text-center" ng-show="carregandoMaisItens" style="padding: 20px;">
+                    <i class="fa fa-spinner fa-spin"></i> Carregando mais itens...
+                </div>
+                <!-- Botão para carregar mais (fallback) -->
+                <div class="text-center" ng-if="temMaisItens && !carregandoMaisItens" style="padding: 20px;">
+                    <button class="btn btn-default" ng-click="carregarMaisItens()">
+                        <i class="fa fa-plus"></i> Carregar mais itens
+                    </button>
+                </div>
+                </div>
+            </div>`;
 
             elem.html(html);
             $(elem).css('margin-top', '400px !important')
+            
+            // Implementação do Lazy Loading
+            scope.listaConsultaVisivel = [];
+            scope.carregandoMaisItens = false;
+            scope.temMaisItens = true;
+            scope.itensPorCarregamento = 20; // Número de itens carregados por vez
+            scope.ultimaPaginaCarregada = 0;
+            
+            // Variáveis para controle do filtro de resultado
+            scope.listaConsultaCompleta = []; // Lista completa original (fonte de dados)
+            scope.listaConsultaFiltrada = []; // Lista filtrada (resultado do filtro)
+            scope.filtroResultadoAtivo = '';
+            
+            // Variável para controle de debounce do filtro
+            var filtroTimeout = null;
+            
+            // Inicializar lista visível quando listaConsulta mudar
+            var watchingUpdate = false; // Flag para evitar loops
+            
+            scope.$watch('listaConsulta', function(novaLista, listaAnterior) {
+                // Evitar processamento durante updates internos
+                if (watchingUpdate) return;
+                
+                if (novaLista && novaLista.length > 0 && novaLista !== listaAnterior) {
+                    // Verificar se a mudança veio de uma fonte externa (não do filtro)
+                    var mudancaExterna = !scope.filtroResultadoAtivo || 
+                                       (scope.listaConsultaCompleta.length === 0) ||
+                                       (novaLista.length > scope.listaConsultaCompleta.length);
+                    
+                    if (mudancaExterna) {
+                        // Salvar como lista completa apenas se for mudança externa
+                        scope.listaConsultaCompleta = angular.copy(novaLista);
+                        
+                        // Se não há filtro ativo, inicializar carregamento
+                        if (!scope.filtroResultadoAtivo) {
+                            scope.listaConsultaVisivel = [];
+                            scope.ultimaPaginaCarregada = 0;
+                            scope.temMaisItens = true;
+                            setTimeout(function() {
+                                scope.carregarMaisItens();
+                            }, 100);
+                        }
+                    }
+                }
+            });
+            
+            // Função para filtrar itens da lista baseado no filtroResultado
+            scope.aplicarFiltroResultado = function() {
+                if (!scope.listaConsultaCompleta || scope.listaConsultaCompleta.length === 0) {
+                    scope.listaConsultaFiltrada = [];
+                    // Evitar trigger do watch durante atualização interna
+                    watchingUpdate = true;
+                    scope.listaConsulta = [];
+                    setTimeout(function() { watchingUpdate = false; }, 0);
+                    return;
+                }
+
+                var filtro = scope.filtroResultadoAtivo;
+                if (!filtro || filtro === '') {
+                    // Se não há filtro, usar lista completa
+                    scope.listaConsultaFiltrada = angular.copy(scope.listaConsultaCompleta);
+                } else {
+                    // Aplicar filtro na lista completa
+                    scope.listaConsultaFiltrada = scope.listaConsultaCompleta.filter(function(item) {
+                        return scope.itemPassaNoFiltro(item, filtro);
+                    });
+                }
+                
+                // Atualizar listaConsulta com o resultado filtrado (evitar trigger do watch)
+                watchingUpdate = true;
+                scope.listaConsulta = angular.copy(scope.listaConsultaFiltrada);
+                setTimeout(function() { watchingUpdate = false; }, 0);
+                
+                // Resetar lista visível para mostrar itens filtrados
+                scope.listaConsultaVisivel = [];
+                scope.ultimaPaginaCarregada = 0;
+                scope.temMaisItens = scope.listaConsultaFiltrada.length > 0;
+                
+                // Carregar primeiros itens imediatamente se há dados
+                if (scope.listaConsultaFiltrada.length > 0) {
+                    scope.ultimaPaginaCarregada = 1;
+                    scope.$evalAsync(function() {
+                        scope.carregarDaListaAtual();
+                    });
+                }
+            };
+            
+            // Função para verificar se um item passa no filtro
+            scope.itemPassaNoFiltro = function(item, filtro) {
+                if (!filtro || filtro === '') return true;
+                
+                var filtroLower = filtro.toLowerCase();
+                
+                // Buscar em todas as propriedades do item
+                for (var prop in item) {
+                    if (item.hasOwnProperty(prop) && item[prop] !== null && item[prop] !== undefined) {
+                        var valor = item[prop].toString().toLowerCase();
+                        if (valor.indexOf(filtroLower) !== -1) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
+            
+            // Função para aplicar filtro de forma imediata (sem debounce)
+            scope.aplicarFiltroImediato = function(filtro) {
+                scope.filtroResultadoAtivo = filtro || '';
+                
+                // Cancelar timeout pendente
+                if (filtroTimeout) {
+                    clearTimeout(filtroTimeout);
+                    filtroTimeout = null;
+                }
+                
+                scope.aplicarFiltroResultado();
+            };
+            
+            // Função para limpar o filtro
+            scope.limparFiltroResultado = function() {
+                // Cancelar timeout pendente
+                if (filtroTimeout) {
+                    clearTimeout(filtroTimeout);
+                    filtroTimeout = null;
+                }
+                
+                // Limpar o campo visual diretamente
+                $('#filtro_resultado').val('');
+                
+                // Limpar as variáveis do scope
+                scope.filtroResultado = '';
+                scope.filtroResultadoAtivo = '';
+                
+                // Aplicar a limpeza do filtro
+                scope.aplicarFiltroResultado();
+                
+                // Forçar atualização do Angular se necessário
+                if (!scope.$$phase && !scope.$root.$$phase) {
+                    scope.$apply();
+                }
+            };
+            
+            // Watch para alterações no filtroResultado com debounce
+            scope.$watch('filtroResultado', function(novoFiltro, filtroAnterior) {
+                // Cancelar timeout anterior se existir
+                if (filtroTimeout) {
+                    clearTimeout(filtroTimeout);
+                }
+                
+                // Aplicar filtro com debounce para evitar execuções desnecessárias
+                filtroTimeout = setTimeout(function() {
+                    scope.$apply(function() {
+                        scope.filtroResultadoAtivo = novoFiltro || '';
+                        scope.aplicarFiltroResultado();
+                    });
+                    filtroTimeout = null;
+                }, 300); // 300ms de debounce
+            });
+            
+            // Watch adicional sem debounce para detectar mudanças muito rápidas
+            var ultimoFiltroAplicado = '';
+            scope.$watch('filtroResultado', function(novoFiltro) {
+                // Se o filtro mudou muito rápido e ainda não foi aplicado
+                if (novoFiltro !== ultimoFiltroAplicado && filtroTimeout) {
+                    ultimoFiltroAplicado = novoFiltro;
+                    
+                    // Para strings muito curtas ou vazias, aplicar imediatamente
+                    if (!novoFiltro || novoFiltro.length <= 2) {
+                        clearTimeout(filtroTimeout);
+                        scope.aplicarFiltroImediato(novoFiltro);
+                        filtroTimeout = null;
+                    }
+                }
+            });
+            
+            // Função para carregar mais itens
+            scope.carregarMaisItens = function() {
+                if (scope.carregandoMaisItens || !scope.temMaisItens) {
+                    return;
+                }
+                
+                scope.carregandoMaisItens = true;
+                scope.ultimaPaginaCarregada++;
+                
+                // Simular delay de carregamento (pode ser removido em produção)
+                setTimeout(function() {
+                    // Solicitar novos dados do backend
+                    scope.carregarDadosLazyLoad();
+                }, 300);
+            };
+            
+            // Função para carregar dados do backend
+            scope.carregarDadosLazyLoad = function() {
+                if (scope.$parent && scope.$parent.filtrar) {
+                    // Usar a função filtrar existente mas com parâmetros de lazy loading
+                    var parametrosLazyLoad = {
+                        pagina: scope.ultimaPaginaCarregada,
+                        itensPagina: scope.itensPorCarregamento,
+                        lazyLoad: true // Flag para indicar que é carregamento lazy
+                    };
+                    
+                    // Chamar função filtrar do escopo pai
+                    scope.$parent.filtrar(scope.ultimaPaginaCarregada, 'lazyLoad');
+                } else {
+                    // Fallback: carregar da lista atual
+                    scope.carregarDaListaAtual();
+                }
+            };
+            
+            // Fallback: carregar da lista atual em memória
+            scope.carregarDaListaAtual = function() {
+                var inicio = (scope.ultimaPaginaCarregada - 1) * scope.itensPorCarregamento;
+                var fim = inicio + scope.itensPorCarregamento;
+                
+                // Usar sempre listaConsulta (que já está filtrada)
+                var listaParaUsar = scope.listaConsulta || [];
+                
+                if (listaParaUsar && listaParaUsar.length > 0) {
+                    var novosItens = listaParaUsar.slice(inicio, fim);
+                    
+                    if (novosItens.length > 0) {
+                        // Se é o primeiro carregamento após filtro, resetar lista visível
+                        if (scope.ultimaPaginaCarregada === 1) {
+                            scope.listaConsultaVisivel = [];
+                        }
+                        scope.listaConsultaVisivel = scope.listaConsultaVisivel.concat(novosItens);
+                        scope.temMaisItens = fim < listaParaUsar.length;
+                    } else {
+                        scope.temMaisItens = false;
+                    }
+                } else {
+                    scope.listaConsultaVisivel = [];
+                    scope.temMaisItens = false;
+                }
+                
+                scope.carregandoMaisItens = false;
+                
+                // Aplicar escopo apenas se não estamos dentro de um digest
+                if (!scope.$$phase && !scope.$root.$$phase) {
+                    scope.$apply();
+                }
+            };
+            
+            // Configurar scroll infinito
+            setTimeout(function() {
+                var container = elem.find('[lazy-load-container]');
+                if (container.length > 0) {
+                    container.on('scroll', function() {
+                        var element = this;
+                        if (element.scrollTop + element.clientHeight >= element.scrollHeight - 100) {
+                            scope.$apply(function() {
+                                scope.carregarMaisItens();
+                            });
+                        }
+                    });
+                }
+                
+                // Fallback: usar scroll da window
+                $(window).on('scroll', function() {
+                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
+                        scope.$apply(function() {
+                            scope.carregarMaisItens();
+                        });
+                    }
+                });
+            }, 500);
+
             $compile(elem.contents())(scope);
         }
     }
@@ -305,14 +582,25 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
         return {
             restrict: 'E',
             link: (scope, elem, attr) => {
-                var html = '';
-                if (scope.filtroResultado.length > 0) {
-                    html = `Itens na Consulta: <span id="qtdconsulta">{{(listaConsulta|filter:${scope.filtroResultado}).length}}</span>`;
-                } else {
-                    html = `Itens na Consulta: <span id="qtdconsulta">{{(listaConsulta|filter:filtroResultado).length}}</span>`;
-                }
-                elem.html(html);
-                $compile(elem.contents())(scope);
+                var atualizarContador = function() {
+                    var html = '';
+                    var totalCompleto = scope.listaConsultaCompleta ? scope.listaConsultaCompleta.length : 0;
+                    var totalFiltrado = scope.listaConsulta ? scope.listaConsulta.length : 0;
+                    var visiveis = scope.listaConsultaVisivel ? scope.listaConsultaVisivel.length : 0;
+                    
+                    if (scope.filtroResultado && scope.filtroResultado.length > 0) {
+                        html = `Exibindo: <span id="qtdconsulta">${visiveis}</span> de ${totalFiltrado} filtrados (${totalCompleto} total)`;
+                    } else {
+                        html = `Itens na Consulta: <span id="qtdconsulta">${visiveis}</span> de ${totalCompleto} total`;
+                    }
+                    elem.html(html);
+                };
+                
+                // Atualizar contador quando as listas mudarem
+                scope.$watchGroup(['listaConsultaCompleta.length', 'listaConsulta.length', 'listaConsultaVisivel.length', 'filtroResultado'], atualizarContador);
+                
+                // Atualização inicial
+                atualizarContador();
             }
         }
     })

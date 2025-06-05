@@ -823,7 +823,13 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                 //Fazendo comparacao se e pagina sem consulta, mostrando resultados direto ao abrir
                                 if (pagina > 0) {
                                     filtros.ordemFiltro = filtros.ordemFiltro == '' && angular.element('#ordemFiltro').length > 0 ? angular.element('#ordemFiltro').val().split(':')[1] : filtros.ordemFiltro;
-                                    filtros.itensPagina = angular.element('#itensPagina') != undefined ? angular.element('#itensPagina').val() : 0;
+                                    
+                                    // Para lazy loading, usar um número fixo de itens por página
+                                    if (origem === 'lazyLoad') {
+                                        filtros.itensPagina = 20; // Número padrão para lazy loading
+                                    } else {
+                                        filtros.itensPagina = angular.element('#itensPagina') != undefined ? angular.element('#itensPagina').val() : 0;
+                                    }
                                 }
 
                                 var fd = new FormData();
@@ -885,7 +891,43 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                                                     $parse('listaConsulta').assign($scope, novaListaDefinitiva);
                                                 }
                                             } else {
-                                                $parse('listaConsulta').assign($scope, data.lista);
+                                                // Implementação do Lazy Loading
+                                                if (origem === 'lazyLoad') {
+                                                    // Para lazy loading, adicionar novos itens à lista existente
+                                                    if ($scope.listaConsulta === undefined) {
+                                                        $scope.listaConsulta = [];
+                                                    }
+                                                    
+                                                    if (data.lista && data.lista.length > 0) {
+                                                        // Adicionar novos itens evitando duplicatas
+                                                        var itensExistentes = $scope.listaConsulta.map(item => item[estrutura.campo_chave]);
+                                                        var novosItens = data.lista.filter(item => 
+                                                            !itensExistentes.includes(item[estrutura.campo_chave])
+                                                        );
+                                                        
+                                                        $scope.listaConsulta = $scope.listaConsulta.concat(novosItens);
+                                                        
+                                                        // Atualizar lista visível no lazy loading
+                                                        if ($scope.listaConsultaVisivel === undefined) {
+                                                            $scope.listaConsultaVisivel = [];
+                                                        }
+                                                        $scope.listaConsultaVisivel = $scope.listaConsultaVisivel.concat(novosItens);
+                                                        $scope.temMaisItens = data.lista.length >= (data.paginacao ? data.paginacao.itensPagina : 20);
+                                                        $scope.carregandoMaisItens = false;
+                                                    } else {
+                                                        $scope.temMaisItens = false;
+                                                        $scope.carregandoMaisItens = false;
+                                                    }
+                                                } else {
+                                                    // Carregamento normal - substituir lista completa
+                                                    $parse('listaConsulta').assign($scope, data.lista);
+                                                    
+                                                    // Inicializar variáveis de lazy loading para filtro normal
+                                                    $scope.listaConsultaVisivel = undefined; // Será inicializada pela diretiva
+                                                    $scope.carregandoMaisItens = false;
+                                                    $scope.temMaisItens = true;
+                                                    $scope.ultimaPaginaCarregada = 0;
+                                                }
                                             }
 
                                             if (data.resumoConsulta != undefined) {
