@@ -377,7 +377,9 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                             }
                             
                             // Usar novo sistema PopUpModal em vez de abrirPopUp
-                            clickNovo = `abrirModal('${rota}', ${JSON.stringify(p.novo.parametrosEnviar || {})}, '${p.novo.titulo || textoNovo}')`;
+                            // Usar aspas simples para o JSON para evitar conflitos no ng-click
+                            var parametrosJson = JSON.stringify(p.novo.parametrosEnviar || {}).replace(/"/g, "'");
+                            clickNovo = `abrirModal('${rota}', ${parametrosJson}, '${p.novo.titulo || textoNovo}')`;
                         } else {
                             clickNovo = p.novo['click'];
                         }

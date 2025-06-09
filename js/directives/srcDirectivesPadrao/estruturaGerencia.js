@@ -1459,6 +1459,50 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 var classe = $attrs.classe;
                 var funcaoEstrutura = $attrs.funcaoEstrutura;
 
+                // Função para processar a funcaoEstrutura, aguardando interpolação se necessário
+                function processarFuncaoEstrutura(callback) {
+                    // Se a funcaoEstrutura contém interpolação ({{...}}), aguardar a resolução
+                    if (funcaoEstrutura && funcaoEstrutura.includes('{{') && funcaoEstrutura.includes('}}')) {
+                        console.log('🔄 [estruturaGerencia] Aguardando interpolação da funcaoEstrutura:', funcaoEstrutura);
+                        
+                        // Aguardar um ciclo do digest para que a interpolação seja resolvida
+                        setTimeout(function() {
+                            var funcaoInterpolada = $element.attr('funcao-estrutura');
+                            console.log('✅ [estruturaGerencia] FuncaoEstrutura interpolada:', funcaoInterpolada);
+                            
+                            if (funcaoInterpolada && funcaoInterpolada !== funcaoEstrutura && !funcaoInterpolada.includes('{{')) {
+                                // A interpolação foi resolvida
+                                $scope.funcaoEstrutura = funcaoInterpolada;
+                                console.log('🎯 [estruturaGerencia] funcaoEstrutura definida como:', funcaoInterpolada);
+                                callback(funcaoInterpolada);
+                            } else {
+                                // Tentar extrair o nome da variável da interpolação
+                                var nomeVariavel = funcaoEstrutura.match(/\{\{(.+?)\}\}/);
+                                if (nomeVariavel && nomeVariavel[1]) {
+                                    var valorVariavel = $scope[nomeVariavel[1].trim()];
+                                    console.log('🎯 [estruturaGerencia] Valor da variável funcaoEstrutura', nomeVariavel[1], ':', valorVariavel);
+                                    if (valorVariavel) {
+                                        $scope.funcaoEstrutura = valorVariavel;
+                                        callback(valorVariavel);
+                                    } else {
+                                        console.warn('⚠️ [estruturaGerencia] Variável funcaoEstrutura não encontrada, aguardando...');
+                                        setTimeout(() => processarFuncaoEstrutura(callback), 100); // Tentar novamente
+                                    }
+                                } else {
+                                    callback(undefined);
+                                }
+                            }
+                        }, 50);
+                    } else if (funcaoEstrutura) {
+                        // funcaoEstrutura normal, processar diretamente
+                        $scope.funcaoEstrutura = funcaoEstrutura;
+                        console.log('🎯 [estruturaGerencia] funcaoEstrutura definida diretamente como:', funcaoEstrutura);
+                        callback(funcaoEstrutura);
+                    } else {
+                        callback(undefined);
+                    }
+                }
+
                 // Função para processar a classe, aguardando interpolação se necessário
                 function processarClasse() {
                     // Se a classe contém interpolação ({{...}}), aguardar a resolução
@@ -1498,28 +1542,32 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 function processarComClasse(classeResolvida) {
                     console.log('🔧 [estruturaGerencia] Processando com classe:', classeResolvida);
                     
-                    var parametrosBuscaEstrutura = {
-                        classe: classeResolvida,
-                        parametrosEnviados: $('#parametrosEnviados').val()
-                    };
+                    // Processar funcaoEstrutura antes de prosseguir
+                    processarFuncaoEstrutura(function(funcaoEstruturaResolvida) {
+                        var parametrosBuscaEstrutura = {
+                            classe: classeResolvida,
+                            parametrosEnviados: $('#parametrosEnviados').val()
+                        };
 
-                    if (funcaoEstrutura != undefined) {
-                        parametrosBuscaEstrutura['funcaoEstrutura'] = funcaoEstrutura;
-                        $scope.funcaoEstrutura = funcaoEstrutura;
-                    }
+                        if (funcaoEstruturaResolvida != undefined) {
+                            parametrosBuscaEstrutura['funcaoEstrutura'] = funcaoEstruturaResolvida;
+                            console.log('🎯 [estruturaGerencia] Incluindo funcaoEstrutura nos parâmetros:', funcaoEstruturaResolvida);
+                        }
 
-                    var paramEnviarBuscaEstrutura = parametrosBuscaEstrutura;
+                        var paramEnviarBuscaEstrutura = parametrosBuscaEstrutura;
 
-                    if ($scope.tipoConsulta == 'post') {
-                        var fdEnviarBuscaEstrutura = new FormData();
-                        fdEnviarBuscaEstrutura.append('parametros', JSON.stringify(parametrosBuscaEstrutura));
-                        paramEnviarBuscaEstrutura = fdEnviarBuscaEstrutura;
-                    }
+                        if ($scope.tipoConsulta == 'post') {
+                            var fdEnviarBuscaEstrutura = new FormData();
+                            fdEnviarBuscaEstrutura.append('parametros', JSON.stringify(parametrosBuscaEstrutura));
+                            paramEnviarBuscaEstrutura = fdEnviarBuscaEstrutura;
+                        }
 
-                    APIServ.executaFuncaoClasse('classeGeral', 'buscarEstrutura', paramEnviarBuscaEstrutura, $scope.tipoConsulta).success(retorno => {
-                        console.log('📋 [estruturaGerencia] Estrutura carregada para classe:', classeResolvida);
-                        montarEstrutura(retorno);
-                    })
+                        APIServ.executaFuncaoClasse('classeGeral', 'buscarEstrutura', paramEnviarBuscaEstrutura, $scope.tipoConsulta).success(retorno => {
+                            console.log('📋 [estruturaGerencia] Estrutura carregada para classe:', classeResolvida);
+                            console.log('📋 [estruturaGerencia] FuncaoEstrutura utilizada:', funcaoEstruturaResolvida);
+                            montarEstrutura(retorno);
+                        })
+                    });
                 }
 
                 if (url != undefined && $scope.estrutura == undefined) {
