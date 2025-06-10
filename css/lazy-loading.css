@@ -1,0 +1,95 @@
+/* CSS para Lazy Loading na Lista de Consulta */
+
+[lazy-load-container] {
+    max-height: 70vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.lazy-loading-indicator {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    margin: 10px 0;
+    animation: fadeInOut 1.5s infinite;
+}
+
+.lazy-loading-indicator i {
+    color: #007bff;
+    font-size: 18px;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Melhoria no visual dos itens da consulta */
+.itemConsulta {
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    transition: background-color 0.2s ease;
+}
+
+.itemConsulta:hover {
+    background-color: #f8f9fa;
+}
+
+/* Botão carregar mais */
+.btn-carregar-mais {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+}
+
+.btn-carregar-mais:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+    color: white;
+}
+
+/* Contador de itens melhorado */
+#qtdconsulta {
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Scroll suave */
+[lazy-load-container] {
+    scroll-behavior: smooth;
+}
+
+/* Loading skeleton effect */
+.item-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    height: 80px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+    [lazy-load-container] {
+        max-height: 60vh;
+    }
+    
+    .lazy-loading-indicator {
+        padding: 15px;
+        font-size: 14px;
+    }
+    
+    .btn-carregar-mais {
+        width: 100%;
+        margin: 10px 0;
+    }
+}

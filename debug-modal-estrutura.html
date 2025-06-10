@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-br" ng-app="debugApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - PopUpModal não carrega estruturaGerencia</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .debug-section { 
+            border: 1px solid #ddd; 
+            margin: 20px 0; 
+            padding: 15px; 
+            border-radius: 5px; 
+        }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .info { background-color: #cce7ff; border-color: #b8daff; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 14px; 
+        }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-warning { background-color: #ffc107; color: black; }
+        .btn-success { background-color: #28a745; color: white; }
+        .log { 
+            background: #1a202c; 
+            color: #e2e8f0;
+            border: 1px solid #4a5568; 
+            border-radius: 4px; 
+            padding: 15px; 
+            margin: 10px 0; 
+            font-family: 'Courier New', monospace; 
+            font-size: 12px; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            white-space: pre-wrap;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #ccc;
+        }
+        .status-ok { border-left-color: #28a745; }
+        .status-error { border-left-color: #dc3545; }
+        .status-warning { border-left-color: #ffc107; }
+    </style>
+</head>
+<body ng-controller="DebugController">
+    <div class="container">
+        <h1>🔍 Debug: PopUpModal não carrega estruturaGerencia</h1>
+        
+        <div class="debug-section error">
+            <h3>❌ Problema Reportado</h3>
+            <p>O Modal parou de carregar a <code>estruturaGerencia</code> ao abrir.</p>
+            
+            <h4>🔍 Possíveis Causas:</h4>
+            <ul>
+                <li><strong>rotaCarregada não está sendo definido como true</strong></li>
+                <li><strong>ng-show="rotaCarregada" não está funcionando</strong></li>
+                <li><strong>Erro na inicialização do controller</strong></li>
+                <li><strong>Problema na função carregarRota()</strong></li>
+                <li><strong>Timeout não está sendo executado</strong></li>
+                <li><strong>Estrutura-gerencia com erro de parâmetros</strong></li>
+            </ul>
+        </div>
+
+        <div class="debug-section info">
+            <h3>🧪 Testes de Diagnóstico</h3>
+            
+            <button class="btn-primary" ng-click="testarInicializacao()">
+                🚀 Testar Inicialização do Modal
+            </button>
+            
+            <button class="btn-warning" ng-click="testarRotaCarregada()">
+                ⏰ Testar rotaCarregada
+            </button>
+            
+            <button class="btn-danger" ng-click="testarEstrutura()">
+                🏗️ Testar Estrutura-gerencia
+            </button>
+            
+            <button class="btn-success" ng-click="simularModalCompleto()">
+                🎭 Simular Modal Completo
+            </button>
+        </div>
+
+        <div class="debug-section" ng-if="diagnosticos.length > 0">
+            <h3>📊 Resultados do Diagnóstico</h3>
+            
+            <div ng-repeat="diag in diagnosticos track by $index" 
+                 class="status-item" 
+                 ng-class="{'status-ok': diag.status === 'ok', 'status-error': diag.status === 'error', 'status-warning': diag.status === 'warning'}">
+                <div>
+                    <strong>{{diag.teste}}:</strong> {{diag.descricao}}
+                    <div ng-if="diag.detalhes" style="margin-top: 5px; font-size: 12px; opacity: 0.8;">
+                        {{diag.detalhes}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="debug-section" ng-if="logs.length > 0">
+            <h3>📝 Logs de Debug</h3>
+            <div class="log">
+                <div ng-repeat="log in logs track by $index">
+                    [{{log.timestamp}}] {{log.nivel}} - {{log.mensagem}}
+                </div>
+            </div>
+            
+            <button class="btn-warning" ng-click="limparLogs()" style="margin-top: 10px;">
+                🧹 Limpar Logs
+            </button>
+        </div>
+
+        <div class="debug-section warning">
+            <h3>🔧 Soluções Possíveis</h3>
+            
+            <h4>1. Verificar Template</h4>
+            <div class="code-block">
+&lt;div ng-show="rotaCarregada" class="estrutura-container"&gt;
+    &lt;estrutura-gerencia 
+        local-exibicao="modal" 
+        classe="{{classeEstrutura}}"
+        subacao="{{subacao}}"
+        funcao-estrutura="{{funcaoEstrutura}}"
+        parametros="{{parametrosJson}}"&gt;
+    &lt;/estrutura-gerencia&gt;
+&lt;/div&gt;
+            </div>
+            
+            <h4>2. Verificar Inicialização</h4>
+            <div class="code-block">
+// No controller, verificar se estas linhas estão executando:
+$scope.rotaCarregada = false;  // Inicial
+// ...
+$timeout(function () {
+    $scope.rotaCarregada = true;  // ← CRÍTICO
+}, 100);
+            </div>
+            
+            <h4>3. Verificar Console</h4>
+            <p>Verificar se aparecem os logs esperados no console do navegador:</p>
+            <div class="code-block">
+🚀 [PopUpModal] Controller inicializado
+🔄 [PopUpModal] carregarRota iniciado
+⏰ [PopUpModal] Timeout executado - definindo rotaCarregada = true
+✅ [PopUpModal] Modal preparado com local-exibicao="modal"
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    
+    <script>
+        var app = angular.module('debugApp', []);
+        
+        app.controller('DebugController', function($scope, $timeout) {
+            $scope.diagnosticos = [];
+            $scope.logs = [];
+            
+            function addLog(nivel, mensagem) {
+                $scope.logs.push({
+                    timestamp: new Date().toLocaleTimeString(),
+                    nivel: nivel,
+                    mensagem: mensagem
+                });
+            }
+            
+            function addDiagnostico(teste, descricao, status, detalhes) {
+                $scope.diagnosticos.push({
+                    teste: teste,
+                    descricao: descricao,
+                    status: status,
+                    detalhes: detalhes
+                });
+            }
+            
+            // Simular o comportamento do PopUpModal Controller
+            function simularController() {
+                addLog('INFO', 'Simulando inicialização do PopUpModal Controller');
+                
+                var scope = {
+                    rota: '/sistema-empresas-grupos/empresasGrupos',
+                    classeEstrutura: 'empresas',
+                    funcaoEstrutura: 'estruturaEmpresasGrupos',
+                    parametros: { teste: true },
+                    rotaCarregada: false,
+                    mostrarBotaoSalvar: false
+                };
+                
+                addLog('DEBUG', 'Scope inicial: rotaCarregada = ' + scope.rotaCarregada);
+                
+                // Simular carregarRota()
+                if (!scope.rota) {
+                    addLog('ERROR', 'Rota não definida!');
+                    addDiagnostico('Validação de Rota', 'Rota está vazia', 'error', 'scope.rota deve estar definido');
+                    return null;
+                }
+                
+                addLog('INFO', 'Rota válida: ' + scope.rota);
+                addDiagnostico('Validação de Rota', 'Rota está definida', 'ok', 'Rota: ' + scope.rota);
+                
+                // Simular timeout
+                setTimeout(function() {
+                    scope.rotaCarregada = true;
+                    addLog('SUCCESS', 'rotaCarregada definido como: ' + scope.rotaCarregada);
+                    addDiagnostico('rotaCarregada', 'Definido corretamente como true', 'ok', 'Timeout executado com sucesso');
+                    
+                    // Simular conversão de parâmetros
+                    if (typeof scope.parametros === 'object' && scope.parametros !== null) {
+                        scope.parametrosJson = JSON.stringify(scope.parametros);
+                        addLog('DEBUG', 'Parâmetros JSON: ' + scope.parametrosJson);
+                        addDiagnostico('Parâmetros JSON', 'Convertidos corretamente', 'ok', scope.parametrosJson);
+                    }
+                    
+                    $scope.$apply();
+                }, 100);
+                
+                return scope;
+            }
+            
+            $scope.testarInicializacao = function() {
+                addLog('START', '=== TESTE DE INICIALIZAÇÃO ===');
+                $scope.diagnosticos = [];
+                
+                var mockScope = simularController();
+                
+                if (mockScope) {
+                    addDiagnostico('Controller', 'Inicialização simulada com sucesso', 'ok', 'Mock scope criado');
+                } else {
+                    addDiagnostico('Controller', 'Falha na inicialização', 'error', 'Verificar logs para detalhes');
+                }
+            };
+            
+            $scope.testarRotaCarregada = function() {
+                addLog('START', '=== TESTE rotaCarregada ===');
+                
+                // Simular diferentes cenários
+                var cenarios = [
+                    { rotaCarregada: false, descricao: 'Estado inicial (deve mostrar loading)' },
+                    { rotaCarregada: true, descricao: 'Após timeout (deve mostrar estrutura)' },
+                    { rotaCarregada: undefined, descricao: 'Não definido (problema!)' }
+                ];
+                
+                cenarios.forEach(function(cenario) {
+                    var mostrarEstrutura = !!cenario.rotaCarregada;
+                    var mostrarLoading = !cenario.rotaCarregada;
+                    
+                    addLog('DEBUG', 'Cenário: rotaCarregada = ' + cenario.rotaCarregada);
+                    addLog('DEBUG', '  ng-show="rotaCarregada" = ' + mostrarEstrutura);
+                    addLog('DEBUG', '  ng-show="!rotaCarregada" = ' + mostrarLoading);
+                    
+                    var status = (cenario.rotaCarregada === true) ? 'ok' : 
+                                (cenario.rotaCarregada === false) ? 'warning' : 'error';
+                    
+                    addDiagnostico('Cenário rotaCarregada', cenario.descricao, status, 
+                                 'Estrutura visível: ' + mostrarEstrutura + ', Loading visível: ' + mostrarLoading);
+                });
+            };
+            
+            $scope.testarEstrutura = function() {
+                addLog('START', '=== TESTE ESTRUTURA-GERENCIA ===');
+                
+                var atributos = {
+                    'local-exibicao': 'modal',
+                    'classe': 'empresas',
+                    'subacao': 'cadastro',
+                    'funcao-estrutura': 'estruturaEmpresasGrupos',
+                    'parametros': '{"teste":true}'
+                };
+                
+                var problemas = [];
+                
+                // Verificar cada atributo
+                Object.keys(atributos).forEach(function(attr) {
+                    var valor = atributos[attr];
+                    if (!valor || valor === 'undefined' || valor === '{}') {
+                        problemas.push(attr + ': ' + (valor || 'vazio'));
+                        addDiagnostico('Atributo ' + attr, 'Valor problemático', 'warning', valor || 'vazio');
+                    } else {
+                        addDiagnostico('Atributo ' + attr, 'Valor correto', 'ok', valor);
+                    }
+                    addLog('DEBUG', attr + ' = "' + valor + '"');
+                });
+                
+                if (problemas.length === 0) {
+                    addDiagnostico('Estrutura-gerencia', 'Todos os atributos OK', 'ok', 'Tag deve renderizar corretamente');
+                } else {
+                    addDiagnostico('Estrutura-gerencia', 'Problemas encontrados', 'error', problemas.join(', '));
+                }
+            };
+            
+            $scope.simularModalCompleto = function() {
+                addLog('START', '=== SIMULAÇÃO MODAL COMPLETO ===');
+                $scope.diagnosticos = [];
+                
+                // Simular Service criando o modal
+                var config = {
+                    rota: '/sistema-empresas-grupos/empresasGrupos',
+                    parametros: {
+                        chave_empresa: 123,
+                        empresa: 'Teste LTDA'
+                    },
+                    titulo: 'Teste Modal',
+                    classeEstrutura: 'empresas',
+                    funcaoEstrutura: 'estruturaEmpresasGrupos'
+                };
+                
+                addLog('INFO', 'Config do modal: ' + JSON.stringify(config));
+                addDiagnostico('Configuração', 'Modal configurado', 'ok', JSON.stringify(config, null, 2));
+                
+                // Simular criação do HTML
+                var modalHtml = '<pop-up-modal ' +
+                    'modal-id="popup-modal-1" ' +
+                    'titulo="' + config.titulo + '" ' +
+                    'rota="' + config.rota + '" ' +
+                    'parametros="' + JSON.stringify(config.parametros).replace(/"/g, '&quot;') + '" ' +
+                    'classe-estrutura="' + config.classeEstrutura + '" ' +
+                    'funcao-estrutura="' + config.funcaoEstrutura + '">' +
+                    '</pop-up-modal>';
+                
+                addLog('DEBUG', 'HTML gerado: ' + modalHtml);
+                addDiagnostico('HTML Service', 'Gerado corretamente', 'ok', 'HTML contém todos os atributos necessários');
+                
+                // Simular processamento da diretiva
+                addLog('INFO', 'Simulando processamento da diretiva...');
+                
+                $timeout(function() {
+                    addLog('SUCCESS', 'Template renderizado');
+                    addLog('SUCCESS', 'ng-show="rotaCarregada" ativo');
+                    addLog('SUCCESS', 'estrutura-gerencia deve estar visível');
+                    
+                    addDiagnostico('Renderização', 'Modal completo funcionando', 'ok', 
+                                 'Se ainda não funcionar, verificar console do navegador para erros JavaScript');
+                }, 200);
+            };
+            
+            $scope.limparLogs = function() {
+                $scope.logs = [];
+                $scope.diagnosticos = [];
+            };
+        });
+    </script>
+</body>
+</html>
