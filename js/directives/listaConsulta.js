@@ -297,11 +297,11 @@ directivesPadrao.directive('listaConsulta', ['$compile', 'APIServ', 'EGFuncoes',
                     <i class="fa fa-spinner fa-spin"></i> Carregando mais itens...
                 </div>
                 <!-- Botão para carregar mais (fallback) -->
-                <div class="text-center" ng-if="temMaisItens && !carregandoMaisItens" style="padding: 20px;">
+                <!-- div class="text-center" ng-if="temMaisItens && !carregandoMaisItens" style="padding: 20px;">
                     <button class="btn btn-default" ng-click="carregarMaisItens()">
                         <i class="fa fa-plus"></i> Carregar mais itens
                     </button>
-                </div>
+                </div -->
                 </div>
             </div>`;
 

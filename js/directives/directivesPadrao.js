@@ -1095,20 +1095,21 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                         for (let k in tempClasses) {
                             classes.push(tempClasses[k]);
                         }
-                    }
-
-
-                    //Este e para botoes na lista da consulta
-                    if (atributos.click != undefined) {
-                        click += `ng-click="${atributos.click}"`;
-                    }
+                    }                //Este e para botoes na lista da consulta
+                if (atributos.click != undefined) {
+                    // Ensure proper escaping to prevent bracket substitution issues
+                    let clickValue = atributos.click.replace(/\]/g, ')');
+                    click += `ng-click="${clickValue}"`;
+                }
 
                     desabilitado = atributos.desabilitado != undefined ? `ng-disabled="${atributos.desabilitado}"` : '';
                 }
 
                 //Este e para botoes na lista da consulta
                 if (p.click != undefined) {
-                    click += `ng-click="${p.click}"`;
+                    // Ensure proper escaping to prevent bracket substitution issues
+                    let clickValue = p.click.replace(/\]/g, ')');
+                    click += `ng-click="${clickValue}"`;
                 }
 
                 botao += `<button ui-topo id="${acao}" type="${p.tipo}" class="btn ${classes.join(' ')} ${p.classes}" ${desabilitado}`;

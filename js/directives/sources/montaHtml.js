@@ -364,6 +364,7 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
 
                         // Migrar para novo sistema de modal PopUpModal
                         var clickNovo;
+
                         if (p.novo['click'] == undefined) {
                             // Construir rota para o novo sistema
                             var rota = '';

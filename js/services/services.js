@@ -282,7 +282,9 @@ angular.module('servicos', ['ngMaterial', 'ngMessages'])
                     funcaoNao();
                 }
             });
-        }; var _telaAguarde = function (acao = '') {
+        }; 
+        
+        var _telaAguarde = function (acao = '') {
             if (acao == '') {
                 var dialogOptions = {
                     template: '<div class="text-center"><img ng-src="api/front/imagens/aguarde.gif" class="img-responsive imgAguarde"><p>Aguarde...</p></div>',
