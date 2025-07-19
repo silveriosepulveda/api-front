@@ -156,11 +156,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 // else if($attrs.subacao != undefined) 
                 //     subacao = $attrs.subacao;
 
-                var nomeFiltroLocal = 'filtro' + acao;
-                var nomeFiltroTemp = 'filtroTemp_' + acao;
-                var filtroTemp = APIServ.buscaDadosLocais(nomeFiltroTemp);
-                var filtroLocal = APIServ.buscaDadosLocais(nomeFiltroLocal);
-
+                
                 $rS['acao'] = acao;
                 if ($rS[acao] == undefined) {
                     $rS[acao] = {};
@@ -278,99 +274,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         e.preventDefault();
                     }
                 }
-
-                $scope.abrirPopUp = function (parametros, tipoEnvio = 'post') {
-                    if ($(event.target).attr('disabled') == 'disabled')
-                        return false;
-
-                    var p = angular.fromJson(APIServ.descriptografa(parametros));
-
-                    //console.log('🔄 [estruturaGerencia] abrirPopUp: Migrando para novo sistema PopUpModal');
-                    //console.log('   - Parâmetros originais:', p);
-
-                    // Construir a rota baseada nos parâmetros originais
-                    var rota = '';
-                    if (p.pagina && p.acao) {
-                        rota = '/' + p.pagina + '/' + p.acao;
-                        if (p.subAcao) {
-                            rota += '/' + p.subAcao;
-                        }
-                    } else {
-                        // Fallback para estrutura padrão
-                        rota = '/estrutura';
-                    }
-
-                    // Preparar parâmetros para o novo modal
-                    var parametrosModal = {
-                        rota: rota,
-                        titulo: p.titulo || 'Modal',
-                        parametros: {
-                            // Preservar parâmetros originais
-                            parametrosEnviados: p.parametrosEnviados,
-                            tabelasRelacionadas: p.tabelasRelacionadas,
-                            parametrosEnviar: p.parametrosEnviar
-                        }
-                    };
-
-                    // Processar tabelas relacionadas se existirem
-                    var tabelaRel = p.tabelaRelacionada;
-                    if (tabelaRel) {
-                        var dadosTabRel = Object.assign({}, $scope.estrutura.tabelasRelacionadas[tabelaRel]);
-                        var objClicado = $(event.target);
-
-                        // Buscar modelo de valor
-                        var modeloValor = objClicado.closest('div.form-group').find('input:text').attr('ng-model');
-                        if (modeloValor) {
-                            modeloValor = modeloValor.replace('[$index]', `[${objClicado.attr('indice')}]`)
-                                .replace('[$parent.$index]', `[${objClicado.attr('indice-superior')}]`);
-                        }
-
-                        parametrosModal.parametros.tabelasRelacionadas = {};
-                        parametrosModal.parametros.tabelasRelacionadas[tabelaRel] = $scope.estrutura.tabelasRelacionadas[tabelaRel];
-
-                        var tabelaSubRel = p.tabelaSubRelacionada;
-                        if (tabelaRel && !tabelaSubRel) {
-                            // Processar tabela relacionada
-                            if (dadosTabRel.campo_valor != undefined && modeloValor) {
-                                var modeloRel = modeloValor.replace(dadosTabRel.campo_valor, dadosTabRel.campo_relacionamento);
-                                parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloRel);
-                            }
-                        } else if (tabelaRel && tabelaSubRel) {
-                            // Processar tabela sub-relacionada
-                            var dadosTabSubRel = dadosTabRel['tabelasSubRelacionadas'][tabelaSubRel];
-                            if (modeloValor) {
-                                var modeloRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
-                                var modeloSubRel = modeloValor.replace(dadosTabSubRel.campo_valor, dadosTabSubRel.campo_relacionamento);
-
-                                parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloRel);
-                                parametrosModal.parametros.tabelasRelacionadas[tabelaRel]['tabelasSubRelacionadas'][tabelaSubRel]['valor_chave_relacionamento'] = eval('$scope.' + modeloSubRel);
-                            }
-                        }
-                    }
-
-                    // Processar parâmetros para enviar
-                    if (p.parametrosEnviar != undefined) {
-                        parametrosModal.parametros.parametrosEnviados = {};
-                        for (var i in p.parametrosEnviar) {
-                            var dadosPE = p.parametrosEnviar[i];
-                            parametrosModal.parametros.parametrosEnviados[i] = {
-                                texto: dadosPE['texto'],
-                                valor: eval('$scope.' + dadosPE['valor'])
-                            }
-                        }
-                    }
-
-                    //console.log('✨ [estruturaGerencia] Abrindo novo modal com:', parametrosModal);
-
-                    // Abrir modal usando o novo sistema
-                    return PopUpModal.abrir(parametrosModal).then(function (dados) {
-                        //console.log('✅ [estruturaGerencia] Modal fechado com dados:', dados);
-                        return dados;
-                    }).catch(function (erro) {
-                        //console.log('ℹ️ [estruturaGerencia] Modal fechado sem dados:', erro);
-                        return null;
-                    });
-                }
+                
                 $scope.abrirVisualizacao = (arquivo, largura, altura) => {
                     var retorno = [];
                     var temp = window.location.href;
@@ -565,21 +469,15 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         var novoFiltro = [];
                         angular.forEach($scope.filtros, function (val, key) {
                             if (key != chave) {
-                                novoFiltro.push({
-                                    'campo': val.campo,
-                                    'operador': val.operador,
-                                    'valor': val.valor,
-                                    'exibir': val.exibir != undefined ? val.exibir : true
-                                });
+                                novoFiltro.push($scope.filtros[key]);
                             }
                         })
-                        $scope.filtros = novoFiltro;
-                        APIServ.salvaDadosLocais(nomeFiltroLocal, novoFiltro);
+                        $scope.filtros = novoFiltro;                        
                     }
 
                     $scope.limparFiltros = function () {
-                        APIServ.apagaDadosLocais(nomeFiltroLocal);
-                        APIServ.apagaDadosLocais(nomeFiltroTemp);
+                        $scope.manipularFiltroLocal($scope.acao, 'limpar');
+
                         $scope.filtros = [];
                         $scope.adicionarFiltro();
                         if ($scope.estrutura.filtrosPadrao != undefined) {
@@ -607,10 +505,24 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         $parse('filtroResultado').assign($scope, '');
                     }
 
-                    if (filtroTemp != null) {
-                        angular.forEach(filtroTemp, function (filtro, key) {
-                            $scope.filtros.push(filtro);
-                        })
+                    $scope.manipularFiltroLocal = function(tela, acao = 'buscar', filtros) {
+                        var filtrosLocal = APIServ.buscaDadosLocais('filtros') || {};
+
+                        if(acao == 'buscar')       {                  
+                            return filtrosLocal[tela] || []
+                        }else if(acao == 'salvar') {                            
+                            filtrosLocal[tela] = filtros;
+                            APIServ.salvaDadosLocais('filtros', filtrosLocal);
+                        }else if(acao == 'limpar') {
+                            filtrosLocal[tela] = [];
+                            APIServ.salvaDadosLocais('filtros', filtrosLocal);
+                        }
+                    }
+
+                    var filtroLocal = $scope.manipularFiltroLocal($scope.acao, 'buscar');
+
+                    if (filtroLocal.length > 0) {
+                        $scope.filtros = filtroLocal;
                     } else if (estrutura.filtrosPadrao) {
                         //$scope.filtros = [];
                         var tirarPrimeiroFiltro = false;
@@ -709,6 +621,9 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         }
                     }
 
+                 
+                    
+
 
                     //Vendo se a funcao de filtrar e personalizada e tem outro nome
                     if ($scope.estrutura.funcaoFiltrar != undefined) {
@@ -735,6 +650,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                             //Esta funcao foi criada, pois pode haver casos de ter intervalo de datas no filtro, ai tenho que divilo em dois.
 
+                            $scope.manipularFiltroLocal($scope.acao, 'salvar', $scope.filtros);
                             $scope.filtroEnviar = $scope.converterFiltroParaEnvio();
 
                             //if (estrutura.mostrarAguardeAoFiltrar == undefined || estrutura.mostrarAguardeAoFiltrar) {
@@ -954,6 +870,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         }
                     }
 
+                    
                     if (($scope.estrutura.filtrarAoIniciar == undefined || $scope.estrutura.filtrarAoIniciar == true) && $scope.tela == 'consulta') {
                         setTimeout(function () {
 
