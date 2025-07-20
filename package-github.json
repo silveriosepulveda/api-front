@@ -1,12 +1,17 @@
 {
-  "name": "silveriosepulveda-api-front",
-  "version": "1.0.3",
-  "description": "Módulos frontend do sistema SegMed - AngularJS",
-  "main": "js/app.js",
-  "directories": {
-    "src": "js",
-    "dist": "dist"
-  },
+  "name": "@silveriosepulveda/api-front",
+  "version": "1.0.0",
+  "description": "Módulos frontend do sistema SegMed - AngularJS com suporte a bundling moderno",
+  "main": "dist/js/ajudaFormatacoes.js",
+  "module": "dist/js/ajudaFormatacoes.js",
+  "files": [
+    "dist/",
+    "js/",
+    "css/",
+    "imagens/",
+    "README.md",
+    "example.html"
+  ],
   "scripts": {
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
@@ -38,6 +43,9 @@
     "url": "https://github.com/silveriosepulveda/api-front/issues"
   },
   "homepage": "https://github.com/silveriosepulveda/api-front#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "engines": {
     "node": ">=14.0.0",
     "npm": ">=6.0.0"
@@ -88,4 +96,4 @@
     "not dead",
     "ie >= 11"
   ]
-}
+} 
