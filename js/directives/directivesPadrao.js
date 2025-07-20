@@ -1,4 +1,13 @@
-var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directives.dirPagination'])    
+// Verifica se a variável 'app' já existe (aplicação principal)
+if (typeof app !== 'undefined') {
+    // Usa a variável 'app' existente da aplicação principal
+    var directivesPadrao = app;
+} else {
+    // Cria um módulo independente se a variável 'app' não existir
+    var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directives.dirPagination']);
+}
+
+directivesPadrao
     .directive('expandeComprimeBloco', function ($compile, APIServ, EGFuncoes) {
         return {
             restrict: 'E',
