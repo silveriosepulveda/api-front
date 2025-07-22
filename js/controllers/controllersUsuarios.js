@@ -18,7 +18,7 @@ angular.module('app.controllersUsuarios', [])
             });
         };
     })
-    .controller('usuarioCtrl', function ($rootScope, $scope, APIServ, $http) {
+    .controller('usuarioCtrl', function ($rootScope, $scope, APIServ, $http) {        
         $scope.sair = () => {
             APIServ.apagaDadosLocais('usuario');
             APIServ.apagaDadosLocais('menuPainel');
@@ -30,16 +30,18 @@ angular.module('app.controllersUsuarios', [])
             var parametros = {
                 'login': dados.login,
                 'senha': dados.senha
-            }
+            }            
 
             APIServ.executaFuncaoClasse('usuarios', 'logarUsuario', parametros).success(function (data) {
-                if (data.usuario.chave_usuario != undefined && parseInt(data.usuario.chave_usuario) >= 0) {
-                    APIServ.salvaDadosLocais('usuario', data.usuario);
-                    APIServ.salvaDadosLocais('menuPainel', data.menus);
-                    window.location.reload();
-                } else if (data.usuario.chave_usuario < 0) {
-                    $scope.loginInvalido = true;
-                }
+                console.log(data);
+                
+                // if (data.usuario.chave_usuario != undefined && parseInt(data.usuario.chave_usuario) >= 0) {
+                //     APIServ.salvaDadosLocais('usuario', data.usuario);
+                //     APIServ.salvaDadosLocais('menuPainel', data.menus);
+                //     window.location.reload();
+                // } else if (data.usuario.chave_usuario < 0) {
+                //     $scope.loginInvalido = true;
+                // }
             });
         };
 

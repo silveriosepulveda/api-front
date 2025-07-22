@@ -1,20 +1,10 @@
-// Verifica se a variável 'app' já existe (aplicação principal)
-if (typeof app !== 'undefined') {
-    // Usa a variável 'app' existente da aplicação principal
-    var directivesPadrao = app;
-} else {
-    // Cria um módulo independente se a variável 'app' não existir
-    var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directives.dirPagination']);
-}
-
-directivesPadrao
+var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directives.dirPagination'])    
     .directive('expandeComprimeBloco', function ($compile, APIServ, EGFuncoes) {
         return {
             restrict: 'E',
             replace: true,
             template: '<button type="button" class="btn btn-default col-xs-3 col-md-1 glyphicon"></button>',
             link: function (scope, elem, attr) {
-
                 var tamanho = elem.attr('tamanho') != undefined ? elem.attr('tamanho') : 'pequeno';
 
                 var tamanhos = {
@@ -472,7 +462,7 @@ directivesPadrao
             link: function (scope, elem) {
                 if ($rootScope.autoCompletaCarregado == undefined) {
                     $rootScope.autoCompletaCarregado = true;
-                    $.getScript('api/front/js/directives/autoCompleta.js');
+                    $.getScript('src/front/js/directives/autoCompleta.js');
                     //var domElem = '<script src="api/js/directives/autoCompleta.js" async defer></script>';
                     //angular.element(elem).append($compile(domElem)(scope));
                 }
@@ -1193,7 +1183,7 @@ directivesPadrao
         return {
             restrict: 'E',
             replace: 'true',
-            templateUrl: 'api/front/js/directives/templates/formCabecalhoConsultaPadrao.html',
+            templateUrl: 'src/front/js/directives/templates/formCabecalhoConsultaPadrao.html',
             link: (scope, elem, attr) => {
                 if (scope.estrutura.ordernarCamposfiltroPesquisa != undefined && scope.estrutura.ordernarCamposfiltroPesquisa) {
                     //scope.camposFiltroPesquisa = scope.camposFiltroPesquisa.sort();// = {};//Object.assign({}, scope.camposFiltroPesquisa);

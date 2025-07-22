@@ -17,7 +17,7 @@
     function MenuPainelDirective() {
         return {
             restrict: 'E',
-            templateUrl: 'api/front/js/directives/menuPainel/menuPainel.template.html',
+            templateUrl: 'src/front/js/directives/menuPainel/menuPainel.template.html',
             controller: MenuPainelController,
             controllerAs: 'vm',
             bindToController: true,
