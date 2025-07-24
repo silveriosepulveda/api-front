@@ -11,7 +11,13 @@ app.factory('AuthService', function ($http, $window, $rootScope, APIServ) {
                     'senha': pass
                 }
 
+                const fd = new FormData();
+                fd.append('parametros', JSON.stringify(parametros));
+
                 APIServ.executaFuncaoClasse('usuarios', 'logarUsuario', parametros).success(function (data) {
+                    console.log(data);
+                    $window.localStorage.setItem('sessionId', data.sessionId);
+                    
                     if (data.usuario.token) {
                         //$window.localStorage.setItem('token', data.usuario.token);
                         $window.localStorage.setItem('usuario', JSON.stringify(data.usuario));

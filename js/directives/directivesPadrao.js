@@ -462,7 +462,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
             link: function (scope, elem) {
                 if ($rootScope.autoCompletaCarregado == undefined) {
                     $rootScope.autoCompletaCarregado = true;
-                    $.getScript('src/front/js/directives/autoCompleta.js');
+                    $.getScript('src/api-front/js/directives/autoCompleta.js');
                     //var domElem = '<script src="api/js/directives/autoCompleta.js" async defer></script>';
                     //angular.element(elem).append($compile(domElem)(scope));
                 }
@@ -1183,7 +1183,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
         return {
             restrict: 'E',
             replace: 'true',
-            templateUrl: 'src/front/js/directives/templates/formCabecalhoConsultaPadrao.html',
+            templateUrl: 'src/api-front/js/directives/templates/formCabecalhoConsultaPadrao.html',
             link: (scope, elem, attr) => {
                 if (scope.estrutura.ordernarCamposfiltroPesquisa != undefined && scope.estrutura.ordernarCamposfiltroPesquisa) {
                     //scope.camposFiltroPesquisa = scope.camposFiltroPesquisa.sort();// = {};//Object.assign({}, scope.camposFiltroPesquisa);

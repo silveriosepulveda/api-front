@@ -7,7 +7,7 @@ angular.module('directivesPadrao').directive('listaConsulta', ['$compile', '$roo
         return {
             restrict: 'EA',
             replace: false,
-            templateUrl: '/src/front/js/directives/srcDirectivesPadrao/listaConsulta.html',
+            templateUrl: '/src/api-front/js/directives/srcDirectivesPadrao/listaConsulta.html',
             scope: {
                 campos: '=',
                 dados: '=',
