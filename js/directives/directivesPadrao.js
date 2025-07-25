@@ -1182,14 +1182,8 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
     .directive('formCabecalhoConsultaPadrao', function () {
         return {
             restrict: 'E',
-            replace: 'true',
-            templateUrl: '/formCabecalhoConsultaPadrao.html',
-            link: (scope, elem, attr) => {
-                if (scope.estrutura.ordernarCamposfiltroPesquisa != undefined && scope.estrutura.ordernarCamposfiltroPesquisa) {
-                    //scope.camposFiltroPesquisa = scope.camposFiltroPesquisa.sort();// = {};//Object.assign({}, scope.camposFiltroPesquisa);
-                    //console.log(scope.camposFiltroPesquisa);
-                }
-            }
+            //replace: 'true',
+            templateUrl: 'api-front/js/directives/templates/formCabecalhoConsultaPadrao.html'            
         }
     })
     .directive('objetoVisualizacao', function ($compile) {

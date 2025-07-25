@@ -15,7 +15,6 @@ angular.module("servicos", ["ngMaterial", "ngMessages"]).factory("APIServ", func
         var headers = {};
         if (sessionId) {
             headers['X-Session-Id'] = sessionId;
-            headers['teste'] = 'teste';
         }
         if (tipo == 'get') {
             var temp = _converteParametrosparaUrl(parametros);            
