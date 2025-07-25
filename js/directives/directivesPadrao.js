@@ -1183,7 +1183,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
         return {
             restrict: 'E',
             replace: 'true',
-            templateUrl: 'src/api-front/js/directives/templates/formCabecalhoConsultaPadrao.html',
+            templateUrl: '/formCabecalhoConsultaPadrao.html',
             link: (scope, elem, attr) => {
                 if (scope.estrutura.ordernarCamposfiltroPesquisa != undefined && scope.estrutura.ordernarCamposfiltroPesquisa) {
                     //scope.camposFiltroPesquisa = scope.camposFiltroPesquisa.sort();// = {};//Object.assign({}, scope.camposFiltroPesquisa);
