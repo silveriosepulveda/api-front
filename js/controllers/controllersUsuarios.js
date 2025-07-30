@@ -23,27 +23,7 @@ angular.module('app.controllersUsuarios', [])
             APIServ.apagaDadosLocais('usuario');
             APIServ.apagaDadosLocais('menuPainel');
             window.location = './?sair';
-        }
-
-        $scope.logarUsuario = function (dados) {
-            $scope.usuario = {};
-            var parametros = {
-                'login': dados.login,
-                'senha': dados.senha
-            }            
-
-            APIServ.executaFuncaoClasse('usuarios', 'logarUsuario', parametros).success(function (data) {
-                console.log(data);
-                
-                // if (data.usuario.chave_usuario != undefined && parseInt(data.usuario.chave_usuario) >= 0) {
-                //     APIServ.salvaDadosLocais('usuario', data.usuario);
-                //     APIServ.salvaDadosLocais('menuPainel', data.menus);
-                //     window.location.reload();
-                // } else if (data.usuario.chave_usuario < 0) {
-                //     $scope.loginInvalido = true;
-                // }
-            });
-        };
+        }       
 
         $scope.buscarUsuarios = function () {
             var filtro = [
@@ -51,20 +31,14 @@ angular.module('app.controllersUsuarios', [])
                     campo: 'chave_usuario',
                     operador: '>',
                     valor: '0'
-                },
-                // {
-                //     campo: 'usuario_sistema',
-                //     operador: '=',
-                //     valor: 'S'
-                // }
-
+                }
             ];
 
             var filtros = {
                 tabela: 'usuarios',
                 filtros: filtro,
                 campo_chave: 'chave_usuario',
-                campos: ['nome', 'administrador', 'login', 'tipo_usuario', 'chave_empresa', 'chave_perfil_padrao'],
+                campos: ['chave_usuario', 'nome', 'administrador', 'login', 'tipo_usuario', 'chave_empresa', 'chave_perfil_padrao'],
                 ordemFiltro: 'nome'
             }
 
@@ -92,10 +66,14 @@ angular.module('app.controllersUsuarios', [])
         $scope.inicializarListaFiltrada = function () {
             $scope.usuariosFiltrados = [];
             angular.forEach($scope.usuarios, function (usuario, key) {
+                console.log(usuario);
+                
                 var usuarioComChave = angular.copy(usuario);
                 usuarioComChave.chaveOriginal = key;
                 $scope.usuariosFiltrados.push(usuarioComChave);
             });
+            console.log($scope.usuariosFiltrados);
+            
         };
 
         // Watch para filtrar usuários quando o texto muda
@@ -126,6 +104,7 @@ angular.module('app.controllersUsuarios', [])
         };
 
         $scope.selecionarUsuario = function (index, usuario) {
+            
             $scope.keyUsuario = usuario.nome + ' -- ' + usuario.login;
             // Usar a chave original se disponível, senão usar o índice
             var chaveUsuario = usuario.chaveOriginal !== undefined ? usuario.chaveOriginal : index;

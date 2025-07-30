@@ -87,7 +87,7 @@
     <h2>Gerenciamento de Perfis de Usuários</h2>
     <hr>
     <div class="form-group col-md-4 col-sm-6" ng-init="buscarUsuarios()">
-        <label>Selecione o Usuário</label>
+        <label>Selecione o Usuário</label> {{keyUsuario}}
         <div class="select-editavel form-group">
             <div class="input-group">
 
@@ -162,5 +162,5 @@
             </div>
         </div>
     </div>
-    <div ng-include src="'api/templates/usuariosPerfilMenus.html'"></div>
+    <div ng-include src="'api-front/templates/usuariosPerfilMenus.html'"></div>
 </div>

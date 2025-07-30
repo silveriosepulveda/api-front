@@ -76,7 +76,7 @@
          */
         function carregarMenuPainel() {
             vm.menuPainel = APIServ.buscaDadosLocais('menuPainel');
-            console.log('MenuPainel carregado/recarregado:', vm.menuPainel);
+            //console.log('MenuPainel carregado/recarregado:', vm.menuPainel);
             
             // Atualizar estado de expansão dos menus
             if (vm.menuPainel) {
@@ -163,7 +163,7 @@
          * Navega para uma página
          */
         function navegar(pagina, acao, subacao) {
-            console.log('Navegando para:', pagina, acao, subacao);
+          //  console.log('Navegando para:', pagina, acao, subacao);
             
             if (vm.onNavigate) {
                 vm.onNavigate({
@@ -404,7 +404,7 @@
         function setupEventListeners() {
             // Escutar eventos de login para recarregar dados do menu
             $scope.$on('usuarioLogado', function(event, usuario) {
-                console.log('🔄 MenuPainel: Recarregando dados após login do usuário:', usuario?.nome);
+                //console.log('🔄 MenuPainel: Recarregando dados após login do usuário:', usuario?.nome);
                 setTimeout(function() {
                     carregarMenuPainel();
                     if (!$scope.$$phase) {

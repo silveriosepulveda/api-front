@@ -18,7 +18,7 @@ app.factory('AuthService', function ($http, $window, $rootScope, APIServ) {
                     console.log(data);
                     $window.localStorage.setItem('sessionId', data.sessionId);
                     
-                    if (data.usuario.token) {
+                    if (data.usuario.sessao) {
                         //$window.localStorage.setItem('token', data.usuario.token);
                         $window.localStorage.setItem('usuario', JSON.stringify(data.usuario));
                         $window.localStorage.setItem('menuPainel', JSON.stringify(data.menus));

@@ -4,7 +4,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
         ////////////////FUNCOES DE MONTAGEM DE HTML/////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////
 
-        console.log('inicializando estruturaGerencia');
+       // console.log('inicializando estruturaGerencia');
         
 
         var controller = function ($rootScope, $scope, $element, $attrs, $route, $routeParams, EGFuncoes, APIAjuFor, PopUpModal) {
@@ -97,7 +97,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
             $scope.larguraTela = window.screen.availWidth
             $scope.alturaTela = window.screen.availHeight;
             $scope.dispositivoMovel = $scope.larguraTela <= 900;
-            $scope.tipoSalvar = 'post';
+            $scope.tipoSalvar = 'get';
             $scope.tipoConsulta ='post';
 
             var html = '';
@@ -1376,8 +1376,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
             var rotaAtual = $route.current;
             var parametrosRota = $routeParams;
 
-            console.log('Dados da rota atual:', rotaAtual);
-            console.log('Parâmetros da rota:', parametrosRota);
+            //console.log('Dados da rota atual:', rotaAtual);
+            //console.log('Parâmetros da rota:', parametrosRota);
 
             //var url = $attrs.urlTemplate; Descontinuado, era para carregar arquivos .tmpls.js que continham as estruturas nas versões anteriores do sistema
             //var classe = $attrs.classe;
@@ -1425,8 +1425,10 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     paramEnviarBuscaEstrutura = fdEnviarBuscaEstrutura;
                 }
 
+                
+                
                 APIServ.executaFuncaoClasse('classeGeral', 'buscarEstrutura', paramEnviarBuscaEstrutura, $scope.tipoConsulta).success(retorno => {
-                    console.log(retorno);
+                   // console.log(retorno);
                     montarEstrutura(retorno);
                 })
 
