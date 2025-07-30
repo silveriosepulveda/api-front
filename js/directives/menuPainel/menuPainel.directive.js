@@ -39,6 +39,9 @@
         vm.favoritosExpanded = true;
         vm.searchText = '';
         vm.allMenusExpanded = false; // Estado de expansão global
+        
+        // Flag para evitar carregamentos múltiplos
+        vm.isLoadingMenu = false;
 
         // ========== MÉTODOS PÚBLICOS ==========
         vm.carregarMenuPainel = carregarMenuPainel;
@@ -62,11 +65,16 @@
         init();
 
         function init() {
-            carregarMenuPainel();
+            console.log('MenuPainel: Inicializando diretiva...');
+            
+            // Carregar dados na ordem correta
             carregarFavoritos();
             carregarEstadoFavoritos();
             carregarEstadoGlobalMenus();
+            carregarMenuPainel();
             setupEventListeners();
+            
+            console.log('MenuPainel: Inicialização concluída');
         }
 
         // ========== FUNÇÕES PRINCIPAIS ==========
@@ -75,19 +83,35 @@
          * Carrega/recarrega dados do menu
          */
         function carregarMenuPainel() {
-            vm.menuPainel = APIServ.buscaDadosLocais('menuPainel');
-            //console.log('MenuPainel carregado/recarregado:', vm.menuPainel);
+            // Evitar carregamentos múltiplos simultâneos
+            if (vm.isLoadingMenu) {
+                console.log('MenuPainel: Carregamento já em andamento, ignorando chamada duplicada');
+                return;
+            }
             
-            // Atualizar estado de expansão dos menus
-            if (vm.menuPainel) {
-                angular.forEach(vm.menuPainel, function(menu, key) {
-                    const savedState = localStorage.getItem('menu_expanded_' + key);
-                    menu.expanded = savedState ? JSON.parse(savedState) : false;
-                    menu.active = false;
-                });
+            vm.isLoadingMenu = true;
+            
+            try {
+                vm.menuPainel = APIServ.buscaDadosLocais('menuPainel');
+                console.log('MenuPainel carregado/recarregado:', vm.menuPainel ? vm.menuPainel.length : 0, 'menus');
                 
-                // Atualizar estado global após carregar os menus
-                updateAllMenusState();
+                // Atualizar estado de expansão dos menus
+                if (vm.menuPainel && Array.isArray(vm.menuPainel)) {
+                    angular.forEach(vm.menuPainel, function(menu, key) {
+                        if (menu && typeof menu === 'object') {
+                            const savedState = localStorage.getItem('menu_expanded_' + key);
+                            menu.expanded = savedState ? JSON.parse(savedState) : false;
+                            menu.active = false;
+                        }
+                    });
+                    
+                    // Atualizar estado global após carregar os menus
+                    updateAllMenusState();
+                }
+            } catch (error) {
+                console.error('Erro ao carregar MenuPainel:', error);
+            } finally {
+                vm.isLoadingMenu = false;
             }
         }
 
@@ -132,11 +156,15 @@
          * Atualiza o estado global baseado nos menus individuais
          */
         function updateAllMenusState() {
+            if (!vm.menuPainel || !Array.isArray(vm.menuPainel)) {
+                return;
+            }
+            
             var expandedCount = 0;
             var totalCount = 0;
             
             angular.forEach(vm.menuPainel, function(menu) {
-                if (menu.exibir) {
+                if (menu && menu.exibir) {
                     totalCount++;
                     if (menu.expanded) {
                         expandedCount++;
@@ -404,30 +432,35 @@
         function setupEventListeners() {
             // Escutar eventos de login para recarregar dados do menu
             $scope.$on('usuarioLogado', function(event, usuario) {
-                //console.log('🔄 MenuPainel: Recarregando dados após login do usuário:', usuario?.nome);
+                console.log('🔄 MenuPainel: Recarregando dados após login do usuário:', usuario?.nome);
+                // Usar timeout para evitar conflitos com outras inicializações
                 setTimeout(function() {
-                    carregarMenuPainel();
-                    if (!$scope.$$phase) {
-                        $scope.$apply();
+                    if (!vm.isLoadingMenu) {
+                        carregarMenuPainel();
+                        if (!$scope.$$phase) {
+                            $scope.$apply();
+                        }
                     }
                 }, 500);
             });
 
             // Escutar mudanças no menuPainel global
             $scope.$on('menuPainelAtualizado', function() {
-                carregarMenuPainel();
+                if (!vm.isLoadingMenu) {
+                    carregarMenuPainel();
+                }
             });
 
             // Watch para mudanças nos favoritos
             $scope.$watch(function() { return vm.favoritos; }, function(newVal, oldVal) {
-                if (newVal !== oldVal) {
-                    console.log('Favoritos atualizados:', newVal);
+                if (newVal !== oldVal && newVal && oldVal) {
+                    console.log('Favoritos atualizados:', newVal.length, 'itens');
                 }
             }, true);
 
             // Watch para mudanças na busca - expandir menus automaticamente
             $scope.$watch(function() { return vm.searchText; }, function(newVal, oldVal) {
-                if (newVal !== oldVal) {
+                if (newVal !== oldVal && vm.menuPainel && vm.menuPainel.length > 0) {
                     expandirMenusComResultados();
                 }
             });
@@ -439,8 +472,8 @@
          * Expande automaticamente os menus que contêm resultados da busca
          */
         function expandirMenusComResultados() {
-            if (!vm.searchText || vm.searchText.trim() === '') {
-                // Se não há busca, não alterar estado dos menus
+            if (!vm.searchText || vm.searchText.trim() === '' || !vm.menuPainel || vm.menuPainel.length === 0) {
+                // Se não há busca ou menus, não alterar estado
                 return;
             }
 
@@ -448,7 +481,7 @@
             var menusExpandidos = 0;
 
             angular.forEach(vm.menuPainel, function(menu, key) {
-                if (!menu.exibir) return;
+                if (!menu || !menu.exibir || !menu.menu) return;
 
                 var temResultados = false;
 
@@ -458,10 +491,10 @@
                 }
 
                 // Verificar se algum item do menu contém a busca
-                if (!temResultados && menu.itens) {
+                if (!temResultados && menu.itens && typeof menu.itens === 'object') {
                     temResultados = Object.keys(menu.itens).some(function(itemKey) {
                         var item = menu.itens[itemKey];
-                        return item.item && item.item.toLowerCase().indexOf(searchLower) !== -1;
+                        return item && item.item && item.item.toLowerCase().indexOf(searchLower) !== -1;
                     });
                 }
 
@@ -471,12 +504,12 @@
                     menu.active = true;
                     localStorage.setItem('menu_expanded_' + key, JSON.stringify(true));
                     menusExpandidos++;
-                    // console.log('🔍 Menu expandido automaticamente:', menu.menu);
+                    console.log('🔍 Menu expandido automaticamente:', menu.menu);
                 }
             });
 
             if (menusExpandidos > 0) {
-                // console.log('🔍 Pesquisa "' + vm.searchText + '" expandiu ' + menusExpandidos + ' menu(s) automaticamente');
+                console.log('🔍 Pesquisa "' + vm.searchText + '" expandiu ' + menusExpandidos + ' menu(s) automaticamente');
                 updateAllMenusState();
             }
         }

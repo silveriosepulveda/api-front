@@ -30,20 +30,20 @@ angular.module('app.controllersUsuarios', [])
                 {
                     campo: 'chave_usuario',
                     operador: '>',
-                    valor: '0'
+                    valor: '1'
                 }
             ];
 
             var filtros = {
-                tabela: 'usuarios',
+                tabela: 'view_usuarios',
                 filtros: filtro,
                 campo_chave: 'chave_usuario',
-                campos: ['chave_usuario', 'nome', 'administrador', 'login', 'tipo_usuario', 'chave_empresa', 'chave_perfil_padrao'],
+                campos: ['chave_usuario', 'nome', 'administrador', 'login', 'tipo_usuario', 'chave_perfil_padrao'],
                 ordemFiltro: 'nome'
             }
 
             APIServ.executaFuncaoClasse('classeGeral', 'consulta', filtros).success(function (data) {
-                console.log(data);
+                console.log('usuario', data);
 
                 $scope.usuarios = data.lista;
                 // Inicializa a lista filtrada com todos os usuários
@@ -57,28 +57,47 @@ angular.module('app.controllersUsuarios', [])
         $scope.usuariosFiltrados = [];
 
         $scope.limparUsuario = function () {
+            $scope.isUpdatingList = true;
             $scope.keyUsuario = '';
             $scope.limparMenus();
             $scope.chave_usuario = null;
+            $scope.isUpdatingList = false;
         }
 
         // Função para inicializar a lista filtrada
         $scope.inicializarListaFiltrada = function () {
             $scope.usuariosFiltrados = [];
-            angular.forEach($scope.usuarios, function (usuario, key) {
-                console.log(usuario);
-                
-                var usuarioComChave = angular.copy(usuario);
-                usuarioComChave.chaveOriginal = key;
-                $scope.usuariosFiltrados.push(usuarioComChave);
-            });
+            
+            // Verificar se $scope.usuarios é um array ou objeto
+            if (Array.isArray($scope.usuarios)) {
+                angular.forEach($scope.usuarios, function (usuario, index) {
+                    console.log(usuario);
+                    
+                    var usuarioComChave = angular.copy(usuario);
+                    usuarioComChave.chaveOriginal = index;
+                    $scope.usuariosFiltrados.push(usuarioComChave);
+                });
+            } else if ($scope.usuarios && typeof $scope.usuarios === 'object') {
+                // Se for um objeto, usar as chaves como índices
+                angular.forEach($scope.usuarios, function (usuario, key) {
+                    console.log(usuario);
+                    
+                    var usuarioComChave = angular.copy(usuario);
+                    usuarioComChave.chaveOriginal = key;
+                    $scope.usuariosFiltrados.push(usuarioComChave);
+                });
+            }
+            
             console.log($scope.usuariosFiltrados);
             
         };
 
+        // Flag para evitar ciclos no $watch
+        $scope.isUpdatingList = false;
+
         // Watch para filtrar usuários quando o texto muda
         $scope.$watch('keyUsuario', function (newValue, oldValue) {
-            if (newValue !== oldValue && $scope.usuarios) {
+            if (newValue !== oldValue && $scope.usuarios && !$scope.isUpdatingList) {
                 $scope.filtrarUsuarios();
             }
         });
@@ -86,25 +105,57 @@ angular.module('app.controllersUsuarios', [])
         $scope.filtrarUsuarios = function () {
             if (!$scope.usuarios) return;
 
+            $scope.isUpdatingList = true;
+            
             if (!$scope.keyUsuario || $scope.keyUsuario.length === 0) {
                 // Quando não há filtro, mostra todos os usuários
-                $scope.inicializarListaFiltrada();
-            } else {
                 $scope.usuariosFiltrados = [];
-                angular.forEach($scope.usuarios, function (usuario, key) {
-                    var textoCompleto = (usuario.nome + ' ' + usuario.login).toLowerCase();
-                    if (textoCompleto.indexOf($scope.keyUsuario.toLowerCase()) !== -1) {
-                        // Adicionar o usuário com sua chave original preservada
+                
+                if (Array.isArray($scope.usuarios)) {
+                    angular.forEach($scope.usuarios, function (usuario, index) {
+                        var usuarioComChave = angular.copy(usuario);
+                        usuarioComChave.chaveOriginal = index;
+                        $scope.usuariosFiltrados.push(usuarioComChave);
+                    });
+                } else if ($scope.usuarios && typeof $scope.usuarios === 'object') {
+                    angular.forEach($scope.usuarios, function (usuario, key) {
                         var usuarioComChave = angular.copy(usuario);
                         usuarioComChave.chaveOriginal = key;
                         $scope.usuariosFiltrados.push(usuarioComChave);
-                    }
-                });
+                    });
+                }
+            } else {
+                $scope.usuariosFiltrados = [];
+                
+                if (Array.isArray($scope.usuarios)) {
+                    angular.forEach($scope.usuarios, function (usuario, index) {
+                        var textoCompleto = (usuario.nome + ' ' + usuario.login).toLowerCase();
+                        if (textoCompleto.indexOf($scope.keyUsuario.toLowerCase()) !== -1) {
+                            // Adicionar o usuário com sua chave original preservada
+                            var usuarioComChave = angular.copy(usuario);
+                            usuarioComChave.chaveOriginal = index;
+                            $scope.usuariosFiltrados.push(usuarioComChave);
+                        }
+                    });
+                } else if ($scope.usuarios && typeof $scope.usuarios === 'object') {
+                    angular.forEach($scope.usuarios, function (usuario, key) {
+                        var textoCompleto = (usuario.nome + ' ' + usuario.login).toLowerCase();
+                        if (textoCompleto.indexOf($scope.keyUsuario.toLowerCase()) !== -1) {
+                            // Adicionar o usuário com sua chave original preservada
+                            var usuarioComChave = angular.copy(usuario);
+                            usuarioComChave.chaveOriginal = key;
+                            $scope.usuariosFiltrados.push(usuarioComChave);
+                        }
+                    });
+                }
             }
+            
+            $scope.isUpdatingList = false;
         };
 
         $scope.selecionarUsuario = function (index, usuario) {
             
+            $scope.isUpdatingList = true;
             $scope.keyUsuario = usuario.nome + ' -- ' + usuario.login;
             // Usar a chave original se disponível, senão usar o índice
             var chaveUsuario = usuario.chaveOriginal !== undefined ? usuario.chaveOriginal : index;
@@ -112,15 +163,19 @@ angular.module('app.controllersUsuarios', [])
             $scope.mostrarListaUsuarios = false;
             //$scope.verUsuario(index);
 
-            var usuario = $scope.usuarios[index];
-            $scope.chave_usuario = usuario.chave_usuario || usuario.chave_usuario;
-            $scope.chave_perfil_padrao = usuario.chave_perfil_padrao;            
-            $scope.buscarPerfilUsuario();
+            // Usar a chave original para buscar o usuário correto
+            var usuarioOriginal = $scope.usuarios[chaveUsuario];
+            if (usuarioOriginal) {
+                $scope.chave_usuario = usuarioOriginal.chave_usuario || usuarioOriginal.chave_usuario;
+                $scope.chave_perfil_padrao = usuarioOriginal.chave_perfil_padrao;            
+                $scope.buscarPerfilUsuario();
+            }
+            $scope.isUpdatingList = false;
         };
 
         $scope.aoFocarCampo = function () {
             $scope.mostrarListaUsuarios = true;
-            if (!$scope.keyUsuario) {
+            if (!$scope.keyUsuario && $scope.usuarios && $scope.usuariosFiltrados.length === 0) {
                 $scope.inicializarListaFiltrada();
             }
         };

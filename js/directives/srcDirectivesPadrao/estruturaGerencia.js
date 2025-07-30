@@ -97,8 +97,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
             $scope.larguraTela = window.screen.availWidth
             $scope.alturaTela = window.screen.availHeight;
             $scope.dispositivoMovel = $scope.larguraTela <= 900;
-            $scope.tipoSalvar = 'get';
-            $scope.tipoConsulta ='post';
+            $scope.tipoSalvar = 'post';
+            $scope.tipoConsulta ='get';
 
             var html = '';
             $scope.fd = new FormData();
