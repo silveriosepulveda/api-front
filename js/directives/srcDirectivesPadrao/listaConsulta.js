@@ -18,6 +18,8 @@ angular.module('directivesPadrao').directive('listaConsulta', ['$compile', '$roo
                 funcaoExcluir: '&?'
             },
             link: function(scope, element, attrs) {
+                console.log('listaConsulta');
+                
                 // Inicializar variáveis
                 scope.paginacao = scope.paginacao || {
                     paginaAtual: 1,
@@ -35,6 +37,8 @@ angular.module('directivesPadrao').directive('listaConsulta', ['$compile', '$roo
                 
                 // Verifica permissão para ações
                 scope.temPermissao = function(acao) {
+                    console.log(APIServ.buscaDadosLocais('usuario'));
+                    
                     if (!scope.acoes || !angular.isArray(scope.acoes)) {
                         return false;
                     }

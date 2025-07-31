@@ -98,7 +98,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
             $scope.alturaTela = window.screen.availHeight;
             $scope.dispositivoMovel = $scope.larguraTela <= 900;
             $scope.tipoSalvar = 'post';
-            $scope.tipoConsulta ='get';
+            $scope.tipoConsulta ='post';
 
             var html = '';
             $scope.fd = new FormData();
@@ -522,11 +522,13 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                         }
                     }
 
-                    var filtroLocal = $scope.manipularFiltroLocal($scope.acao, 'buscar');
+                    $scope.filtros = Object.assign([], $scope.manipularFiltroLocal($scope.acao, 'buscar'));
 
-                    if (filtroLocal.length > 0) {
-                        $scope.filtros = filtroLocal;
-                    } else if (estrutura.filtrosPadrao) {
+
+                    // if (filtroLocal.length > 0) {
+                    //     $scope.filtros = filtroLocal;
+                    // } else 
+                    if (estrutura.filtrosPadrao) {
                         //$scope.filtros = [];
                         var tirarPrimeiroFiltro = false;
                         angular.forEach(estrutura.filtrosPadrao, function (val, key) {
@@ -563,6 +565,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                             $scope.filtros.splice(0, 1);
                         }
                     }
+
+                    
 
                     $scope.converterFiltroParaEnvio = function () {
                         var retorno = [];
@@ -1235,7 +1239,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
 
                             var fd = new FormData();
                             fd.append('filtros', JSON.stringify(filtros));
-                            APIServ.executaFuncaoClasse('classeGeral', 'buscarParaAlterar', fd, 'post').success(function (data) {
+                            APIServ.executaFuncaoClasse('classeGeral', 'buscarParaAlterar', fd, $scope.tipoConsulta).success(function (data) {
                                 //APIServ.executaFuncaoClasse('classeGeral', 'buscarParaAlterar', filtros).success(function (data) {
                                 //                                  console.log(data);
                                 $rS.carregando = false;
@@ -1352,8 +1356,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 if ($scope.tela == 'consulta' && estrutura.filtrosPadrao) {
                     setTimeout(function () {
                         angular.forEach($scope.filtros, function (item, key) {
-                            if (item.campo != '') {
-                                angular.element(`#filtros_${key}_campo`).trigger('change');
+                            if (item.campo != '' && estrutura.filtrosPadrao[item['campo']] != undefined) {
+                                angular.element(`#filtros_${key}_campo`).trigger('change');                                
                                 $scope.filtros[key]['valor'] = estrutura.filtrosPadrao[item['campo']]['valor'] != undefined ? estrutura.filtrosPadrao[item['campo']]['valor'] : '';
                             }
                         });
@@ -1417,8 +1421,7 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 }
 
                 let paramEnviarBuscaEstrutura = parametrosBuscaEstrutura;
-
-                console.log(paramEnviarBuscaEstrutura);
+                
                 if ($scope.tipoConsulta == 'post') {
                     let fdEnviarBuscaEstrutura = new FormData();
                     fdEnviarBuscaEstrutura.append('parametros', JSON.stringify(parametrosBuscaEstrutura));

@@ -9,8 +9,7 @@ angular.module("servicos", ["ngMaterial", "ngMessages"]).factory("APIServ", func
     
 
     var _executaFuncaoClasse = function (classe, funcaoExecutar, parametros, tipo = 'get') {
-        var sessionId = window.localStorage.getItem('sessionId');
-        console.log(sessionId);
+        var sessionId = window.localStorage.getItem('sessionId');        
         
         var headers = {};
         if (sessionId) {

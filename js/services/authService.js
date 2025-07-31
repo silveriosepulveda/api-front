@@ -22,6 +22,8 @@ app.factory('AuthService', function ($http, $window, $rootScope, APIServ) {
                         //$window.localStorage.setItem('token', data.usuario.token);
                         $window.localStorage.setItem('usuario', JSON.stringify(data.usuario));
                         $window.localStorage.setItem('menuPainel', JSON.stringify(data.menus));
+                        // Também salvar usando APIServ para compatibilidade
+                        APIServ.salvaDadosLocais('menuPainel', data.menus);
                         
                         // Notificar outros controllers sobre o login bem-sucedido
                         $rootScope.$broadcast('usuarioLogado', data.usuario);
@@ -42,6 +44,8 @@ app.factory('AuthService', function ($http, $window, $rootScope, APIServ) {
             $window.localStorage.removeItem('menuPainel');
             $window.localStorage.removeItem('token');
             $window.localStorage.removeItem('usuario');
+            // Também apagar usando APIServ para compatibilidade
+            APIServ.apagaDadosLocais('menuPainel');
         },
         getUsuario: function () {
             try {
