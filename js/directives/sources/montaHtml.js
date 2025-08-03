@@ -70,7 +70,7 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
 
             var verificarPerfil = p.verificarPerfil != undefined && p.verificarPerfil;
 
-            var temAcao = $rS[acao] != undefined && $rS[acao]['campos'] != undefined && $rS[acao]['campos'][campo] != undefined;
+            var temAcao = true;// $rS[acao] != undefined && $rS[acao]['campos'] != undefined && $rS[acao]['campos'][campo] != undefined;
 
             if (!verificarPerfil || (verificarPerfil && temAcao)) {
                 var dadosUsuario = APIServ.buscarValorVariavel(APIServ.buscaDadosLocais('usuario'), campo);

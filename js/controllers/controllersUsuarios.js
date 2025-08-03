@@ -229,6 +229,8 @@ angular
             };
 
             APIServ.executaFuncaoClasse("classeGeral", "consulta", filtros).success(function (data) {
+                console.log(data.lista);
+
                 $scope.perfisPadrao = data.lista;
             });
         };
@@ -270,6 +272,19 @@ angular
             });
         };
 
+        $scope.excluirPerfilPadrao = function () {
+            funcaoSim = function () {
+                APIServ.executaFuncaoClasse("usuarios", "excluirPerfilPadrao", $scope.chave_perfil_padrao).success(function (retorno) {
+                    if (retorno.sucesso != undefined) {
+                        $scope.buscarPerfisPadrao();
+                        $scope.limparMenus();
+                    }
+                });
+            };
+
+            APIServ.dialogoSimples("Informação!", "Esta ação exclui o Perfil Padrão. Continuar?", "Sim", "Não", funcaoSim);
+        };
+
         $scope.salvarPerfilPadrao = function (perfil) {
             var p = perfil;
             if (p.chave_perfil_padrao == undefined && p.novoPerfil == undefined) {
@@ -286,9 +301,12 @@ angular
                 //  $rS.carregando = true;
 
                 APIServ.executaFuncaoClasse("usuarios", "salvarPerfilPadrao", fd, "post").success((retorno) => {
-                    console.log(retorno);
-
                     $rS.carregando = false;
+                    if (retorno.sucesso != undefined) {
+                        $scope.buscarPerfisPadrao();
+                        $scope.limparMenus();
+                        APIServ.mensagemSimples("Confirmação", "Perfil Salvo com Sucesso!");
+                    }
                 });
             }
         };
@@ -303,7 +321,9 @@ angular
                 fd.append("chave_perfil_padrao", $scope.chave_perfil_padrao);
                 //$rS.carregando = true;
                 APIServ.executaFuncaoClasse("usuarios", "salvarPerfilUsuario", fd, "post").success(function (retorno) {
-                    console.log(retorno);
+                    if (retorno.sucesso != undefined) {
+                        APIServ.mensagemSimples("Confirmação", "Perfil Salvo com Sucesso!");
+                    }
 
                     $rS.carregando = false;
                 });
@@ -337,27 +357,14 @@ angular
             });
         };
 
-        $scope.alterarPerfilTela = function (keyM, keyI, keyA) {
+        $scope.alterarPerfilTela = async function (keyM, keyI, keyA) {            
             if (keyA != undefined) {
-                var selecionado = $scope.menus[keyM]["itens"][keyI]["acoes"][keyA]["selecionado"];
+                var selecionado = $scope.menus[keyM]["itens"][keyI]["acoes"][keyA]["selecionado"];                               
+
                 if (selecionado) {
                     $scope.menus[keyM]["selecionado"] = true;
                     $scope.menus[keyM]["itens"][keyI]["selecionado"] = true;
-                } else {
-                    if ($scope.menus[keyM]["itens"][keyI]["padrao"]) {
-                        console.log(APIServ.parametrosUrl());
-                        if (APIServ.parametrosUrl()[2] == "usuariosPerfil") {
-                            desvincularPerfilPadrao().then((retorno) => {
-                                if (!retorno) {
-                                    $scope.menus[keyM]["selecionado"] = true;
-                                    $scope.menus[keyM]["itens"][keyI]["selecionado"] = true;
-                                    $scope.menus[keyM]["itens"][keyI]["acoes"][keyA]["selecionado"] = true;
-                                    $scope.$apply();
-                                }
-                            });
-                        }
-                    }
-                }
+                } 
             } else if (keyI != undefined) {
                 var selecionado = $scope.menus[keyM]["itens"][keyI]["selecionado"];
                 if (selecionado) {
@@ -375,6 +382,8 @@ angular
                     });
                 });
             }
+
+            //*/
         };
 
         $scope.buscarPerfilUsuario = function () {
@@ -388,13 +397,17 @@ angular
                         angular.forEach($scope.menus, function (menu) {
                             if (menu.chave_menu == pp.chave_menu) {
                                 menu.selecionado = true;
+                                menu.tipo_perfil = menu.tipo_perfil != "Padrao" ? pp.tipo_perfil : menu.tipo_perfil;
+
                                 angular.forEach(menu.itens, function (item) {
                                     if (item.chave_item == pp.chave_item) {
                                         item.selecionado = true;
+                                        item.tipo_perfil = item.tipo_perfil != "Padrao" ? pp.tipo_perfil : item.tipo_perfil;
 
                                         angular.forEach(item.acoes, function (acao) {
                                             if (acao.chave_acao == pp.chave_acao) {
                                                 acao.selecionado = true;
+                                                acao.tipo_perfil = acao.tipo_perfil != "Padrao" ? pp.tipo_perfil : acao.tipo_perfil;
                                             }
                                         });
 
@@ -402,6 +415,7 @@ angular
                                             if (campo.chave_campo == pp.chave_campo) {
                                                 campo.selecionado = true;
                                                 campo.padrao = true;
+                                                campo.tipo_perfil = campo.tipo_perfil != "Padrao" ? pp.tipo_perfil : campo.tipo_perfil;
                                             }
                                         });
                                     }

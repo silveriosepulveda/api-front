@@ -128,6 +128,8 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                 var parametros = scope.estrutura;
                 let raizModelo = scope.estrutura.raizModelo;
                 let campoChave = scope.estrutura.raizModelo + '.' + scope.estrutura.campo_chave;
+                const usuario = APIServ.buscaDadosLocais('usuario');
+                const admSistema = usuario['administrador_sistema'] == 'S';
 
                 let nomeFormConsulta = 'formCon' + parametros.raizModelo;
                 let tipoConsulta = parametros.tipoConsulta != undefined ? parametros.tipoConsulta : 'camposDinamicos';
@@ -170,7 +172,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                         <h2 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'cadastro' && (${campoChave} == 0 || ${campoChave} == undefined)">${parametros.textoPagina} - Inclusão</h2>
                         <h2 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'cadastro' && ${campoChave} > 0">${parametros.textoPagina} - Alteração</h2>`;
 
-                if (EGFuncoes.temCadastro(parametros) && $rS[acao]['acoes']['Cadastrar']) {
+                if (EGFuncoes.temCadastro(parametros) && ($rS[acao]['acoes']['Cadastrar'] || admSistema)) {
                     html += `<button class="col-xs-12 col-md-4 btn btn-success" ng-class="{'top10': !dispositivoMovel}" ng-if="tela != 'cadastro'" ng-click="mudaTela('cadastro')">${parametros.textoNovo}</button>`;
                 }
 

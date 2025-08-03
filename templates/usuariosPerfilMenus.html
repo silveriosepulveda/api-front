@@ -295,7 +295,8 @@
                 <input type="checkbox" 
                        class="tree-checkbox"
                        ng-click="alterarPerfilTela(keyM)" 
-                       ng-model="menus[keyM]['selecionado']">
+                       ng-model="menus[keyM]['selecionado']"
+                       ng-disabled="m.tipo_perfil == 'Padrao'">
                 <span class="tree-menu-title" ng-class="{'filtro-highlight': contemFiltro(m.menu)}">{{m.menu}}</span>
             </div>
 
@@ -309,7 +310,8 @@
                         <input type="checkbox" 
                                class="tree-checkbox"
                                ng-click="alterarPerfilTela(keyM, keyI)" 
-                               ng-model="menus[keyM]['itens'][keyI]['selecionado']">
+                               ng-model="menus[keyM]['itens'][keyI]['selecionado']"
+                               ng-disabled="i.tipo_perfil == 'Padrao'">
                         <span class="tree-item-title" ng-class="{'filtro-highlight': contemFiltro(i.item)}">{{i.item}}</span>
                     </div>
 
@@ -324,7 +326,8 @@
                                         <input type="checkbox" 
                                                class="tree-checkbox"
                                                ng-model="menus[keyM]['itens'][keyI]['acoes'][keyA]['selecionado']" 
-                                               ng-click="alterarPerfilTela(keyM, keyI, keyA)">
+                                               ng-click="alterarPerfilTela(keyM, keyI, keyA)"
+                                               ng-disabled="a.tipo_perfil == 'Padrao'">
                                         <span class="tree-action-title" ng-class="{'filtro-highlight': contemFiltro(a.acao)}">{{a.acao}}</span>
                                     </div>
                                 </div>
@@ -336,7 +339,8 @@
                                         <input type="checkbox" 
                                                class="tree-checkbox"
                                                ng-model="menus[keyM]['itens'][keyI]['campos'][keyC]['selecionado']" 
-                                               ng-click="alterarPerfilTela(keyM, keyI, keyC)">
+                                               ng-click="alterarPerfilTela(keyM, keyI, keyC)"
+                                               ng-disabled="c.tipo_perfil == 'Padrao'">
                                         <span class="tree-field-title" ng-class="{'filtro-highlight': contemFiltro(c.titulo_campo)}">{{c.titulo_campo}}</span>
                                     </div>
                                 </div>

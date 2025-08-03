@@ -1,4 +1,20 @@
-angular.module("servicos", ["ngMaterial", "ngMessages"]).factory("APIServ", function ($rootScope, $http, config, $base64, $mdDialog, APIAjuFor) {
+angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).factory("APIServ", function ($rootScope, $http, config, $base64, $mdDialog, APIAjuFor, DialogoSimplesServ) {
+    
+    // Referência ao serviço de diálogo isolado
+    var _dialogoSimples = function(titulo, texto, btnConfirmar, btnCancelar, funcaoSim, funcaoNao) {
+        return DialogoSimplesServ.dialogoSimples(titulo, texto, btnConfirmar, btnCancelar, funcaoSim, funcaoNao);
+    };
+    
+    // Wrapper para mensagem simples
+    var _mensagemSimples = function (titulo, texto, funcao, fecharModal = false) {
+        return DialogoSimplesServ.mensagemSimples(titulo, texto, funcao, fecharModal);
+    };
+    
+    // Wrapper para tela de aguarde
+    var _telaAguarde = function (acao = "") {
+        return DialogoSimplesServ.telaAguarde(acao);
+    };
+    
     var _enviaDadosTabela = function (tabela, chave, dados) {
         var temp = _converteParametrosparaUrl(dados);
         var parametrosEnviar = angular.isObject(temp) ? angular.toJson(temp) : temp;
@@ -86,253 +102,6 @@ angular.module("servicos", ["ngMaterial", "ngMessages"]).factory("APIServ", func
                 }
             });
             return _salvaDadosLocais(nomeApagar, novo);
-        }
-    }; // Helper function to detect if we're inside a PopUpModal
-    var _isInsideModal = function () {
-        // Verifica múltiplas variações de classes de modal do Bootstrap
-        return (
-            document.querySelector(".popup-modal.show") !== null ||
-            document.querySelector(".popup-modal.in") !== null ||
-            document.querySelector(".popup-modal:not(.fade)") !== null ||
-            document.querySelector(".modal.show") !== null ||
-            document.querySelector(".modal.in") !== null ||
-            document.querySelector(".modal:not(.fade)") !== null ||
-            // Verifica backdrop do modal Bootstrap
-            document.querySelector(".modal-backdrop") !== null ||
-            // Verifica se algum elemento tem classe popup-modal visível
-            (function () {
-                var modals = document.querySelectorAll(".popup-modal");
-                for (var i = 0; i < modals.length; i++) {
-                    var style = window.getComputedStyle(modals[i]);
-                    if (style.display !== "none" && style.visibility !== "hidden") {
-                        return true;
-                    }
-                }
-                return false;
-            })()
-        );
-    }; // SOLUÇÃO ROBUSTA E EFICAZ: Força z-index de forma mais direta e agressiva
-    var _forceDialogAboveModal = function (isLoading) {
-        // HIERARQUIA CORRIGIDA: Container deve ter z-index MAIS ALTO que o dialog para botões funcionarem
-        var dialogZIndex = isLoading ? 100001 : 100000; // Dialog base
-        var containerZIndex = isLoading ? 100005 : 100002; // Container SEMPRE mais alto
-        var buttonZIndex = isLoading ? 100006 : 100003; // Botões mais altos ainda            // Função para aplicar z-index de forma agressiva
-        var applyZIndex = function () {
-            try {
-                // ESTRATÉGIA 1: Força TODOS os md-dialog
-                var dialogs = document.querySelectorAll("md-dialog");
-                for (var i = 0; i < dialogs.length; i++) {
-                    var dialog = dialogs[i];
-                    dialog.style.setProperty("z-index", dialogZIndex.toString(), "important");
-                    dialog.style.setProperty("position", "fixed", "important");
-                    dialog.classList.add("popup-modal-dialog-overlay");
-                    if (isLoading) dialog.classList.add("popup-modal-loading");
-
-                    // CORREÇÃO: Container pai deve ter z-index MAIS ALTO
-                    if (dialog.parentElement) {
-                        dialog.parentElement.style.setProperty("z-index", containerZIndex.toString(), "important");
-                        dialog.parentElement.style.setProperty("position", "fixed", "important");
-                    }
-                }
-
-                // ESTRATÉGIA 2: Força TODOS os containers - PRIORIDADE MÁXIMA
-                var containers = document.querySelectorAll('._md-dialog-container, .md-dialog-container, [role="dialog"]');
-                for (var i = 0; i < containers.length; i++) {
-                    var container = containers[i];
-                    // CORREÇÃO: Container deve ter z-index MAIS ALTO para botões funcionarem
-                    container.style.setProperty("z-index", containerZIndex.toString(), "important");
-                    container.style.setProperty("position", "fixed", "important");
-                    container.classList.add("popup-modal-dialog-overlay");
-
-                    // Garantir que buttons/actions dentro do container funcionem
-                    var buttons = container.querySelectorAll("button, .md-button, [ng-click], .btn");
-                    for (var j = 0; j < buttons.length; j++) {
-                        buttons[j].style.setProperty("z-index", buttonZIndex.toString(), "important");
-                        buttons[j].style.setProperty("position", "relative", "important");
-                        buttons[j].style.setProperty("pointer-events", "auto", "important");
-                    }
-                } // ESTRATÉGIA 3: Força backdrops ABAIXO dos dialogs
-                var backdrops = document.querySelectorAll(".md-dialog-backdrop, .md-backdrop, .cdk-overlay-backdrop");
-                for (var i = 0; i < backdrops.length; i++) {
-                    // CORREÇÃO: Backdrop deve ficar ABAIXO dos dialogs, não acima
-                    backdrops[i].style.setProperty("z-index", "99998", "important");
-                    backdrops[i].style.setProperty("opacity", "0.5", "important");
-                    backdrops[i].style.setProperty("pointer-events", "none", "important");
-                }
-
-                // ESTRATÉGIA 3.1: Desabilitar backdrops problemáticos em contexto modal
-                if (_isInsideModal()) {
-                    var problematicBackdrops = document.querySelectorAll(".md-dialog-backdrop");
-                    for (var i = 0; i < problematicBackdrops.length; i++) {
-                        // Ocultar backdrop problemático em contexto modal
-                        problematicBackdrops[i].style.setProperty("display", "none", "important");
-                    }
-                } // ESTRATÉGIA 4: Força todos os elementos do Angular Material Dialog
-                var allDialogElements = document.querySelectorAll('[aria-describedby*="dialog"], [aria-labelledby*="dialog"], .md-dialog-container > *');
-                for (var i = 0; i < allDialogElements.length; i++) {
-                    allDialogElements[i].style.setProperty("z-index", dialogZIndex.toString(), "important");
-                }
-            } catch (error) {
-                console.warn("Erro ao aplicar z-index forçado:", error);
-            }
-        };
-
-        // Execute imediatamente
-        applyZIndex();
-
-        // Execute múltiplas vezes para garantir que funcione (dialogs criados dinamicamente)
-        for (var retry = 1; retry <= 5; retry++) {
-            setTimeout(applyZIndex, retry * 50);
-        }
-
-        // Execute uma vez mais após um delay maior
-        setTimeout(applyZIndex, 500);
-    };
-    // Enhanced message system with proper z-index for modals
-
-    var _mensagemSimples = function (titulo, texto, funcao, fecharModal = false) {
-        var dialogOptions = {
-            title: titulo,
-            textContent: texto,
-            ok: "Ok",
-        };
-
-        // If we're inside a modal, apply high z-index class
-        if (_isInsideModal()) {
-            dialogOptions.parent = angular.element(document.body);
-            dialogOptions.clickOutsideToClose = true;
-            dialogOptions.escapeToClose = true;
-            dialogOptions.targetEvent = null;
-            dialogOptions.hasBackdrop = true;
-            dialogOptions.skipHide = false;
-            dialogOptions.multiple = true; // Allow multiple dialogs
-        }
-
-        var confirm = $mdDialog.confirm(dialogOptions);
-        var showPromise = $mdDialog.show(confirm);
-
-        // Apply z-index fix IMMEDIATELY if we're inside a modal
-        if (_isInsideModal()) {
-            _forceDialogAboveModal(false);
-
-            // Also apply after dialog is fully rendered
-            showPromise.then(null, null).finally(function () {
-                setTimeout(function () {
-                    _forceDialogAboveModal(false);
-                }, 50);
-            });
-        }
-        showPromise.then(
-            function () {
-                if (funcao != undefined) {
-                    funcao();
-                }
-
-                // Fechar PopUpModal se fecharModal=true
-                if (fecharModal) {
-                    // Detectar e fechar modal ativo
-                    if (window.bootstrap && window.bootstrap.Modal) {
-                        // Bootstrap 5
-                        var modals = document.querySelectorAll(".modal.show, .popup-modal.show");
-                        modals.forEach(function (modal) {
-                            var modalInstance = window.bootstrap.Modal.getInstance(modal);
-                            if (modalInstance) modalInstance.hide();
-                        });
-                    } else if (window.$ && window.$.fn.modal) {
-                        // Bootstrap 4/jQuery
-                        $(".modal.show, .popup-modal.show, .popup-modal.in").modal("hide");
-                    }
-                }
-            },
-            function () {
-                // Dialog cancelled
-            }
-        );
-    };
-
-    var _dialogoSimples = function (titulo, texto, btnConfirmar, btnCancelar, funcaoSim, funcaoNao) {
-        var dialogOptions = {
-            title: titulo,
-            textContent: texto,
-            ariaLabel: "Confirmation Dialog",
-            ok: btnConfirmar,
-            cancel: btnCancelar,
-        };
-
-        // If we're inside a modal, configure for proper z-index handling
-        if (_isInsideModal()) {
-            dialogOptions.parent = angular.element(document.body);
-            dialogOptions.clickOutsideToClose = true;
-            dialogOptions.escapeToClose = true;
-            dialogOptions.targetEvent = null;
-            dialogOptions.hasBackdrop = true;
-            dialogOptions.skipHide = false;
-            dialogOptions.multiple = true; // Allow multiple dialogs
-        } else {
-            dialogOptions.targetEvent = arguments[6] || null; // Allow targetEvent from outside modal
-        }
-
-        var confirm = $mdDialog.confirm(dialogOptions);
-        var showPromise = $mdDialog.show(confirm);
-
-        // Apply z-index fix IMMEDIATELY if we're inside a modal
-        if (_isInsideModal()) {
-            _forceDialogAboveModal(false);
-
-            // Also apply after dialog is fully rendered
-            showPromise.then(null, null).finally(function () {
-                setTimeout(function () {
-                    _forceDialogAboveModal(false);
-                }, 50);
-            });
-        }
-
-        showPromise.then(
-            function () {
-                funcaoSim();
-            },
-            function () {
-                if (funcaoNao != undefined) {
-                    funcaoNao();
-                }
-            }
-        );
-    };
-
-    var _telaAguarde = function (acao = "") {
-        if (acao == "") {
-            var dialogOptions = {
-                template: '<div class="text-center"><img ng-src="src/api-front/imagens/aguarde.gif" class="img-responsive imgAguarde"><p>Aguarde...</p></div>',
-                hasBackdrop: true,
-                clickOutsideToClose: false,
-                escapeToClose: false,
-            };
-
-            // If we're inside a modal, configure for proper z-index handling
-            if (_isInsideModal()) {
-                dialogOptions.parent = angular.element(document.body);
-                dialogOptions.multiple = true;
-                dialogOptions.skipHide = false;
-            }
-
-            var showPromise = $mdDialog.show(dialogOptions);
-
-            // Apply z-index fix IMMEDIATELY if we're inside a modal
-            if (_isInsideModal()) {
-                _forceDialogAboveModal(true); // true = loading dialog gets highest priority
-
-                // Also apply after dialog is fully rendered
-                showPromise.then(null, null).finally(function () {
-                    setTimeout(function () {
-                        _forceDialogAboveModal(true);
-                    }, 50);
-                });
-            }
-
-            return showPromise;
-        } else if (acao == "fechar") {
-            $mdDialog.hide();
-            // Remove duplicate hide call
         }
     };
 
@@ -523,7 +292,5 @@ angular.module("servicos", ["ngMaterial", "ngMessages"]).factory("APIServ", func
         descriptografa: _descriptografa,
         // abrirModal: _abrirModal,
         fecharModal: _fecharModal,
-        // Modal context utility function
-        isInsideModal: _isInsideModal,
     };
 });

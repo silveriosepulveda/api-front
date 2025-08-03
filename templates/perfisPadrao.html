@@ -20,6 +20,6 @@
         <input type="text" ng-model="filtroMenus" class="form-control input-lg">
     </div>
     <button type="button" class="btn btn-success input-lg col-sm-3 col-md-2 baixarbotao" ng-click="salvarPerfilPadrao(menus)">Savlar Perfil Padrao</button>
-    <button type="button" class="btn btn-danger input-lg col-sm-3 col-md-2 baixarbotao" ng-click="" ng-if="!cadastro">Excluir Perfil Padrão</button>
+    <button type="button" class="btn btn-danger input-lg col-sm-3 col-md-2 baixarbotao" ng-click="excluirPerfilPadrao()" ng-if="!cadastro">Excluir Perfil Padrão</button>
     <div ng-include src="'api-front/templates/usuariosPerfilMenus.html'"></div>
 </div>
