@@ -423,15 +423,15 @@ $(document).ready(function () {
         var botao = document.getElementById('botaoMenu');
         var largura = $(document).width();
         
-        //console.log('🧪 DEBUG INICIAL DO MENU:');
-        //console.log('  - Largura da tela:', largura + 'px');
-        //console.log('  - localStorage manterMenuOculto:', localStorage.getItem('manterMenuOculto'));
-        //console.log('  - Valor interpretado (manterOculto):', manterOculto);
-        //console.log('  - Estado do botão:', botao ? botao.innerHTML : 'BOTÃO NÃO ENCONTRADO');
-        //console.log('  - Classes do body:', document.body.className);
+        console.log('🧪 DEBUG INICIAL DO MENU:');
+        console.log('  - Largura da tela:', largura + 'px');
+        console.log('  - localStorage manterMenuOculto:', localStorage.getItem('manterMenuOculto'));
+        console.log('  - Valor interpretado (manterOculto):', manterOculto);
+        console.log('  - Estado do botão:', botao ? botao.innerHTML : 'BOTÃO NÃO ENCONTRADO');
+        console.log('  - Classes do body:', document.body.className);
         
         if (largura > 1000 && !manterOculto && botao && botao.innerHTML === 'Mostrar Menu') {
-            //console.log('⚠️  PROBLEMA DETECTADO: Menu deveria estar aberto mas não está!');
+            console.log('⚠️  PROBLEMA DETECTADO: Menu deveria estar aberto mas não está!');
         }
     }, 1000);
 });

@@ -160,12 +160,12 @@ directivesPadrao
                 ng-class="{'glyphicon-plus' : !item.exibirDetalhes, 'glyphicon-minus':item.exibirDetalhes}" title="Ver Detalhes"  ng-click=${funcaoDet}(item)></button>`;
                     }
 
-                    if (
-                        admSistema ||
-                        ((parametros.funcaoAlterar == undefined || parametros.funcaoAlterar != "desativada") &&
-                            $rS[acao] != undefined &&
-                            $rS[acao]["acoes"]["Alterar"])
-                    ) {
+                    // if (
+                    //     admSistema ||
+                    //     ((parametros.funcaoAlterar == undefined || parametros.funcaoAlterar != "desativada") &&
+                    //         $rS[acao] != undefined &&
+                    //         $rS[acao]["acoes"]["Alterar"])
+                    // ) {
                         var funcaoAlt = parametros.funcaoAlterar != undefined ? parametros.funcaoAlterar : "alterar";
                         var textoBotaoAlterar = parametros.textoBotaoAlterar != undefined ? parametros.textoBotaoAlterar : "";
                         var iconeBotaoAlterar =
@@ -176,21 +176,21 @@ directivesPadrao
                                 : parametros.classesBotaoAlterar;
                         var ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar}"` : "";
                         htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)"
-                    ${ocultarAlterar}>${textoBotaoAlterar}</button>`;
+                            ${ocultarAlterar}>${textoBotaoAlterar}</button>`;
                         //htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)">${textoBotaoAlterar}</button>`;
-                    }
-                    if (
-                        admSistema ||
-                        ((parametros.funcaoExcluir == undefined || parametros.funcaoExcluir != "desativada") &&
-                            $rS[acao] != undefined &&
-                            $rS[acao]["acoes"]["Excluir"])
-                    ) {
+                    //}
+                    // if (
+                    //     admSistema ||
+                    //     ((parametros.funcaoExcluir == undefined || parametros.funcaoExcluir != "desativada") &&
+                    //         $rS[acao] != undefined &&
+                    //         $rS[acao]["acoes"]["Excluir"])
+                    // ) {
                         var funcaoExc = parametros.funcaoExcluir != undefined ? parametros.funcaoExcluir : "excluir";
                         var ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir}"` : "";
                         htmlBotoes += `<button type="button" class="btn btn-modern btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"
-                    ${ocultarExcluir}></button>`;
+                            ${ocultarExcluir}></button>`;
                         //htmlBotoes += `<button type="button" class="btn btn-default glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"></button>`;
-                    }
+                    //}
 
                     if (habilitarSalvar) {
                         htmlBotoes += `

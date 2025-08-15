@@ -490,8 +490,8 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                             }
                             fd.append('term', parametrosBusca.term);
 
-                            APIServ.executaFuncaoClasse(parametrosBusca.classeBusca, parametrosBusca.funcaoBusca, fd, 'post').
-                           //     APIServ.executaFuncaoClasse(parametrosBusca.classeBusca, parametrosBusca.funcaoBusca, parametrosBusca).
+                           // APIServ.executaFuncaoClasse(parametrosBusca.classeBusca, parametrosBusca.funcaoBusca, fd, 'post').
+                                APIServ.executaFuncaoClasse(parametrosBusca.classeBusca, parametrosBusca.funcaoBusca, parametrosBusca).
                                 success(data => {         
                                     if (typeof data === 'string') {
                                         APIServ.mensagemSimples('Informação', 'Erro ao Carregar');

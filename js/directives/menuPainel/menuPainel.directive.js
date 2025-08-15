@@ -60,6 +60,7 @@
         vm.toggleFavorito = toggleFavorito;
         vm.toggleFavoritosExpansion = toggleFavoritosExpansion;
         vm.carregarEstadoFavoritos = carregarEstadoFavoritos;
+        vm.manipularMenu = manipularMenu;
 
         // ========== INICIALIZAÇÃO ==========
         init();
@@ -164,6 +165,26 @@
             } else {
                 // Calcular estado global baseado nos menus individuais
                 updateAllMenusState();
+            }
+        }
+
+        function manipularMenu() {
+            var botao = document.getElementById('botaoMenu');
+            var manterOculto = localStorage.getItem('manterMenuOculto') === 'true';
+            
+            if (botao.innerHTML == 'Mostrar Menu') {
+                openNav();
+            } else if (botao.innerHTML == 'Ocultar Menu') {
+                // Forçar fechamento do menu e marcar "manter oculto" se necessário
+                if (!manterOculto && $(document).width() > 1000) {
+                    var checkbox = document.getElementById('manterMenuOculto');
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        localStorage.setItem('manterMenuOculto', true);
+                        console.log('Menu fechado via botão - preferência "manter oculto" marcada');
+                    }
+                }
+                closeNav();
             }
         }
 

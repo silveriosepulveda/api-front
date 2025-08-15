@@ -1240,14 +1240,16 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                             var fd = new FormData();
                             fd.append('filtros', JSON.stringify(filtros));
                             APIServ.executaFuncaoClasse('classeGeral', 'buscarParaAlterar', fd, $scope.tipoConsulta).success(function (data) {
-                                //APIServ.executaFuncaoClasse('classeGeral', 'buscarParaAlterar', filtros).success(function (data) {
-                                //                                  console.log(data);
+                                
                                 $rS.carregando = false;
                                 if (usarTimerConsulta) {
                                     $rootScope.iniciarTimer();
                                 }
 
-                                if (typeof data === 'string') {
+                                if(data.aviso != undefined) {
+                                    APIServ.mensagemSimples('Informação', data.aviso);
+                                    return;
+                                }else if (typeof data === 'string') {
                                     APIServ.mensagemSimples('Informação', 'Erro, Tente Novamente');
                                 } else {
 
