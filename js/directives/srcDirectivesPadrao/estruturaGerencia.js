@@ -441,9 +441,12 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 $scope.alterarExibicaoConsulta = () => {
                     $scope.exibirConsulta = !$scope.exibirConsulta;
                     if ($scope.exibirConsulta) {
-                        $rootScope.pausarTimer();
+                        if($scope.filtros.length == 0) {
+                            $scope.adicionarFiltro();
+                        }
+                       // $rootScope.pausarTimer();
                     } else {
-                        $rootScope.iniciarTimer();
+                        // $rootScope.iniciarTimer();
                     }
                 }
 
@@ -458,6 +461,8 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                     }
 
                     $scope.adicionarFiltro();
+                    console.log($scope.filtros);
+                    
 
                     $scope.ordemFiltro = $scope.estrutura.campoOrdemPadraoFiltro != undefined ? $scope.estrutura.campoOrdemPadraoFiltro : '';
                     $scope.sentidoFiltro = $scope.estrutura.sentidoOrdemPadraoFiltro ? $scope.estrutura.sentidoOrdemPadraoFiltro : '';
@@ -1328,7 +1333,11 @@ app.directive('estruturaGerencia', ['$compile', '$base64', '$parse', 'filtroPadr
                 var html = '';
                 if (EGFuncoes.temConsulta(retorno)) {
                     html += '<cabecalho-consulta></cabecalho-consulta>'; //montaCabecalhoConsulta(retorno, $scope);
-                    html += '<lista-consulta></lista-consulta>'; //  montaListaConsulta(estrutura);
+                    if(estrutura.tipoListaConsulta == 'tabela') {   
+                        html += '<lista-consulta-tabela></lista-consulta-tabela>'; //  montaListaConsulta(estrutura);
+                    } else {
+                        html += '<lista-consulta></lista-consulta>'; //  montaListaConsulta(estrutura);
+                    }
                 }
 
                 //Esta variavel armazenará todas as campos do formulario vazios

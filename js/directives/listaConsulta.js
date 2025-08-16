@@ -4,86 +4,51 @@ directivesPadrao
         "APIServ",
         "EGFuncoes",
         "APIAjuFor",
-        function ($compile, APIServ, EGFuncoes, APIAjuFor) {
+        "FuncoesConsulta",
+        function ($compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta) {
             return {
                 restrict: "E",
                 replace: true,
                 template: "",
                 link: function (scope, elem) {
-                    var acao = scope.acao != undefined ? scope.acao : APIServ.parametrosUrl()[1];
-                    const usuario = APIServ.buscaDadosLocais("usuario");
-                    const admSistema = usuario["administrador_sistema"] == "S";
+                    // Verificar se deve usar a nova diretiva de tabela
+                    // Por enquanto, vamos usar uma verificação simples baseada em um parâmetro
+                    // if (scope.estrutura && scope.estrutura.tipoListaConsulta === 'tabela') {
+                    //     // Usar a nova diretiva listaConsultaTabela
+                    //     var html = '<lista-consulta-tabela></lista-consulta-tabela>';
+                    //     elem.html(html);
+                    //     $compile(elem.contents())(scope);
+                    //     return;
+                    // }
+                    
+                    // Usar funções do serviço centralizado
+                    var acao = FuncoesConsulta.obterParametrosUrl(scope.acao);
+                    var infoUsuario = FuncoesConsulta.obterInformacoesUsuario();
+                    var usuario = infoUsuario.usuario;
+                    var admSistema = infoUsuario.admSistema;
 
                     var parametros = scope.estrutura;
 
-                    var posicaoBotoes =
-                        scope.estrutura.botoesAcoesItensConsultaPosicao != undefined ? scope.estrutura.botoesAcoesItensConsultaPosicao : "esquerda";
-                    var classeBotoes = posicaoBotoes == "superior" || posicaoBotoes == "inferior" ? "col-xs-12" : "col-xs-12 col-md-2";
-                    var classeLista = posicaoBotoes == "superior" || posicaoBotoes == "inferior" ? "col-xs-12" : "col-xs-12 col-md-10";
+                    var posicaoBotoes = scope.estrutura.botoesAcoesItensConsultaPosicao != undefined 
+                        ? scope.estrutura.botoesAcoesItensConsultaPosicao 
+                        : "esquerda";
+                    
+                    var classes = FuncoesConsulta.gerarClassesBotoes(posicaoBotoes);
+                    var classeBotoes = classes.classeBotoes;
+                    var classeLista = classes.classeLista;
                     var habilitarSalvar = false;
 
-                    scope.aoEntrarInputConsulta = (item, event) => {
-                        var campo = $(event.target).attr("campo");
-
-                        item.valoresOriginais = item.valoresOriginais != undefined ? item.valoresOriginais : {};
-                        item.valoresOriginais[campo] =
-                            item.valoresOriginais != undefined && item.valoresOriginais[campo] != undefined ? item.valoresOriginais[campo] : item[campo];
+                    // Usar funções do serviço centralizado
+                    scope.aoEntrarInputConsulta = FuncoesConsulta.aoEntrarInputConsulta;
+                    scope.alteracaoItemConsulta = FuncoesConsulta.alteracaoItemConsulta;
+                    scope.salvarAlteracoesItem = function(item, event) {
+                        FuncoesConsulta.salvarAlteracoesItem(item, event, parametros);
                     };
-
-                    scope.alteracaoItemConsulta = (item, event) => {
-                        var elemento = $(event.target);
-                        var campo = elemento.attr("campo");
-
-                        if (item.valoresOriginais[campo] != undefined && item.valoresOriginais[campo] != item[campo]) {
-                            $(event.target).closest(".itemConsulta").addClass("fundoVermelho");
-                            item.habilitarSalvar = true;
-                            $("#filtro_resultado").prop("disabled", "disabled");
-                        } else {
-                            $("#filtro_resultado").prop("disabled", "");
-                            $(event.target).closest(".itemConsulta").removeClass("fundoVermelho");
-                            item.habilitarSalvar = false;
-                        }
-                    };
-
-                    scope.salvarAlteracoesItem = (item, event) => {
-                        var elemento = $(event.target);
-
-                        var parametrosAlteracao = {
-                            tabela: parametros.tabela,
-                            campoChave: parametros.campo_chave,
-                            dados: item,
-                        };
-
-                        var fd = new FormData();
-                        fd.append("parametros", JSON.stringify(parametrosAlteracao));
-
-                        APIServ.executaFuncaoClasse("classeGeral", "alterarItemConsulta", fd, "post").success((retorno) => {
-                            if (retorno.camposObrigatoriosVazios != undefined) {
-                                APIServ.mensagemSimples("Há Campos Obrigatórios Vazios");
-                            } else if (retorno.sucesso != undefined) {
-                                $("#filtro_resultado").prop("disabled", "");
-                                $(event.target).closest(".itemConsulta").removeClass("fundoVermelho");
-                                item.habilitarSalvar = false;
-                            } else if (retorno.erro != undefined) {
-                                APIServ.mensagemSimples(retorno.erro);
-                            }
-                        });
-                    };
-
-                    scope.cancelarAlteracoesItem = (item, event) => {
-                        console.log(item);
-                        for (var v in item) {
-                            item[v] = item.valoresOriginais != undefined && item.valoresOriginais[v] != undefined ? item.valoresOriginais[v] : item[v];
-                        }
-
-                        $(event.target).closest(".itemConsulta").removeClass("fundoVermelho");
-                        item.habilitarSalvar = false;
-                        $("#filtro_resultado").prop("disabled", "");
-                    };
+                    scope.cancelarAlteracoesItem = FuncoesConsulta.cancelarAlteracoesItem;
 
                     /************************ CRIANDO OS CAMPOS DA LISTA **********************/
                     var htmlCamposLista = `
-            <div class="${classeLista}">
+            <div class="${classeLista} listaConsulta">
                 <div class="row">`;
 
                     //Aqui, ao inves de usar o repeat do angular, crio todos os elementos pois as informacoes sobre o campo estao no template js

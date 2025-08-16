@@ -52,7 +52,7 @@ div.conteudoBusca div.row.itemConsulta{
     .corpo {
         top: 40px;
     }
-    lista-consulta {
+    lista-consulta lista-consulta-tabela{
         margin: auto;
     }
 }

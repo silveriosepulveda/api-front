@@ -423,12 +423,12 @@ $(document).ready(function () {
         var botao = document.getElementById('botaoMenu');
         var largura = $(document).width();
         
-        console.log('🧪 DEBUG INICIAL DO MENU:');
-        console.log('  - Largura da tela:', largura + 'px');
-        console.log('  - localStorage manterMenuOculto:', localStorage.getItem('manterMenuOculto'));
-        console.log('  - Valor interpretado (manterOculto):', manterOculto);
-        console.log('  - Estado do botão:', botao ? botao.innerHTML : 'BOTÃO NÃO ENCONTRADO');
-        console.log('  - Classes do body:', document.body.className);
+        // console.log('🧪 DEBUG INICIAL DO MENU:');
+        // console.log('  - Largura da tela:', largura + 'px');
+        // console.log('  - localStorage manterMenuOculto:', localStorage.getItem('manterMenuOculto'));
+        // console.log('  - Valor interpretado (manterOculto):', manterOculto);
+        // console.log('  - Estado do botão:', botao ? botao.innerHTML : 'BOTÃO NÃO ENCONTRADO');
+        // console.log('  - Classes do body:', document.body.className);
         
         if (largura > 1000 && !manterOculto && botao && botao.innerHTML === 'Mostrar Menu') {
             console.log('⚠️  PROBLEMA DETECTADO: Menu deveria estar aberto mas não está!');
@@ -632,7 +632,7 @@ function carregarPreferenciaMenu() {
         }
     }
     
-    console.log('🔧 Carregando preferência do menu:', manterOculto ? 'manter oculto' : 'manter visível');
+    //console.log('🔧 Carregando preferência do menu:', manterOculto ? 'manter oculto' : 'manter visível');
     
     // NOVO COMPORTAMENTO: Menu abre por padrão, só fica fechado se "manter oculto" estiver marcado
     if ($(document).width() > 1000) {
@@ -648,7 +648,7 @@ function carregarPreferenciaMenu() {
                 
                 if (botao && botao.innerHTML == 'Mostrar Menu') {
                     openNav();
-                    console.log('✅ Menu aberto por padrão (preferência: manter visível)');
+                   // console.log('✅ Menu aberto por padrão (preferência: manter visível)');
                 } else {
                     console.log('🔄 Menu já estava aberto');
                 }
