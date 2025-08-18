@@ -20,10 +20,17 @@ angular
         };
     })
     .controller("usuarioCtrl", function ($rootScope, $scope, APIServ, $http) {
-        $scope.sair = () => {
-            APIServ.apagaDadosLocais("usuario");
-            APIServ.apagaDadosLocais("menuPainel");
-            window.location = "./?sair";
+        // $scope.sair = () => {
+        //     APIServ.apagaDadosLocais("usuario");
+        //     APIServ.apagaDadosLocais("menuPainel");
+        //     APIServ.apagaDadosLocais("sessionId");
+        //     APIServ.apagaDadosLocais('filtros');
+        //     window.location = "./?sair";
+        // };
+
+        $scope.abrirAlterarSenha = (item) => {
+            console.log(item);
+            item.alterarSenha = !item.alterarSenha;
         };
 
         $scope.buscarUsuarios = function () {
@@ -357,14 +364,14 @@ angular
             });
         };
 
-        $scope.alterarPerfilTela = async function (keyM, keyI, keyA) {            
+        $scope.alterarPerfilTela = async function (keyM, keyI, keyA) {
             if (keyA != undefined) {
-                var selecionado = $scope.menus[keyM]["itens"][keyI]["acoes"][keyA]["selecionado"];                               
+                var selecionado = $scope.menus[keyM]["itens"][keyI]["acoes"][keyA]["selecionado"];
 
                 if (selecionado) {
                     $scope.menus[keyM]["selecionado"] = true;
                     $scope.menus[keyM]["itens"][keyI]["selecionado"] = true;
-                } 
+                }
             } else if (keyI != undefined) {
                 var selecionado = $scope.menus[keyM]["itens"][keyI]["selecionado"];
                 if (selecionado) {
@@ -455,113 +462,166 @@ angular
         // Funções para a árvore de menus
         $scope.filtroArvoreMenus = "";
 
-        $scope.inicializarArvoreMenus = function () {
-            if ($scope.menus) {
-                angular.forEach($scope.menus, function (menu, keyM) {
-                    menu.expanded = true; // Inicia expandido
-                    if (menu.itens) {
-                        angular.forEach(menu.itens, function (item, keyI) {
-                            item.expanded = true; // Inicia expandido
-                        });
-                    }
-                });
-            }
-        };
+        // $scope.inicializarArvoreMenus = function () {
+        //     if ($scope.menus) {
+        //         angular.forEach($scope.menus, function (menu, keyM) {
+        //             menu.expanded = true; // Inicia expandido
+        //             if (menu.itens) {
+        //                 angular.forEach(menu.itens, function (item, keyI) {
+        //                     item.expanded = true; // Inicia expandido
+        //                 });
+        //             }
+        //         });
+        //     }
+        // };
 
-        $scope.toggleMenu = function (keyM) {
-            if ($scope.menus && $scope.menus[keyM]) {
-                $scope.menus[keyM].expanded = !$scope.menus[keyM].expanded;
-            }
-        };
+        // $scope.toggleMenu = function (keyM) {
+        //     if ($scope.menus && $scope.menus[keyM]) {
+        //         $scope.menus[keyM].expanded = !$scope.menus[keyM].expanded;
+        //     }
+        // };
 
-        $scope.toggleItem = function (keyM, keyI) {
-            if ($scope.menus && $scope.menus[keyM] && $scope.menus[keyM].itens && $scope.menus[keyM].itens[keyI]) {
-                $scope.menus[keyM].itens[keyI].expanded = !$scope.menus[keyM].itens[keyI].expanded;
-            }
-        };
+        // $scope.toggleItem = function (keyM, keyI) {
+        //     if ($scope.menus && $scope.menus[keyM] && $scope.menus[keyM].itens && $scope.menus[keyM].itens[keyI]) {
+        //         $scope.menus[keyM].itens[keyI].expanded = !$scope.menus[keyM].itens[keyI].expanded;
+        //     }
+        // };
 
-        $scope.expandirTodos = function () {
-            if ($scope.menus) {
-                angular.forEach($scope.menus, function (menu, keyM) {
-                    menu.expanded = true;
-                    if (menu.itens) {
-                        angular.forEach(menu.itens, function (item, keyI) {
-                            item.expanded = true;
-                        });
-                    }
-                });
-            }
-        };
+        // $scope.expandirTodos = function () {
+        //     if ($scope.menus) {
+        //         angular.forEach($scope.menus, function (menu, keyM) {
+        //             menu.expanded = true;
+        //             if (menu.itens) {
+        //                 angular.forEach(menu.itens, function (item, keyI) {
+        //                     item.expanded = true;
+        //                 });
+        //             }
+        //         });
+        //     }
+        // };
 
-        $scope.colapsarTodos = function () {
-            if ($scope.menus) {
-                angular.forEach($scope.menus, function (menu, keyM) {
-                    menu.expanded = false;
-                    if (menu.itens) {
-                        angular.forEach(menu.itens, function (item, keyI) {
-                            item.expanded = false;
-                        });
-                    }
-                });
-            }
-        };
+        // $scope.colapsarTodos = function () {
+        //     if ($scope.menus) {
+        //         angular.forEach($scope.menus, function (menu, keyM) {
+        //             menu.expanded = false;
+        //             if (menu.itens) {
+        //                 angular.forEach(menu.itens, function (item, keyI) {
+        //                     item.expanded = false;
+        //                 });
+        //             }
+        //         });
+        //     }
+        // };
 
-        $scope.filtrarArvoreMenus = function (menu) {
-            if (!$scope.filtroArvoreMenus) return true;
+        // $scope.filtrarArvoreMenus = function (menu) {
+        //     if (!$scope.filtroArvoreMenus) return true;
 
-            var filtro = $scope.filtroArvoreMenus.toLowerCase();
+        //     var filtro = $scope.filtroArvoreMenus.toLowerCase();
 
-            // Buscar no nome do menu
-            if (menu.menu && menu.menu.toLowerCase().indexOf(filtro) !== -1) {
-                return true;
-            }
+        //     // Buscar no nome do menu
+        //     if (menu.menu && menu.menu.toLowerCase().indexOf(filtro) !== -1) {
+        //         return true;
+        //     }
 
-            // Buscar nos itens
-            if (menu.itens) {
-                for (var keyI in menu.itens) {
-                    var item = menu.itens[keyI];
-                    if (item.item && item.item.toLowerCase().indexOf(filtro) !== -1) {
-                        return true;
-                    }
+        //     // Buscar nos itens
+        //     if (menu.itens) {
+        //         for (var keyI in menu.itens) {
+        //             var item = menu.itens[keyI];
+        //             if (item.item && item.item.toLowerCase().indexOf(filtro) !== -1) {
+        //                 return true;
+        //             }
 
-                    // Buscar nas ações
-                    if (item.acoes) {
-                        for (var keyA in item.acoes) {
-                            var acao = item.acoes[keyA];
-                            if (acao.acao && acao.acao.toLowerCase().indexOf(filtro) !== -1) {
-                                return true;
-                            }
+        //             // Buscar nas ações
+        //             if (item.acoes) {
+        //                 for (var keyA in item.acoes) {
+        //                     var acao = item.acoes[keyA];
+        //                     if (acao.acao && acao.acao.toLowerCase().indexOf(filtro) !== -1) {
+        //                         return true;
+        //                     }
+        //                 }
+        //             }
+
+        //             // Buscar nos campos
+        //             if (item.campos) {
+        //                 for (var keyC in item.campos) {
+        //                     var campo = item.campos[keyC];
+        //                     if (campo.titulo_campo && campo.titulo_campo.toLowerCase().indexOf(filtro) !== -1) {
+        //                         return true;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+
+        //     return false;
+        // };
+
+        // $scope.contemFiltro = function (texto) {
+        //     if (!$scope.filtroArvoreMenus || !texto) return false;
+        //     return texto.toLowerCase().indexOf($scope.filtroArvoreMenus.toLowerCase()) !== -1;
+        // };
+
+        // $scope.limparFiltroArvore = function () {
+        //     $scope.filtroArvoreMenus = "";
+        // };
+
+        // // Watch para expandir automaticamente quando filtrar
+        // $scope.$watch("filtroArvoreMenus", function (newValue) {
+        //     if (newValue && newValue.length > 0) {
+        //         $scope.expandirTodos();
+        //     }
+        // });
+    })
+    .directive("alterarSenha", [
+        "$compile",
+        "APIServ",
+        function ($compile, APIServ) {
+            return {
+                restrict: "E",
+                template: "<></>",
+                link: function (scope, elem) {
+                    const item = scope.$parent.$parent.item;
+                    const nomeForm = `formAltSenha${item.chave_cadastro}`;
+                    let html = `
+                    <div class="col-xs-12">
+                        <form class="row" name="${nomeForm}" ng-submit="${nomeForm}.$valid && alterarSenhaLocal()" novalidate valida-Formulario>
+                            <div class="col-md-6 form-group">
+                                <label>Digite a Nova Senha</label>
+                                <input type="password" name="senha" id="senha" ng-model="senhaLocal" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Confirme a Nova Senha</label>
+                                <input type="password" name="confirmaSenha" id="confirmaSenha" ng-model="confirmaSenhaLocal" class="form-control" required igual="senha-Senha" equalTo>
+                            </div>
+                            <button type="submit" class="btn btn-primary col-xs-12">Alterar Senha</button>
+                        </form>
+                    </div>
+            `;
+
+                    scope.alterarSenhaLocal = function () {
+                        if (scope.senhaLocal == scope.confirmaSenhaLocal) {
+                            const temp = new FormData();
+                            temp.append("dados", JSON.stringify( {
+                                chave_usuario: item.chave_usuario,
+                                senha: scope.senhaLocal,
+                            }));
+
+                            APIServ.executaFuncaoClasse("usuarios", "alterarSenha", temp, "post").success(function (retorno) {
+                                if (retorno.sucesso && retorno.sucesso > 0) {
+                                    item.alterarSenha = false;
+                                    APIServ.mensagemSimples("Confirmação", "Senha Alterada.");
+                                } else {
+                                    APIServ.mensagemSimples("Informação", "Erro ao Alterar Senha!");
+                                }
+                            });
+                        } else {
+                            APIServ.mensagemSimples("Informação", "As senhas não conferem!");
                         }
-                    }
+                    };
 
-                    // Buscar nos campos
-                    if (item.campos) {
-                        for (var keyC in item.campos) {
-                            var campo = item.campos[keyC];
-                            if (campo.titulo_campo && campo.titulo_campo.toLowerCase().indexOf(filtro) !== -1) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-        };
-
-        $scope.contemFiltro = function (texto) {
-            if (!$scope.filtroArvoreMenus || !texto) return false;
-            return texto.toLowerCase().indexOf($scope.filtroArvoreMenus.toLowerCase()) !== -1;
-        };
-
-        $scope.limparFiltroArvore = function () {
-            $scope.filtroArvoreMenus = "";
-        };
-
-        // Watch para expandir automaticamente quando filtrar
-        $scope.$watch("filtroArvoreMenus", function (newValue) {
-            if (newValue && newValue.length > 0) {
-                $scope.expandirTodos();
-            }
-        });
-    });
+                    elem.html(html);
+                    $compile(elem.contents())(scope);
+                },
+            };
+        },
+    ]);

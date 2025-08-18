@@ -41,17 +41,22 @@ div.conteudoBusca div.row.itemConsulta{
         z-index: 999;
         width: 100%
     }
-    /* .cabecalhoConsulta{
-        position: fixed !important;        
-        top: 30;
+    .cabecalhoConsulta {
+        position: sticky !important;        
+        top: 50px;
         left: 0;
-        z-index: 999;
-        width: 100%;    
-        background-color: #ffffff;    
-    } */
-    .corpo {
-        top: 40px;
+        z-index: 998;
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #e9ecef;
+        padding: 10px 0;
+        margin: 0;
+        width: 100%;
     }
+    /* .corpo {
+        top: 40px;
+    } */
     lista-consulta lista-consulta-tabela{
         margin: auto;
     }

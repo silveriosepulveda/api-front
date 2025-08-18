@@ -1,6 +1,9 @@
-<form id="nomeFormConsulta" name="nomeFormConsulta" class="formCabecalhoConsulta" ng-submit="filtrar()" valida-Formulario novalidate>
-    <link rel="stylesheet" href="/api-front/js/directives/templates/formCabecalhoConsultaPadrao.css">
-    <link rel="stylesheet" href="/api-front/css/lista-consulta-tabela.css">
+app.directive('formCabecalhoConsultaPadrao', function () {
+    return {
+        restrict: 'E',
+        //replace: 'true',
+        template: `<form id="nomeFormConsulta" name="nomeFormConsulta" class="formCabecalhoConsulta" ng-submit="filtrar()" valida-Formulario novalidate>
+    <link rel="stylesheet" href="/api-front/js/directives/templates/formCabecalhoConsultaPadrao.css">    
     <input type="hidden" id="pagina" name="pagina" value="1">
     <!--Filtro Padrao do Sistema-->
     
@@ -147,5 +150,9 @@
         </div>
         <timer-consulta intervalo="{{estrutura.usarTimerConsulta.intervalo}}" ng-if="estrutura.usarTimerConsulta"></timer-consulta>
 
+        
+
     </div>
-</form>
+</form>`
+    }
+})

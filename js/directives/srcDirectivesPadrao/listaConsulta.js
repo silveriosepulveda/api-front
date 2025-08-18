@@ -217,16 +217,7 @@ directivesPadrao
                     } else {
                         filtro = "filtroResultado";
                         scope.filtroResultado = "";
-                    }
-                    // console.log(filtro);
-
-                    // if(scope.filtroResultado != undefined){
-                    //     console.log('tem');
-                    // }
-
-                    // scope.filtroResultado = item => {
-                    //     console.log(item);
-                    // }
+                    }                    
 
                     var html = `            
             <div ng-if="tela == 'consulta'">            

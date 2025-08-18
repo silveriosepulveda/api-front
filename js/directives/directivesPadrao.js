@@ -1024,6 +1024,9 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
             link: function (scope, elem) {
                 var acaoTela = APIServ.parametrosUrl()[1];
                 var acao = elem.attr('parametros');
+                const usuario = APIServ.buscaDadosLocais('usuario');
+                const adm = usuario.administrador_sistema == 'S';
+                
 
                 var p = APIServ.buscarValorVariavel(scope.estrutura, acao);
                 var classes = [];
@@ -1054,10 +1057,10 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                 let click = '';
                 let desabilitado = '';
                 let titulo = p.titulo != undefined && p.titulo != '' ? p.titulo : '';
-                let texto = p.texto != undefined && p.texto != '' ? p.texto : '';
+                let texto = p.texto != undefined && p.texto != '' ? p.texto : '';                                
 
                 //Vendo se ignorara o perfil ou se o respeitara
-                let ngIf = p.ignorarPerfil == undefined || p.ignorarPerfil == false ? `${acaoTela}['acoes']['${acao}'] != undefined ` : '';
+                let ngIf = !adm && (p.ignorarPerfil == undefined || p.ignorarPerfil == false) ? `${acaoTela}['acoes']['${acao}'] != undefined ` : '';
 
                 let atributos = undefined;
                 if (p.atributosButton != undefined)
@@ -1181,13 +1184,13 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
             }
         }
     })
-    .directive('formCabecalhoConsultaPadrao', function () {
-        return {
-            restrict: 'E',
-            //replace: 'true',
-            templateUrl: 'api-front/js/directives/templates/formCabecalhoConsultaPadrao.html'            
-        }
-    })
+    // .directive('formCabecalhoConsultaPadrao', function () {
+    //     return {
+    //         restrict: 'E',
+    //         //replace: 'true',
+    //         templateUrl: 'api-front/js/directives/templates/formCabecalhoConsultaPadrao.html'            
+    //     }
+    // })
     .directive('objetoVisualizacao', function ($compile) {
         return {
             restrict: "E",

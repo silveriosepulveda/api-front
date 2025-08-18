@@ -1,4 +1,4 @@
-app.directive('cabecalhoConsulta', ['$compile', 'APIServ', 'EGFuncoes', 'APIAjuFor', function ($compile, APIServ, EGFuncoes, APIAjuFor) {
+app.directive('cabecalhoConsulta', ['$compile', 'APIServ', 'EGFuncoes', 'APIAjuFor', 'FuncoesConsulta', function ($compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta) {
     return {
         restrict: 'E',
         replace: true,
@@ -87,9 +87,16 @@ app.directive('cabecalhoConsulta', ['$compile', 'APIServ', 'EGFuncoes', 'APIAjuF
                 </div>
             </div>`;
 
+            if(scope.estrutura.tipoListaConsulta == 'tabela') {
+                html += '<cabecalho-lista-consulta-tabela></cabecalho-lista-consulta-tabela>';
+            }
+
             // html += scope.estrutura.naoFiltrarAoIniciar == undefined || scope.estrutura.naoFiltrarAoIniciar == false ?
             //     `<div ng-init="filtrar(0)" ng-if="estrutura.tipoEstrutura == 'consultaDireta' && tela != 'cadastro'""></div>` : '';
-            elem.html(html);
+            
+            // Cabeçalho da tabela movido para diretiva separada cabecalhoListaConsultaTabela
+            
+                        elem.html(html);
             elem.addClass('row-fluid cabecalhoConsulta')
             $compile(elem.contents())(scope);
         }
