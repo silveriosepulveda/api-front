@@ -452,6 +452,8 @@ app.directive("estruturaGerencia", [
                 }
 
                 $scope.alterarExibicaoConsulta = () => {
+                    console.log('alterarExibicaoConsulta');
+                    
                     $scope.exibirConsulta = !$scope.exibirConsulta;
                     if ($scope.exibirConsulta) {
                         if ($scope.filtros.length == 0) {
@@ -1355,9 +1357,11 @@ app.directive("estruturaGerencia", [
                 var html = "";
                 if (EGFuncoes.temConsulta(retorno)) {
                     html += '<cabecalho-consulta class="cabecalhoConsulta " style="float: left;"></cabecalho-consulta>'; //montaCabecalhoConsulta(retorno, $scope);
-                    if (estrutura.tipoListaConsulta == "tabela") {
+                    if (estrutura.tipoListaConsulta != undefined && estrutura.tipoListaConsulta == "tabela") {
+                        $scope.tipoListaConsulta = "tabela";
                         html += '<lista-consulta-tabela class="listaConsulta"></lista-consulta-tabela>'; //  montaListaConsulta(estrutura);
                     } else {
+                        $scope.tipoListaConsulta = "lista";
                         html += '<lista-consulta class="listaConsulta"></lista-consulta>'; //  montaListaConsulta(estrutura);
                     }
                 }

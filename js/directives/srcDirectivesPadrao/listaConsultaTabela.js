@@ -4,19 +4,42 @@ directivesPadrao.directive("listaConsultaTabela", [
     "EGFuncoes",
     "APIAjuFor",
     "FuncoesConsulta",
-    function ($compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta) {
+    "$timeout",
+    "$q",
+    function ($compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta, $timeout, $q) {
         return {
             restrict: "E",
             replace: true,
             template: "",
             link: function (scope, elem) {
+                // ==================== CONFIGURAÇÕES INICIAIS ====================
+
                 // Usar funções do serviço centralizado
                 var acao = FuncoesConsulta.obterParametrosUrl(scope.acao);
                 var infoUsuario = FuncoesConsulta.obterInformacoesUsuario();
                 var usuario = infoUsuario.usuario;
                 var admSistema = infoUsuario.admSistema;
-
                 var parametros = scope.estrutura;
+
+                // Configurações de performance
+                var CONFIG = {
+                    ITENS_POR_PAGINA: 20,
+                    DEBOUNCE_FILTRO: 300,
+                    DEBOUNCE_SCROLL: 150,
+                    TIMEOUT_CARREGAMENTO: 200,
+                };
+
+                // Variáveis de estado
+                var estado = {
+                    carregando: false,
+                    filtroTimeout: null,
+                    scrollTimeout: null,
+                    watchingUpdate: false,
+                    ultimoFiltroAplicado: "",
+                    scrollListener: null,
+                };
+
+                // ==================== INICIALIZAÇÃO ====================
 
                 // Forçar posição dos botões para direita
                 var posicaoBotoes = "direita";
@@ -36,7 +59,8 @@ directivesPadrao.directive("listaConsultaTabela", [
                 // Usar função do serviço para mesclar campos
                 var camposMesclados = FuncoesConsulta.mesclarCampos(parametros.listaConsulta, parametros.campos);
 
-                /************************ CRIANDO OS CAMPOS DA LISTA **********************/
+                // ==================== CONFIGURAÇÃO DOS CAMPOS ====================
+
                 // Verificar se há campos com habilitação de edição para definir habilitarSalvar
                 angular.forEach(camposMesclados, function (val, key) {
                     if (val.tipo != "oculto") {
@@ -44,222 +68,40 @@ directivesPadrao.directive("listaConsultaTabela", [
                     }
                 });
 
-                /***************************** FIM DOS CAMPOS DA LISTA  **********************************/
+                // ==================== GERAÇÃO DOS BOTÕES ====================
 
-                /******************CRIANDO OS BOTOES DAS FUNCOES *******************************************/
-                var htmlBotoes = `<div class="col-acoes">`;
+                var htmlBotoes = gerarHtmlBotoes(parametros, habilitarSalvar);
 
-                if (
-                    (parametros.funcaoDetalhar == undefined || parametros.funcaoDetalhar != "desativada") &&
-                    (parametros.ocultarDetalhes == undefined || !parametros.ocultarDetalhes)
-                ) {
-                    var funcaoDet = parametros.funcaoDetalhar != undefined ? parametros.funcaoDetalhar : "detalhar";
-                    htmlBotoes += `<button type="button" name="button" class="btn btn-modern btn-outline-secondary glyphicon"
-                ng-class="{'glyphicon-plus' : !item.exibirDetalhes, 'glyphicon-minus':item.exibirDetalhes}" title="Ver Detalhes"  ng-click=${funcaoDet}(item)></button>`;
-                }
+                // ==================== CONFIGURAÇÃO DO FILTRO ====================
 
-                var funcaoAlt = parametros.funcaoAlterar != undefined ? parametros.funcaoAlterar : "alterar";
-                var textoBotaoAlterar = parametros.textoBotaoAlterar != undefined ? parametros.textoBotaoAlterar : "";
-                var iconeBotaoAlterar =
-                    parametros.ocultarIconeBotaoAlterar == undefined || !parametros.ocultarIconeBotaoAlterar ? "glyphicon-pencil glyphicon" : "";
-                var classesBotaoAlterar =
-                    parametros.classesBotaoAlterar == undefined || !parametros.classesBotaoAlterar
-                        ? "btn-modern btn-outline-primary"
-                        : parametros.classesBotaoAlterar;
-                var ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar}"` : "";
-                htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)"
-                        ${ocultarAlterar}>${textoBotaoAlterar}</button>`;
+                var filtro = configurarFiltro(scope.estrutura);
+                scope.filtroResultado = filtro;
 
-                var funcaoExc = parametros.funcaoExcluir != undefined ? parametros.funcaoExcluir : "excluir";
-                var ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir}"` : "";
-                htmlBotoes += `<button type="button" class="btn btn-modern btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"
-                        ${ocultarExcluir}></button>`;
+                // ==================== GERAÇÃO DO HTML ====================
 
-                if (habilitarSalvar) {
-                    htmlBotoes += `
-                    <button type="button" class="btn btn-modern btn-success glyphicon glyphicon-ok" ng-click="salvarAlteracoesItem(item, $event)" ng-if="item.habilitarSalvar">
-                    <button type="button" class="btn btn-modern btn-danger glyphicon glyphicon-remove-circle" ng-click="cancelarAlteracoesItem(item, $event)" ng-if="item.habilitarSalvar">
-                `;
-                }
-
-                if (parametros.acoesItensConsulta != undefined) {
-                    angular.forEach(parametros.acoesItensConsulta, function (val, key) {
-                        if (val == "anexos") {
-                            htmlBotoes += `<input-botao parametros="${val}"></input-botao>`; // EGFuncoes.montarBotao(parametros.anexos);
-                        } else if (val == "diretiva" || (val.tipo != undefined && val.tipo == "diretiva")) {
-                            var nomeDiretiva = val.nomeDiretiva != undefined ? val.nomeDiretiva : key;
-                            nomeDiretiva = APIAjuFor.variavelParaDiretiva(nomeDiretiva);
-                            htmlBotoes += `<${nomeDiretiva} campo="${key}"></${nomeDiretiva}>`;
-                        } else if (val.tipo == "caixaSelecao") {
-                            htmlBotoes += `<span class="form-inline"><input type="checkbox" ng-model="item.${key}" ng-click="selecionarItemConsulta(key, item)"></span>`;
-                        } else {
-                            val["tipo"] = "button";
-                            htmlBotoes += `<input-botao parametros="${key}"></input-botao>`; // EGFuncoes.montarBotao(val);
-                        }
-                    });
-                }
-
-                htmlBotoes += `</div>`;
-                /*********************** FIM DOS BOTOES ******************************/
-
-                var filtro = "";
-                if (scope.estrutura.camposFiltroPersonalizado != undefined && Object.keys(scope.estrutura.camposFiltroPersonalizado).length > 0) {
-                    filtro = "{";
-                    var cont = 1;
-                    for (var i in scope.estrutura.camposFiltroPersonalizado) {
-                        filtro += i + ":" + scope.estrutura.raizModelo + "." + i;
-
-                        filtro += cont < Object.keys(scope.estrutura.camposFiltroPersonalizado).length ? "," : "";
-                        cont++;
-                    }
-                    filtro += "}";
-                    scope.filtroResultado = filtro;
-                } else {
-                    filtro = "filtroResultado";
-                    scope.filtroResultado = "";
-                }
-
-                var html = `
-            <div ng-if="tela == 'consulta'" class="listaConsulta">
-                <div class="itemConsulta col-xs-12 bg-danger text-center" ng-if="listaConsulta.length == 0 && tela != 'cadastro'">
-                    <h3>Nenhum Ítem Encontrado</h3>
-                </div>
-                <div class="conteudoBusca col-xs-12">
-                    <div class="table-responsive">
-                        <div class="table-container">
-                            <table class="table table-striped table-hover">
-                                <tbody>
-                                <tr ng-repeat="item in listaConsultaVisivel track by $index" ng-if="tela != 'cadastro'"
-                                    indice="{{$index}}" id="divItemConsulta_{{$index}}" class="itemConsulta">
-                                    <td colspan="100%" class="linhaListaConsulta">
-                                        <div class="row">
-                                            <div class="${classeLista}">
-                                                <div class="row inicioItem">`;
-
-                // Adicionar células de dados com sistema de grid responsivo
-                angular.forEach(camposMesclados, function (val, key) {
-                    if (val.tipo != "oculto") {
-                        // Calcular tamanho da coluna baseado no valor md do campo
-                        var tamanhoColuna = val.md || 12; // Padrão: 12 colunas (largura total)
-                        var classeColuna = `col-xs-12 col-md-${tamanhoColuna}`;
-
-                        html += `<div class="${classeColuna}">`;
-
-                        if (val.tipo == "caixaSelecao") {
-                            html += `<monta-html campo="selecionado"></monta-html>`;
-                        } else if (val.tipo == "imagem") {
-                            html += `<img ng-src="{{item.${key}}}" class="img-responsive" style="max-height:120px !important" imagem-dinamica>`;
-                        } else if (val == "diretiva") {
-                            var nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
-                            html += `<${nomeDiretiva}></${nomeDiretiva}>`;
-                        } else if (val.tipo == "select") {
-                            html += `<monta-html campo="${key}"></monta-html>`;
-                        } else if (val.tipo == "ordenacaoConsulta") {
-                            html += `<ordenacao-consulta campo="${key}"></ordenacao-consulta>`;
-                        } else if (val.habilitarEdicao != undefined && val.habilitarEdicao) {
-                            html += `<input class="form-control input-xs" type="text" ng-model="item.${key}" campo="${key}" 
-                                    ng-focus="aoEntrarInputConsulta(item, $event)" 
-                                    ng-keyup="alteracaoItemConsulta(item, $event)">`;
-                        } else {
-                            html += `<span>{{item.${key}}}</span>`;
-                        }
-
-                        html += `</div>`;
-                    }
-                });
-
-                html += `
-                                    </div>
-                                </div>
-                                <div class="${classeBotoes}">
-                                    ${htmlBotoes}
-                                </div>
-                            </div>`;
-
-                var textoDetalhes = parametros.textoDetalhesConsulta != undefined ? parametros.textoDetalhesConsulta : "Mais Informações";
-                html += `
-                        <div ng-if="item.exibirDetalhes" class="fundoDetalheConsulta">                        
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <h4 class="campoItemConsulta text-center fundobranco">${textoDetalhes}</h4>`;
-
-                var diretivaDetalhes = parametros.diretivaDetalhesConsulta != undefined ? parametros.diretivaDetalhesConsulta : "detalhes-item-consulta";
-                html += `<${diretivaDetalhes}></${diretivaDetalhes}>`;
-
-                if (parametros.anexos != undefined) {
-                    html += `<arquivos-anexos tela="detalhes" chave-array="key"></arquivos-anexos>`;
-                }
-
-                html += `                            
-                                    </div>
-                                </div>
-                                </div>
-                            </td>
-                        </tr>
-                            </tbody>
-                        </table>
-                        </div>
-                    </div>`;
-
-                if (parametros.acoesRodapeConsulta != undefined) {
-                    html += `<div class="col-xs-12><div class="row">`;
-                    angular.forEach(parametros.acoesRodapeConsulta, function (val, key) {
-                        html += `<input-botao parametros="${key}" ng-if="tela=='consulta'"></input-botao>`; // montarBotao(val);
-                    });
-                    html += `</div></div>`;
-                    html += "<hr>";
-                }
-                html += "</div>";
-                html += `
-                                 <!-- Indicador de carregamento -->
-                 <div class="lazy-loading-indicator text-center" ng-show="carregandoMaisItens" style="padding: 20px;">
-                     <i class="fa fa-spinner fa-spin"></i> Carregando mais itens...
-                 </div>
-                 
-                 <!-- Botões de controle -->
-                 <div class="text-center" ng-if="temMaisItens && !carregandoMaisItens" style="padding: 20px;">
-                     <button class="btn btn-primary" ng-click="carregarMaisItens()" style="margin-right: 10px;">
-                         <i class="fa fa-plus"></i> Carregar mais itens
-                     </button>
-                     <button class="btn btn-success" ng-click="carregarTodosItens()">
-                         <i class="fa fa-list"></i> Carregar todos os itens
-                     </button>
-                 </div>
-                 
-                 <!-- Informações de debug -->
-                 <div class="text-center" style="padding: 10px; background: #f8f9fa; border-top: 1px solid #dee2e6;">
-                     <small class="text-muted">
-                         Itens exibidos: {{listaConsultaVisivel.length}} | 
-                         Total na lista: {{listaConsultaCompleta.length}} | 
-                         Tem mais itens: {{temMaisItens}}
-                     </small>
-                 </div>
-                </div>
-            </div>`;               
-
+                var html = gerarHtmlTabela(camposMesclados, classeLista, classeBotoes, htmlBotoes, parametros);
                 elem.html(html);
                 $(elem).css("margin-top", "400px !important");
 
-                // SISTEMA DE LAZY LOADING OTIMIZADO
+                // ==================== SISTEMA DE LAZY LOADING ====================
+
+                // Inicializar variáveis de estado
                 scope.listaConsultaVisivel = [];
                 scope.carregandoMaisItens = false;
                 scope.temMaisItens = true;
-                scope.itensPorCarregamento = 15; // Carregar 15 itens por vez
+                scope.itensPorCarregamento = CONFIG.ITENS_POR_PAGINA;
                 scope.ultimaPaginaCarregada = 0;
-                scope.listaConsultaCompleta = []; // Lista completa original
+                scope.listaConsultaCompleta = [];
+                scope.listaConsultaFiltrada = [];
+                scope.filtroResultadoAtivo = "";
 
-                // Sistema de filtros por coluna - Funções movidas para cabecalhoConsulta.js
-                // scope.filtrosColuna e scope.aplicarFiltroColuna são definidos no cabecalhoConsulta.js
+                // ==================== WATCHERS OTIMIZADOS ====================
 
                 // Watch para detectar mudanças na lista original e reaplicar filtros
-                scope.$watch("listaConsultaCompleta", function (novaLista) {
-                    if (novaLista && novaLista.length > 0) {
-                        // Se há filtros ativos, reaplicar
-                        var temFiltrosAtivos = false;
-                        angular.forEach(scope.filtrosColuna, function (valor) {
-                            if (valor && valor.trim() !== "") {
-                                temFiltrosAtivos = true;
-                            }
+                var unwatchListaCompleta = scope.$watch("listaConsultaCompleta", function (novaLista) {
+                    if (novaLista && novaLista.length > 0 && scope.filtrosColuna) {
+                        var temFiltrosAtivos = Object.keys(scope.filtrosColuna).some(function (key) {
+                            return scope.filtrosColuna[key] && scope.filtrosColuna[key].trim() !== "";
                         });
 
                         if (temFiltrosAtivos) {
@@ -268,98 +110,103 @@ directivesPadrao.directive("listaConsultaTabela", [
                     }
                 });
 
-                // Variáveis para controle do filtro de resultado
-                scope.listaConsultaCompleta = []; // Lista completa original (fonte de dados)
-                scope.listaConsultaFiltrada = []; // Lista filtrada (resultado do filtro)
-                scope.filtroResultadoAtivo = "";
+                // Watch principal para listaConsulta com tratamento de erro
+                var unwatchListaConsulta = scope.$watch("listaConsulta", function (novaLista, listaAnterior) {
+                    try {
+                        if (estado.watchingUpdate) return;
 
-                // Variável para controle de debounce do filtro
-                var filtroTimeout = null;
+                        if (novaLista && novaLista.length > 0) {
+                            // Salvar como lista completa
+                            scope.listaConsultaCompleta = angular.copy(novaLista);
 
-                // Inicializar lista visível quando listaConsulta mudar
-                scope.$watch("listaConsulta", function (novaLista) {
-                    console.log("=== WATCH LISTA CONSULTA CHAMADO ===");
-                    console.log("novaLista.length:", novaLista ? novaLista.length : "null");
+                            // Inicializar lazy loading
+                            inicializarLazyLoading();
 
-                    if (novaLista && novaLista.length > 0) {
-                        console.log("=== INICIANDO LAZY LOADING ===");
-                        console.log("novaLista.length:", novaLista.length);
-
-                        // Salvar como lista completa
-                        scope.listaConsultaCompleta = angular.copy(novaLista);
-                        console.log("listaConsultaCompleta definida:", scope.listaConsultaCompleta.length);
-
-                        // Inicializar lazy loading
-                        scope.listaConsultaVisivel = [];
-                        scope.ultimaPaginaCarregada = 0;
-                        scope.temMaisItens = true;
-                        scope.carregandoMaisItens = false;
-
-                        // Carregar primeiros itens
-                        scope.carregarMaisItens();
-                    } else {
-                        console.log("Lista vazia ou null");
-                        scope.listaConsultaVisivel = [];
-                        scope.temMaisItens = false;
+                            // Carregar primeiros itens
+                            scope.carregarMaisItens();
+                        } else {
+                            limparListaVisivel();
+                        }
+                    } catch (error) {
+                        console.error("Erro no watch listaConsulta:", error);
+                        limparListaVisivel();
                     }
                 });
 
+                // Watch para filtroResultado com debounce otimizado
+                var unwatchFiltroResultado = scope.$watch("filtroResultado", function (novoFiltro, filtroAnterior) {
+                    if (estado.watchingUpdate) return;
+
+                    // Cancelar timeout anterior
+                    if (estado.filtroTimeout) {
+                        $timeout.cancel(estado.filtroTimeout);
+                    }
+
+                    // Aplicar filtro com debounce
+                    estado.filtroTimeout = $timeout(function () {
+                        try {
+                            scope.filtroResultadoAtivo = novoFiltro || "";
+                            scope.aplicarFiltroResultado();
+                        } catch (error) {
+                            console.error("Erro ao aplicar filtro:", error);
+                        }
+                    }, CONFIG.DEBOUNCE_FILTRO);
+                });
+
+                // ==================== FUNÇÕES DE FILTRO OTIMIZADAS ====================
+
                 // Função para filtrar itens da lista baseado no filtroResultado
                 scope.aplicarFiltroResultado = function () {
-                    if (!scope.listaConsultaCompleta || scope.listaConsultaCompleta.length === 0) {
-                        scope.listaConsultaFiltrada = [];
-                        // Evitar trigger do watch durante atualização interna
-                        watchingUpdate = true;
-                        scope.listaConsulta = [];
-                        setTimeout(function () {
-                            watchingUpdate = false;
-                        }, 0);
-                        return;
-                    }
+                    try {
+                        if (!scope.listaConsultaCompleta || scope.listaConsultaCompleta.length === 0) {
+                            scope.listaConsultaFiltrada = [];
+                            atualizarListaConsulta([]);
+                            return;
+                        }
 
-                    var filtro = scope.filtroResultadoAtivo;
-                    if (!filtro || filtro === "") {
-                        // Se não há filtro, usar lista completa
-                        scope.listaConsultaFiltrada = angular.copy(scope.listaConsultaCompleta);
-                    } else {
-                        // Aplicar filtro na lista completa
-                        scope.listaConsultaFiltrada = scope.listaConsultaCompleta.filter(function (item) {
-                            return scope.itemPassaNoFiltro(item, filtro);
-                        });
-                    }
+                        var filtro = scope.filtroResultadoAtivo;
+                        if (!filtro || filtro === "") {
+                            scope.listaConsultaFiltrada = angular.copy(scope.listaConsultaCompleta);
+                        } else {
+                            scope.listaConsultaFiltrada = scope.listaConsultaCompleta.filter(function (item) {
+                                return scope.itemPassaNoFiltro(item, filtro);
+                            });
+                        }
 
-                    // Atualizar listaConsulta com o resultado filtrado (evitar trigger do watch)
-                    watchingUpdate = true;
-                    scope.listaConsulta = angular.copy(scope.listaConsultaFiltrada);
-                    setTimeout(function () {
-                        watchingUpdate = false;
-                    }, 0);
+                        // Atualizar listaConsulta com o resultado filtrado
+                        atualizarListaConsulta(scope.listaConsultaFiltrada);
 
-                    // Resetar lista visível para mostrar itens filtrados
-                    scope.listaConsultaVisivel = [];
-                    scope.ultimaPaginaCarregada = 0;
-                    scope.temMaisItens = scope.listaConsultaFiltrada.length > 0;
+                        // Resetar lista visível para mostrar itens filtrados
+                        inicializarLazyLoading();
 
-                    // Carregar primeiros itens imediatamente se há dados
-                    if (scope.listaConsultaFiltrada.length > 0) {
-                        scope.ultimaPaginaCarregada = 1;
-                        scope.$evalAsync(function () {
-                            scope.carregarDaListaAtual();
-                        });
+                        // Carregar primeiros itens imediatamente se há dados
+                        if (scope.listaConsultaFiltrada.length > 0) {
+                            scope.ultimaPaginaCarregada = 1;
+                            scope.$evalAsync(function () {
+                                scope.carregarDaListaAtual();
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Erro ao aplicar filtro resultado:", error);
                     }
                 };
 
-                // Função para verificar se um item passa no filtro
+                // Função para verificar se um item passa no filtro (otimizada)
                 scope.itemPassaNoFiltro = function (item, filtro) {
                     if (!filtro || filtro === "") return true;
 
                     var filtroLower = filtro.toLowerCase();
 
-                    // Buscar em todas as propriedades do item
-                    for (var prop in item) {
-                        if (item.hasOwnProperty(prop) && item[prop] !== null && item[prop] !== undefined) {
-                            var valor = item[prop].toString().toLowerCase();
-                            if (valor.indexOf(filtroLower) !== -1) {
+                    // Cache para propriedades do item
+                    var propriedades = Object.keys(item);
+
+                    for (var i = 0; i < propriedades.length; i++) {
+                        var prop = propriedades[i];
+                        var valor = item[prop];
+
+                        if (valor !== null && valor !== undefined) {
+                            var valorStr = String(valor).toLowerCase();
+                            if (valorStr.indexOf(filtroLower) !== -1) {
                                 return true;
                             }
                         }
@@ -367,173 +214,371 @@ directivesPadrao.directive("listaConsultaTabela", [
                     return false;
                 };
 
-                // Função para aplicar filtro de forma imediata (sem debounce)
+                // Função para aplicar filtro de forma imediata
                 scope.aplicarFiltroImediato = function (filtro) {
-                    scope.filtroResultadoAtivo = filtro || "";
-
-                    // Cancelar timeout pendente
-                    if (filtroTimeout) {
-                        clearTimeout(filtroTimeout);
-                        filtroTimeout = null;
+                    if (estado.filtroTimeout) {
+                        $timeout.cancel(estado.filtroTimeout);
                     }
 
+                    scope.filtroResultadoAtivo = filtro || "";
                     scope.aplicarFiltroResultado();
                 };
 
                 // Função para limpar o filtro
                 scope.limparFiltroResultado = function () {
-                    // Cancelar timeout pendente
-                    if (filtroTimeout) {
-                        clearTimeout(filtroTimeout);
-                        filtroTimeout = null;
+                    if (estado.filtroTimeout) {
+                        $timeout.cancel(estado.filtroTimeout);
                     }
 
-                    // Limpar o campo visual diretamente
-                    $("#filtro_resultado").val("");
+                    // Limpar o campo visual
+                    var campoFiltro = document.getElementById("filtro_resultado");
+                    if (campoFiltro) {
+                        campoFiltro.value = "";
+                    }
 
                     // Limpar as variáveis do scope
                     scope.filtroResultado = "";
                     scope.filtroResultadoAtivo = "";
-
-                    // Aplicar a limpeza do filtro
                     scope.aplicarFiltroResultado();
-
-                    // Forçar atualização do Angular se necessário
-                    if (!scope.$$phase && !scope.$root.$$phase) {
-                        scope.$apply();
-                    }
                 };
 
-                // Watch para alterações no filtroResultado com debounce
-                scope.$watch("filtroResultado", function (novoFiltro, filtroAnterior) {
-                    // Cancelar timeout anterior se existir
-                    if (filtroTimeout) {
-                        clearTimeout(filtroTimeout);
-                    }
-
-                    // Aplicar filtro com debounce para evitar execuções desnecessárias
-                    filtroTimeout = setTimeout(function () {
-                        scope.$apply(function () {
-                            scope.filtroResultadoAtivo = novoFiltro || "";
-                            scope.aplicarFiltroResultado();
-                        });
-                        filtroTimeout = null;
-                    }, 300); // 300ms de debounce
-                });
-
-                // Watch adicional sem debounce para detectar mudanças muito rápidas
-                var ultimoFiltroAplicado = "";
-                scope.$watch("filtroResultado", function (novoFiltro) {
-                    // Se o filtro mudou muito rápido e ainda não foi aplicado
-                    if (novoFiltro !== ultimoFiltroAplicado && filtroTimeout) {
-                        ultimoFiltroAplicado = novoFiltro;
-
-                        // Para strings muito curtas ou vazias, aplicar imediatamente
-                        if (!novoFiltro || novoFiltro.length <= 2) {
-                            clearTimeout(filtroTimeout);
-                            scope.aplicarFiltroImediato(novoFiltro);
-                            filtroTimeout = null;
-                        }
-                    }
-                });
-
-                // FUNÇÕES DE LAZY LOADING OTIMIZADAS
+                // ==================== FUNÇÕES DE LAZY LOADING OTIMIZADAS ====================
 
                 // Função para carregar mais itens
                 scope.carregarMaisItens = function () {
-                    if (scope.carregandoMaisItens || !scope.temMaisItens) {
-                        console.log("Retornando - já carregando ou não tem mais itens");
+                    if (estado.carregando || !scope.temMaisItens) {
                         return;
                     }
 
                     // Verificar se já carregamos todos os itens
                     if (scope.listaConsultaVisivel.length >= scope.listaConsultaCompleta.length) {
-                        console.log("Todos os itens já foram carregados");
                         scope.temMaisItens = false;
                         return;
                     }
 
+                    estado.carregando = true;
                     scope.carregandoMaisItens = true;
-                    console.log("Iniciando carregamento de mais itens");
 
-                    // Simular delay de carregamento (pode ser removido em produção)
-                    setTimeout(function () {
+                    $timeout(function () {
                         scope.carregarDaListaAtual();
-                    }, 200);
+                    }, CONFIG.TIMEOUT_CARREGAMENTO);
                 };
 
                 // Função para carregar dados da lista atual
                 scope.carregarDaListaAtual = function () {
-                    // Usar sempre listaConsultaCompleta como fonte
-                    var listaParaUsar = scope.listaConsultaCompleta || [];
+                    try {
+                        var listaParaUsar = scope.listaConsultaCompleta || [];
 
-                    if (listaParaUsar && listaParaUsar.length > 0) {
-                        // Calcular quantos itens já foram carregados
-                        var itensJaCarregados = scope.listaConsultaVisivel.length;
+                        if (listaParaUsar && listaParaUsar.length > 0) {
+                            var itensJaCarregados = scope.listaConsultaVisivel.length;
+                            var itensRestantes = listaParaUsar.length - itensJaCarregados;
+                            var itensParaCarregar = Math.min(scope.itensPorCarregamento, itensRestantes);
 
-                        // Calcular quantos itens ainda faltam carregar
-                        var itensRestantes = listaParaUsar.length - itensJaCarregados;
-
-                        // Determinar quantos itens carregar nesta vez
-                        var itensParaCarregar = Math.min(scope.itensPorCarregamento, itensRestantes);
-
-                        if (itensParaCarregar > 0) {
-                            // Pegar os próximos itens da lista completa
-                            var novosItens = listaParaUsar.slice(itensJaCarregados, itensJaCarregados + itensParaCarregar);
-
-                            // Adicionar novos itens à lista visível
-                            scope.listaConsultaVisivel = scope.listaConsultaVisivel.concat(novosItens);
-                            scope.temMaisItens = itensJaCarregados + itensParaCarregar < listaParaUsar.length;
+                            if (itensParaCarregar > 0) {
+                                var novosItens = listaParaUsar.slice(itensJaCarregados, itensJaCarregados + itensParaCarregar);
+                                scope.listaConsultaVisivel = scope.listaConsultaVisivel.concat(novosItens);
+                                scope.temMaisItens = itensJaCarregados + itensParaCarregar < listaParaUsar.length;
+                            } else {
+                                scope.temMaisItens = false;
+                            }
                         } else {
-                            scope.temMaisItens = false;
-                            console.log("Nenhum item novo para carregar");
+                            limparListaVisivel();
                         }
-                    } else {
-                        scope.listaConsultaVisivel = [];
-                        scope.temMaisItens = false;
-                        console.log("Lista vazia");
-                    }
+                    } catch (error) {
+                        console.error("Erro ao carregar dados da lista:", error);
+                        limparListaVisivel();
+                    } finally {
+                        estado.carregando = false;
+                        scope.carregandoMaisItens = false;
 
-                    scope.carregandoMaisItens = false;
-
-                    // Aplicar escopo apenas se não estamos dentro de um digest
-                    if (!scope.$$phase && !scope.$root.$$phase) {
-                        scope.$apply();
+                        if (!scope.$$phase && !scope.$root.$$phase) {
+                            scope.$apply();
+                        }
                     }
                 };
 
                 // Função para carregar todos os itens de uma vez
                 scope.carregarTodosItens = function () {
-                    console.log("=== carregarTodosItens chamado ===");
-                    scope.listaConsultaVisivel = angular.copy(scope.listaConsultaCompleta);
-                    scope.temMaisItens = false;
-                    scope.carregandoMaisItens = false;
-                    console.log("Todos os itens carregados:", scope.listaConsultaVisivel.length);
+                    try {
+                        scope.listaConsultaVisivel = angular.copy(scope.listaConsultaCompleta);
+                        scope.temMaisItens = false;
+                        scope.carregandoMaisItens = false;
+                    } catch (error) {
+                        console.error("Erro ao carregar todos os itens:", error);
+                    }
                 };
 
-                // Configurar scroll infinito
-                setTimeout(function () {
-                    var scrollTimeout = null;
+                // ==================== FUNÇÕES AUXILIARES ====================
 
-                    // Usar scroll da window para detectar quando chegar ao final
-                    $(window).on("scroll", function () {
-                        // Cancelar timeout anterior para evitar múltiplas chamadas
-                        if (scrollTimeout) {
-                            clearTimeout(scrollTimeout);
+                function inicializarLazyLoading() {
+                    scope.listaConsultaVisivel = [];
+                    scope.ultimaPaginaCarregada = 0;
+                    scope.temMaisItens = true;
+                    scope.carregandoMaisItens = false;
+                }
+
+                function limparListaVisivel() {
+                    scope.listaConsultaVisivel = [];
+                    scope.temMaisItens = false;
+                    scope.carregandoMaisItens = false;
+                }
+
+                function atualizarListaConsulta(novaLista) {
+                    estado.watchingUpdate = true;
+                    scope.listaConsulta = angular.copy(novaLista);
+                    $timeout(function () {
+                        estado.watchingUpdate = false;
+                    }, 0);
+                }
+
+                function configurarFiltro(estrutura) {
+                    if (estrutura.camposFiltroPersonalizado && Object.keys(estrutura.camposFiltroPersonalizado).length > 0) {
+                        var filtro = "{";
+                        var cont = 1;
+                        for (var i in estrutura.camposFiltroPersonalizado) {
+                            filtro += i + ":" + estrutura.raizModelo + "." + i;
+                            filtro += cont < Object.keys(estrutura.camposFiltroPersonalizado).length ? "," : "";
+                            cont++;
+                        }
+                        filtro += "}";
+                        return filtro;
+                    } else {
+                        return "";
+                    }
+                }
+
+                function gerarHtmlBotoes(parametros, habilitarSalvar) {
+                    var htmlBotoes = `<div class="col-acoes">`;
+
+                    // Botão detalhar
+                    if (
+                        (parametros.funcaoDetalhar == undefined || parametros.funcaoDetalhar != "desativada") &&
+                        (parametros.ocultarDetalhes == undefined || !parametros.ocultarDetalhes)
+                    ) {
+                        var funcaoDet = parametros.funcaoDetalhar != undefined ? parametros.funcaoDetalhar : "detalhar";
+                        htmlBotoes += `<button type="button" name="button" class="btn btn-modern btn-outline-secondary glyphicon"
+                    ng-class="{'glyphicon-plus' : !item.exibirDetalhes, 'glyphicon-minus':item.exibirDetalhes}" title="Ver Detalhes"  ng-click=${funcaoDet}(item)></button>`;
+                    }
+
+                    // Botão alterar
+                    var funcaoAlt = parametros.funcaoAlterar != undefined ? parametros.funcaoAlterar : "alterar";
+                    var textoBotaoAlterar = parametros.textoBotaoAlterar != undefined ? parametros.textoBotaoAlterar : "";
+                    var iconeBotaoAlterar =
+                        parametros.ocultarIconeBotaoAlterar == undefined || !parametros.ocultarIconeBotaoAlterar ? "glyphicon-pencil glyphicon" : "";
+                    var classesBotaoAlterar =
+                        parametros.classesBotaoAlterar == undefined || !parametros.classesBotaoAlterar
+                            ? "btn-modern btn-outline-primary"
+                            : parametros.classesBotaoAlterar;
+                    var ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar}"` : "";
+                    htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)" ${ocultarAlterar}>${textoBotaoAlterar}</button>`;
+
+                    // Botão excluir
+                    var funcaoExc = parametros.funcaoExcluir != undefined ? parametros.funcaoExcluir : "excluir";
+                    var ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir}"` : "";
+                    htmlBotoes += `<button type="button" class="btn btn-modern btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)" ${ocultarExcluir}></button>`;
+
+                    // Botões de salvar/cancelar
+                    if (habilitarSalvar) {
+                        htmlBotoes += `
+                        <button type="button" class="btn btn-modern btn-success glyphicon glyphicon-ok" ng-click="salvarAlteracoesItem(item, $event)" ng-if="item.habilitarSalvar">
+                        <button type="button" class="btn btn-modern btn-danger glyphicon glyphicon-remove-circle" ng-click="cancelarAlteracoesItem(item, $event)" ng-if="item.habilitarSalvar">
+                    `;
+                    }
+
+                    // Ações personalizadas
+                    if (parametros.acoesItensConsulta != undefined) {
+                        angular.forEach(parametros.acoesItensConsulta, function (val, key) {
+                            if (val == "anexos") {
+                                htmlBotoes += `<input-botao parametros="${val}"></input-botao>`;
+                            } else if (val == "diretiva" || (val.tipo != undefined && val.tipo == "diretiva")) {
+                                var nomeDiretiva = val.nomeDiretiva != undefined ? val.nomeDiretiva : key;
+                                nomeDiretiva = APIAjuFor.variavelParaDiretiva(nomeDiretiva);
+                                htmlBotoes += `<${nomeDiretiva} campo="${key}"></${nomeDiretiva}>`;
+                            } else if (val.tipo == "caixaSelecao") {
+                                htmlBotoes += `<span class="form-inline"><input type="checkbox" ng-model="item.${key}" ng-click="selecionarItemConsulta(key, item)"></span>`;
+                            } else {
+                                val["tipo"] = "button";
+                                htmlBotoes += `<input-botao parametros="${key}"></input-botao>`;
+                            }
+                        });
+                    }
+
+                    htmlBotoes += `</div>`;
+                    return htmlBotoes;
+                }
+
+                function gerarHtmlTabela(camposMesclados, classeLista, classeBotoes, htmlBotoes, parametros) {
+                    var html = `
+                <div ng-if="tela == 'consulta'" class="listaConsulta">
+                    <div class="itemConsulta col-xs-12 bg-danger text-center" ng-if="listaConsulta.length == 0 && tela != 'cadastro'">
+                        <h3>Nenhum Ítem Encontrado</h3>
+                    </div>
+                    <div class="conteudoBusca col-xs-12">
+                        
+                        <div class="table-responsive">
+                            <div class="table-container">
+                                <table class="table table-striped table-hover">
+                                    <tbody>
+                                    <tr ng-repeat="item in listaConsultaVisivel track by $index" ng-if="tela != 'cadastro'"
+                                        indice="{{$index}}" id="divItemConsulta_{{$index}}" class="itemConsulta">
+                                        <td colspan="100%" class="linhaListaConsulta">
+                                            <div class="row">
+                                                <div class="${classeLista}">
+                                                    <div class="row inicioItem">`;
+
+                    // Adicionar células de dados com sistema de grid responsivo
+                    angular.forEach(camposMesclados, function (val, key) {
+                        if (val.tipo != "oculto") {
+                            var tamanhoColuna = val.md || 12;
+                            var classeColuna = `col-xs-12 col-md-${tamanhoColuna}`;
+
+                            html += `<div class="${classeColuna}">`;
+
+                            if (val.tipo == "caixaSelecao") {
+                                html += `<monta-html campo="selecionado"></monta-html>`;
+                            } else if (val.tipo == "imagem") {
+                                html += `<img ng-src="{{item.${key}}}" class="img-responsive" style="max-height:120px !important" imagem-dinamica>`;
+                            } else if (val == "diretiva") {
+                                var nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
+                                html += `<${nomeDiretiva}></${nomeDiretiva}>`;
+                            } else if (val.tipo == "select") {
+                                html += `<monta-html campo="${key}"></monta-html>`;
+                            } else if (val.tipo == "ordenacaoConsulta") {
+                                html += `<ordenacao-consulta campo="${key}"></ordenacao-consulta>`;
+                            } else if (val.habilitarEdicao != undefined && val.habilitarEdicao) {
+                                html += `<input class="form-control input-xs" type="text" ng-model="item.${key}" campo="${key}" 
+                                        ng-focus="aoEntrarInputConsulta(item, $event)" 
+                                        ng-keyup="alteracaoItemConsulta(item, $event)">`;
+                            } else {
+                                html += `<span>{{item.${key}}}</span>`;
+                            }
+
+                            html += `</div>`;
+                        }
+                    });
+
+                    html += `
+                                        </div>
+                                    </div>
+                                    <div class="${classeBotoes}">
+                                        ${htmlBotoes}
+                                    </div>
+                                </div>`;
+
+                    var textoDetalhes = parametros.textoDetalhesConsulta != undefined ? parametros.textoDetalhesConsulta : "Mais Informações";
+                    html += `
+                            <div ng-if="item.exibirDetalhes" class="fundoDetalheConsulta">                        
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h4 class="campoItemConsulta text-center fundobranco">${textoDetalhes}</h4>`;
+
+                    var diretivaDetalhes = parametros.diretivaDetalhesConsulta != undefined ? parametros.diretivaDetalhesConsulta : "detalhes-item-consulta";
+                    html += `<${diretivaDetalhes}></${diretivaDetalhes}>`;
+
+                    if (parametros.anexos != undefined) {
+                        html += `<arquivos-anexos tela="detalhes" chave-array="key"></arquivos-anexos>`;
+                    }
+
+                    html += `                            
+                                        </div>
+                                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>`;
+
+                    if (parametros.acoesRodapeConsulta != undefined) {
+                        html += `<div class="col-xs-12><div class="row">`;
+                        angular.forEach(parametros.acoesRodapeConsulta, function (val, key) {
+                            html += `<input-botao parametros="${key}" ng-if="tela=='consulta'"></input-botao>`;
+                        });
+                        html += `</div></div>`;
+                        html += "<hr>";
+                    }
+
+                    html += "</div>";
+                    html += `
+                                     <!-- Indicador de carregamento -->
+                     <div class="lazy-loading-indicator text-center" ng-show="carregandoMaisItens" style="padding: 20px;">
+                         <i class="fa fa-spinner fa-spin"></i> Carregando mais itens...
+                     </div>
+                     
+                     <!-- Botões de controle -->
+                     <div class="text-center" ng-if="temMaisItens && !carregandoMaisItens" style="padding: 20px;">
+                         <button class="btn btn-primary" ng-click="carregarMaisItens()" style="margin-right: 10px;">
+                             <i class="fa fa-plus"></i> Carregar mais itens
+                         </button>
+                         <button class="btn btn-success" ng-click="carregarTodosItens()">
+                             <i class="fa fa-list"></i> Carregar todos os itens
+                         </button>
+                     </div>
+                     
+                     <!-- Informações de debug -->
+                     <div class="text-center" style="padding: 10px; background: #f8f9fa; border-top: 1px solid #dee2e6;">
+                         <small class="text-muted">
+                             Itens exibidos: {{listaConsultaVisivel.length}} | 
+                             Total na lista: {{listaConsultaCompleta.length}} | 
+                             Tem mais itens: {{temMaisItens}}
+                         </small>
+                     </div>
+                    </div>
+                </div>`;
+
+                    return html;
+                }
+
+                // ==================== CONFIGURAÇÃO DO SCROLL INFINITO ====================
+
+                $timeout(function () {
+                    estado.scrollListener = function () {
+                        if (estado.scrollTimeout) {
+                            clearTimeout(estado.scrollTimeout);
                         }
 
-                        scrollTimeout = setTimeout(function () {
+                        estado.scrollTimeout = setTimeout(function () {
                             if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
                                 if (!scope.carregandoMaisItens && scope.temMaisItens) {
-                                    console.log("=== SCROLL DETECTADO - Carregando mais itens ===");
                                     scope.$apply(function () {
                                         scope.carregarMaisItens();
                                     });
                                 }
                             }
-                        }, 100); // Debounce de 100ms
-                    });
+                        }, CONFIG.DEBOUNCE_SCROLL);
+                    };
+
+                    $(window).on("scroll", estado.scrollListener);
                 }, 500);
+
+                // ==================== LIMPEZA E DESTRUIÇÃO ====================
+
+                scope.$on("$destroy", function () {
+                    // Cancelar todos os timeouts
+                    if (estado.filtroTimeout) {
+                        $timeout.cancel(estado.filtroTimeout);
+                    }
+                    if (estado.scrollTimeout) {
+                        clearTimeout(estado.scrollTimeout);
+                    }
+
+                    // Remover listener de scroll
+                    if (estado.scrollListener) {
+                        $(window).off("scroll", estado.scrollListener);
+                    }
+
+                    // Remover watchers
+                    if (unwatchListaConsulta) {
+                        unwatchListaConsulta();
+                    }
+                    if (unwatchFiltroResultado) {
+                        unwatchFiltroResultado();
+                    }
+                    if (unwatchListaCompleta) {
+                        unwatchListaCompleta();
+                    }
+                });
 
                 $compile(elem.contents())(scope);
             },
@@ -545,7 +590,8 @@ directivesPadrao.directive("listaConsultaTabela", [
 directivesPadrao.directive("cabecalhoListaConsultaTabela", [
     "$compile",
     "FuncoesConsulta",
-    function ($compile, FuncoesConsulta) {
+    "$timeout",
+    function ($compile, FuncoesConsulta, $timeout) {
         return {
             restrict: "E",
             replace: true,
@@ -556,59 +602,191 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                     var parametros = scope.estrutura;
                     var html = gerarCabecalhoTabela(scope, parametros);
 
-                    // Adicionar funções de filtro ao escopo
-                    scope.filtrosColuna = {};
-                    var filtroColunaTimeout = null;
+                    // ==================== SISTEMA DE FILTROS MELHORADO ====================
 
-                    // Função para aplicar filtros por coluna
+                    // Estado dos filtros
+                    scope.filtrosColuna = {};
+                    scope.filtrosAtivos = {};
+                    scope.resultadosFiltrados = 0;
+                    scope.modoFiltro = "lazy"; // 'lazy' ou 'todos'
+
+                    var filtroColunaTimeout = null;
+                    var cacheFiltros = {};
+
+                    // Função para validar e normalizar valor de filtro
+                    function normalizarValorFiltro(valor) {
+                        if (valor === null || valor === undefined) return "";
+                        return String(valor).trim().toLowerCase();
+                    }
+
+                    // Função para verificar se um item passa em um filtro específico
+                    function itemPassaNoFiltro(item, coluna, valorFiltro) {
+                        var valorItem = item[coluna];
+
+                        // Tratar diferentes tipos de dados
+                        if (valorItem === null || valorItem === undefined) {
+                            return valorFiltro === ""; // Aceitar se filtro estiver vazio
+                        }
+
+                        // Se o valor é um objeto ou array, tentar converter para string
+                        if (typeof valorItem === "object") {
+                            try {
+                                valorItem = JSON.stringify(valorItem);
+                            } catch (e) {
+                                valorItem = String(valorItem);
+                            }
+                        }
+
+                        var valorItemStr = normalizarValorFiltro(valorItem);
+                        var valorFiltroStr = normalizarValorFiltro(valorFiltro);
+
+                        // Busca por substring (case-insensitive)
+                        return valorItemStr.indexOf(valorFiltroStr) !== -1;
+                    }
+
+                    // Função para aplicar filtros com cache
                     scope.aplicarFiltroColuna = function () {
                         // Cancelar timeout anterior se existir
                         if (filtroColunaTimeout) {
-                            clearTimeout(filtroColunaTimeout);
+                            $timeout.cancel(filtroColunaTimeout);
                         }
 
-                        // Aplicar filtro com debounce
-                        filtroColunaTimeout = setTimeout(function () {
-                            // Usar sempre listaConsultaCompleta como base
-                            var listaBase = scope.listaConsultaCompleta || scope.listaConsulta || [];
-
-                            console.log("=== aplicarFiltroColuna ===");
-                            console.log("listaBase.length:", listaBase.length);
-
-                            var listaFiltrada = angular.copy(listaBase);
-
-                            // Aplicar filtros para cada coluna
-                            angular.forEach(scope.filtrosColuna, function (valorFiltro, nomeColuna) {
-                                if (valorFiltro && valorFiltro.trim() !== "") {
-                                    listaFiltrada = listaFiltrada.filter(function (item) {
-                                        var valorItem = item[nomeColuna];
-                                        if (valorItem === null || valorItem === undefined) {
-                                            return false;
-                                        }
-                                        // Converter para string para comparação
-                                        var valorItemStr = String(valorItem).toLowerCase();
-                                        var valorFiltroStr = valorFiltro.toLowerCase();
-                                        return valorItemStr.indexOf(valorFiltroStr) !== -1;
-                                    });
+                        // Aplicar filtro com debounce otimizado
+                        filtroColunaTimeout = $timeout(function () {
+                            try {
+                                // Usar sempre listaConsultaCompleta como base
+                                var listaBase = scope.listaConsultaCompleta || scope.listaConsulta || [];
+                                if (!listaBase || listaBase.length === 0) {
+                                    scope.listaConsultaVisivel = [];
+                                    scope.resultadosFiltrados = 0;
+                                    return;
                                 }
-                            });
 
-                            console.log("listaFiltrada.length:", listaFiltrada.length);
+                                // Verificar se há filtros ativos
+                                var filtrosAtivos = {};
+                                var temFiltrosAtivos = false;
 
-                            // Para filtros, mostrar todos os itens filtrados
-                            scope.$apply(function () {
-                                scope.listaConsultaVisivel = listaFiltrada;
-                                scope.temMaisItens = false; // Não há mais itens para carregar quando filtrado
-                            });
-                        }, 300); // Debounce de 300ms
+                                angular.forEach(scope.filtrosColuna, function (valorFiltro, nomeColuna) {
+                                    var valorNormalizado = normalizarValorFiltro(valorFiltro);
+                                    if (valorNormalizado !== "") {
+                                        filtrosAtivos[nomeColuna] = valorNormalizado;
+                                        temFiltrosAtivos = true;
+                                    }
+                                });
+
+                                // Atualizar estado dos filtros ativos
+                                scope.filtrosAtivos = filtrosAtivos;
+                                scope.modoFiltro = temFiltrosAtivos ? "todos" : "lazy";
+
+                                var listaFiltrada;
+
+                                if (temFiltrosAtivos) {
+                                    // Aplicar filtros
+                                    listaFiltrada = listaBase.filter(function (item) {
+                                        // Item deve passar em TODOS os filtros ativos
+                                        for (var coluna in filtrosAtivos) {
+                                            if (!itemPassaNoFiltro(item, coluna, filtrosAtivos[coluna])) {
+                                                return false;
+                                            }
+                                        }
+                                        return true;
+                                    });
+                                } else {
+                                    // Sem filtros, usar lista original
+                                    listaFiltrada = listaBase;
+                                }
+
+                                // Atualizar resultados
+                                scope.resultadosFiltrados = listaFiltrada.length;
+
+                                if (scope.modoFiltro === "todos") {
+                                    // Modo filtro: mostrar todos os resultados
+                                    scope.listaConsultaVisivel = listaFiltrada;
+                                    scope.temMaisItens = false;
+                                } else {
+                                    // Modo lazy: aplicar lazy loading
+                                    scope.listaConsultaFiltrada = listaFiltrada;
+                                    // Inicializar lazy loading diretamente
+                                    scope.listaConsultaVisivel = [];
+                                    scope.ultimaPaginaCarregada = 0;
+                                    scope.temMaisItens = true;
+                                    scope.carregandoMaisItens = false;
+                                    scope.carregarMaisItens();
+                                }
+
+                                // Forçar atualização da view
+                                if (!scope.$$phase && !scope.$root.$$phase) {
+                                    scope.$apply();
+                                }
+                            } catch (error) {
+                                console.error("Erro ao aplicar filtro coluna:", error);
+                                scope.resultadosFiltrados = 0;
+                            }
+                        }, 200); // Debounce reduzido para 200ms para melhor responsividade
                     };
 
                     // Função para limpar filtros
                     scope.limparFiltrosLocal = function () {
-                        scope.filtrosColuna = {};
-                        scope.listaConsultaVisivel = scope.listaConsultaCompleta || scope.listaConsulta || [];
-                        scope.temMaisItens = scope.listaConsultaCompleta && scope.listaConsultaCompleta.length > scope.listaConsultaVisivel.length;
+                        try {
+                            // Limpar todos os campos de filtro
+                            scope.filtrosColuna = {};
+                            scope.filtrosAtivos = {};
+                            scope.resultadosFiltrados = 0;
+                            scope.modoFiltro = "lazy";
+
+                            // Limpar campos visuais
+                            var inputs = elem.find('input[ng-model^="filtrosColuna"]');
+                            inputs.val("");
+
+                            // Restaurar lista completa e lazy loading
+                            if (scope.listaConsultaCompleta && scope.listaConsultaCompleta.length > 0) {
+                                scope.listaConsultaVisivel = [];
+                                scope.listaConsultaFiltrada = scope.listaConsultaCompleta;
+                                scope.temMaisItens = true;
+                                scope.carregandoMaisItens = false;
+                                scope.ultimaPaginaCarregada = 0;
+
+                                // Carregar primeiros itens
+                                scope.carregarMaisItens();
+                            }
+                        } catch (error) {
+                            console.error("Erro ao limpar filtros:", error);
+                        }
                     };
+
+                    // Função para alternar exibição de filtros
+                    scope.alterarExibicaoFiltros = function () {
+                        scope.exibirFiltros = !scope.exibirFiltros;
+                    };
+
+                    // Função para obter contador de filtros ativos
+                    scope.getContadorFiltrosAtivos = function () {
+                        var contador = 0;
+                        angular.forEach(scope.filtrosAtivos, function () {
+                            contador++;
+                        });
+                        return contador;
+                    };
+
+                    // Watch para detectar mudanças na lista completa
+                    var unwatchListaCompleta = scope.$watch("listaConsultaCompleta", function (novaLista) {
+                        if (novaLista && novaLista.length > 0) {
+                            // Reaplicar filtros se houver filtros ativos
+                            if (scope.getContadorFiltrosAtivos() > 0) {
+                                scope.aplicarFiltroColuna();
+                            }
+                        }
+                    });
+
+                    // Cleanup
+                    scope.$on("$destroy", function () {
+                        if (filtroColunaTimeout) {
+                            $timeout.cancel(filtroColunaTimeout);
+                        }
+                        if (unwatchListaCompleta) {
+                            unwatchListaCompleta();
+                        }
+                    });
 
                     elem.html(html);
                     $compile(elem.contents())(scope);
@@ -624,7 +802,7 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                     var camposMesclados = FuncoesConsulta.mesclarCampos(parametros.listaConsulta, parametros.campos);
 
                     var htmlCabecalho = `
-                    <div class="col-xs-12" ng-if="tela=='consulta'">
+                    <div class="col-xs-12 linhaFiltrosListaConsultaTabela" ng-if="tela=='consulta'">
                         <div class="table-responsive">
                             <div class="table-container">
                                 <table class="table table-striped table-hover">
@@ -638,11 +816,9 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                     // Criar cabeçalhos baseados nos campos mesclados
                     angular.forEach(camposMesclados, function (val, key) {
                         if (val.tipo != "oculto") {
-                            // Calcular tamanho da coluna baseado no valor md do campo
-                            var tamanhoColuna = val.md || 12; // Padrão: 12 colunas (largura total)
+                            var tamanhoColuna = val.md || 12;
                             var classeColuna = `col-xs-12 col-md-${tamanhoColuna}`;
 
-                            // Verificar se o campo tem texto definido, caso contrário usar o key
                             var texto = "";
                             if (val.texto != undefined && val.texto !== null && val.texto !== "") {
                                 texto = val.texto;
@@ -676,11 +852,9 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                     // Criar filtros baseados nos campos mesclados
                     angular.forEach(camposMesclados, function (val, key) {
                         if (val.tipo != "oculto") {
-                            // Calcular tamanho da coluna baseado no valor md do campo
-                            var tamanhoColuna = val.md || 12; // Padrão: 12 colunas (largura total)
+                            var tamanhoColuna = val.md || 12;
                             var classeColuna = `col-xs-12 col-md-${tamanhoColuna}`;
 
-                            // Verificar se o campo tem texto definido para o placeholder
                             var textoPlaceholder = "";
                             if (val.texto != undefined && val.texto !== null && val.texto !== "") {
                                 textoPlaceholder = val.texto;
@@ -691,7 +865,7 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                             }
 
                             htmlCabecalho += `<div class="${classeColuna}">`;
-                            htmlCabecalho += `<input type="text" class="form-control input-sm" placeholder="Filtrar ${textoPlaceholder}" ng-model="filtrosColuna['${key}']" ng-change="aplicarFiltroColuna()">`;
+                            htmlCabecalho += `<input type="text" class="form-control input-sm" placeholder="Filtrar ${textoPlaceholder}" ng-model="filtrosColuna['${key}']" ng-change="aplicarFiltroColuna()" ng-class="{'has-filters': filtrosAtivos['${key}']}">`;
                             htmlCabecalho += `</div>`;
                         }
                     });
@@ -700,10 +874,16 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                                         </div>
                                                     </div>
                                                     <div class="${classeBotoes}">
-                                                        <button class="btn btn-xs btn-warning" ng-click="limparFiltrosLocal()" title="Limpar filtros" style="margin-left: 5px; padding: 2px 4px;">
-                                                            <i class="fa fa-times"></i>
-                                                        </button>
-                                                    </div>
+                                                        <div class="btn-group" role="group">
+                                                            <button class="btn btn-xs btn-warning" ng-click="limparFiltrosLocal()" title="Limpar filtros" ng-disabled="getContadorFiltrosAtivos() == 0">
+                                                                <i class="fa fa-eraser"></i> Limpar
+                                                            </button>
+                                                            <button type="button" class="btn btn-xs btn-info" ng-click="alterarExibicaoFiltros()" title="Alternar exibição de filtros">
+                                                                <i class="fa fa-search"></i> Busca
+                                                            </button>
+                                                        </div>
+
+                                                        </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -711,9 +891,69 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                 </table>
                             </div>
                         </div>
+                        <!-- Linha de resumo da lista -->
+                        
+                            <div class="col-xs-12">
+                                <div class="pull-left font12">
+                                    <strong>Total de itens:</strong> {{listaConsultaCompleta ? listaConsultaCompleta.length : 0}}
+                                </div>
+                                <div class="pull-right font12" >
+                                    <strong>Exibindo:</strong> {{listaConsultaVisivel ? listaConsultaVisivel.length : 0}} itens
+                                    <span ng-if="getContadorFiltrosAtivos && getContadorFiltrosAtivos() > 0" style="margin-left: 15px;">
+                                        <i class="fa fa-filter text-success"></i> 
+                                        <strong>{{getContadorFiltrosAtivos()}} filtro(s) ativo(s)</strong>
+                                    </span>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        
                     </div>`;
 
                     return htmlCabecalho;
+                }
+
+                // Adicionar CSS para filtros ativos
+                var css = `
+                    <style>
+                        .has-filters {
+                            border-color: #5cb85c !important;
+                            box-shadow: 0 0 5px rgba(92, 184, 92, 0.3) !important;
+                        }
+                        
+                        .btn-group .btn {
+                            margin-right: 2px;
+                        }
+                        
+                        .btn-group .btn:last-child {
+                            margin-right: 0;
+                        }
+                        
+                        .resumo-lista {
+                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                            border: 1px solid #dee2e6;
+                            border-radius: 5px;
+                            padding: 10px 15px;
+                            margin-bottom: 15px;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        }
+                        
+                        .resumo-lista .pull-left,
+                        .resumo-lista .pull-right {
+                            font-size: 13px;
+                        }
+                        
+                        .resumo-lista .text-success {
+                            color: #28a745 !important;
+                        }
+                    </style>
+                `;
+
+                // Inserir CSS no head se ainda não existir
+                if (!document.getElementById("filtros-css")) {
+                    var styleElement = document.createElement("div");
+                    styleElement.innerHTML = css;
+                    styleElement.id = "filtros-css";
+                    document.head.appendChild(styleElement);
                 }
             },
         };
