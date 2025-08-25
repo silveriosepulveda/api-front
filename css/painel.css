@@ -1,3 +1,8 @@
+hr{
+    margin-top: 5px !important;
+    margin-bottom: 0 !important;
+}
+
 html-detalhe div {
     white-space: pre-wrap;
 }
@@ -64,7 +69,7 @@ div.conteudoBusca div.row.itemConsulta{
 
 @media screen and (max-width: 2200px) {
     a, a>span, span, label, select, option, .form-control, div, .ui-autocomplete-input, .btn {
-        font-size: 16px!important;
+        font-size: 14px!important;
     }
     .divItemCadastro {
         min-height: 80px !important;
@@ -73,10 +78,10 @@ div.conteudoBusca div.row.itemConsulta{
 
 @media screen and (max-width: 1440px) {
     a, a>span, span, label, option, .form-control, div, .ui-autocomplete-input, .btn {
-        font-size: 14px!important;
+        font-size: 12px!important;
     }
     select {
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 
@@ -122,9 +127,7 @@ div.conteudoBusca div.row.itemConsulta{
     z-index: 999;
 }
 
-.corpo {
-    margin-top: 50px;
-}
+
 
 .oculto {
     display: none!important;

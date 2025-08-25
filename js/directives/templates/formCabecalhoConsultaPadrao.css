@@ -8,6 +8,7 @@
 }
 
 
+
 /* Estilos para a diretiva listaConsultaTabela */
 /* .cabecalhoConsulta {
     position: fixed;
@@ -20,8 +21,14 @@
     margin-top: 100px;
 } */
 
+.linhaListaConsulta{
+    padding-top: 1px !important;
+    margin-bottom: 1px !important;
+    height: 10px !important;
+}
+
 .table-responsive {
-    margin-top: 20px;
+    /* margin-top: 20px; */
     border-radius: 12px;
     overflow: visible; /* Permitir que o conteúdo seja visível */
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -30,12 +37,14 @@
     display: block; /* Mudança para block em vez de flex */
     width: 100%;
     max-width: 100%;
+    float: left;
 }
 
 .table-container {
     /* Removidas limitações de flex e overflow */
     position: relative;
     width: 100%;
+    margin-top: 50px !important;
 }
 
 .table {
@@ -553,6 +562,10 @@
     margin-right: 10px;
     font-size: 16px;
     color: #667eea;
+}
+
+tr.itemConsulta{
+    max-height: 15px !important;
 }
 
 /* Estilos para mensagem de nenhum item encontrado */

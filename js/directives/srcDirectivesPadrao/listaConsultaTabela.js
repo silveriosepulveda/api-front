@@ -408,26 +408,8 @@ directivesPadrao.directive("listaConsultaTabela", [
                     return htmlBotoes;
                 }
 
-                function gerarHtmlTabela(camposMesclados, classeLista, classeBotoes, htmlBotoes, parametros) {
-                    var html = `
-                <div ng-if="tela == 'consulta'" class="listaConsulta">
-                    <div class="itemConsulta col-xs-12 bg-danger text-center" ng-if="listaConsulta.length == 0 && tela != 'cadastro'">
-                        <h3>Nenhum Ítem Encontrado</h3>
-                    </div>
-                    <div class="conteudoBusca col-xs-12">
-                        
-                        <div class="table-responsive">
-                            <div class="table-container">
-                                <table class="table table-striped table-hover">
-                                    <tbody>
-                                    <tr ng-repeat="item in listaConsultaVisivel track by $index" ng-if="tela != 'cadastro'"
-                                        indice="{{$index}}" id="divItemConsulta_{{$index}}" class="itemConsulta">
-                                        <td colspan="100%" class="linhaListaConsulta">
-                                            <div class="row">
-                                                <div class="${classeLista}">
-                                                    <div class="row inicioItem">`;
-
-                    // Adicionar células de dados com sistema de grid responsivo
+                function gerarHtmlItemConsulta(camposMesclados) {
+                    var html = "";
                     angular.forEach(camposMesclados, function (val, key) {
                         if (val.tipo != "oculto") {
                             var tamanhoColuna = val.md || 12;
@@ -457,52 +439,65 @@ directivesPadrao.directive("listaConsultaTabela", [
                             html += `</div>`;
                         }
                     });
+                    return html;
+                }
 
-                    html += `
-                                        </div>
-                                    </div>
-                                    <div class="${classeBotoes}">
-                                        ${htmlBotoes}
-                                    </div>
-                                </div>`;
-
+                function gerarHtmlTabela(camposMesclados, classeLista, classeBotoes, htmlBotoes, parametros) {
+                    const htmlItemConsulta = gerarHtmlItemConsulta(camposMesclados);
                     var textoDetalhes = parametros.textoDetalhesConsulta != undefined ? parametros.textoDetalhesConsulta : "Mais Informações";
-                    html += `
-                            <div ng-if="item.exibirDetalhes" class="fundoDetalheConsulta">                        
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <h4 class="campoItemConsulta text-center fundobranco">${textoDetalhes}</h4>`;
-
                     var diretivaDetalhes = parametros.diretivaDetalhesConsulta != undefined ? parametros.diretivaDetalhesConsulta : "detalhes-item-consulta";
-                    html += `<${diretivaDetalhes}></${diretivaDetalhes}>`;
+                    var htmlAnexos = parametros.anexos != undefined ? `<arquivos-anexos tela="detalhes" chave-array="key"></arquivos-anexos>` : "";
 
-                    if (parametros.anexos != undefined) {
-                        html += `<arquivos-anexos tela="detalhes" chave-array="key"></arquivos-anexos>`;
-                    }
-
-                    html += `                            
-                                        </div>
-                                    </div>
-                                    </div>
-                                </td>
-                            </tr>
-                                </tbody>
-                            </table>
-                            </div>
-                        </div>`;
-
+                    var htmlAcoesRodapeConsulta = "";
                     if (parametros.acoesRodapeConsulta != undefined) {
-                        html += `<div class="col-xs-12><div class="row">`;
+                        htmlAcoesRodapeConsulta += `<div class="col-xs-12><div class="row">`;
                         angular.forEach(parametros.acoesRodapeConsulta, function (val, key) {
-                            html += `<input-botao parametros="${key}" ng-if="tela=='consulta'"></input-botao>`;
+                            htmlAcoesRodapeConsulta += `<input-botao parametros="${key}" ng-if="tela=='consulta'"></input-botao>`;
                         });
-                        html += `</div></div>`;
-                        html += "<hr>";
+                        htmlAcoesRodapeConsulta += `</div></div>`;
+                        htmlAcoesRodapeConsulta += "<hr>";
                     }
 
-                    html += "</div>";
-                    html += `
-                                     <!-- Indicador de carregamento -->
+                    var html = `
+                <div ng-if="tela == 'consulta'" class="listaConsulta row">
+                    <div class="itemConsulta col-xs-12 bg-danger text-center" ng-if="listaConsulta.length == 0 && tela != 'cadastro'">
+                        <h3>Nenhum Ítem Encontrado</h3>
+                    </div>
+                    <div class="conteudoBusca col-xs-12">                        
+                        <div class="table-responsive">
+                            <div class="table-container">
+                                <table class="table table-striped table-hover">
+                                    <tbody>
+                                    <tr ng-repeat="item in listaConsultaVisivel track by $index" ng-if="tela != 'cadastro'" indice="{{$index}}" id="divItemConsulta_{{$index}}" class="itemConsulta">
+                                        <td colspan="100%" class="linhaListaConsulta row">
+                                            <div class="row">
+                                                <div class="${classeLista}">
+                                                    <div class="row inicioItem">
+                                                        ${htmlItemConsulta}
+                                                    </div>
+                                                </div>
+                                                <div class="${classeBotoes}">
+                                                    ${htmlBotoes}
+                                                </div>
+                                            </div>
+                                            <div ng-if="item.exibirDetalhes" class="fundoDetalheConsulta">                        
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <h4 class="campoItemConsulta text-center fundobranco">${textoDetalhes}</h4>                    
+                                                        <${diretivaDetalhes}></${diretivaDetalhes}>                    
+                                                        ${htmlAnexos}                      
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        ${htmlAcoesRodapeConsulta}
+                    </div>
+                    <!-- Indicador de carregamento -->
                      <div class="lazy-loading-indicator text-center" ng-show="carregandoMaisItens" style="padding: 20px;">
                          <i class="fa fa-spinner fa-spin"></i> Carregando mais itens...
                      </div>
@@ -846,7 +841,7 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                             </td>
                                         </tr>
                                         <tr class="filtros-tabela">
-                                            <td colspan="100%" class="linhaListaConsulta">
+                                            <td colspan="100%" class="linhaListaConsultaCabecalho">
                                                 <div class="row">
                                                     <div class="${classeLista}">
                                                         <div class="row">`;
