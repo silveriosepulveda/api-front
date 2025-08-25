@@ -91,7 +91,11 @@ app.factory('FuncoesConsulta', ['APIServ', function(APIServ) {
      * IMPORTANTE: Mostra apenas os campos que estão em listaConsulta
      */
     funcoesConsulta.mesclarCampos = function(listaConsulta, campos) {
-        var camposMesclados = angular.copy(listaConsulta || {});
+        var camposMesclados = angular.copy(listaConsulta || {});  
+        console.log(listaConsulta);
+        console.log(campos);
+        
+            
         
         if (campos) {
             angular.forEach(camposMesclados, function(val, key) {
@@ -108,11 +112,11 @@ app.factory('FuncoesConsulta', ['APIServ', function(APIServ) {
                         camposMesclados[key] = campos[key];
                     } else if (typeof valorListaConsulta === "object" && typeof campos[key] === "object") {
                         // Ambos são objetos, faz merge das propriedades
-                        angular.forEach(campos[key], function(campoVal, campoKey) {
-                            if (!camposMesclados[key].hasOwnProperty(campoKey)) {
-                                camposMesclados[key][campoKey] = campoVal;
-                            }
-                        });
+                        //angular.forEach(campos[key], function(campoVal, campoKey) {
+                          //  if (!camposMesclados[key].hasOwnProperty(campoKey)) {
+                                camposMesclados[key] = Object.assign({}, valorListaConsulta, campos[key]);
+                          //  }
+                       // });
                     }
                 }
             });

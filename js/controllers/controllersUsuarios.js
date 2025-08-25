@@ -462,18 +462,18 @@ angular
         // Funções para a árvore de menus
         $scope.filtroArvoreMenus = "";
 
-        // $scope.inicializarArvoreMenus = function () {
-        //     if ($scope.menus) {
-        //         angular.forEach($scope.menus, function (menu, keyM) {
-        //             menu.expanded = true; // Inicia expandido
-        //             if (menu.itens) {
-        //                 angular.forEach(menu.itens, function (item, keyI) {
-        //                     item.expanded = true; // Inicia expandido
-        //                 });
-        //             }
-        //         });
-        //     }
-        // };
+        $scope.inicializarArvoreMenus = function () {
+            if ($scope.menus) {
+                angular.forEach($scope.menus, function (menu, keyM) {
+                    menu.expanded = true; // Inicia expandido
+                    if (menu.itens) {
+                        angular.forEach(menu.itens, function (item, keyI) {
+                            item.expanded = true; // Inicia expandido
+                        });
+                    }
+                });
+            }
+        };
 
         // $scope.toggleMenu = function (keyM) {
         //     if ($scope.menus && $scope.menus[keyM]) {

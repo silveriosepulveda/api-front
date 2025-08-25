@@ -114,6 +114,8 @@ app.directive("estruturaGerencia", [
             $scope.fd = new FormData();
 
             var montarEstrutura = function (estrutura) {
+                console.log(estrutura);
+                
                 var retorno = estrutura;
 
                 //Fazendo a validacao dos poderes do usuario
@@ -1356,6 +1358,8 @@ app.directive("estruturaGerencia", [
 
                 var html = "";
                 if (EGFuncoes.temConsulta(retorno)) {
+                    console.log(estrutura.listaConsulta);
+                    
                     html += '<cabecalho-consulta class="cabecalhoConsulta " style="float: left;"></cabecalho-consulta>'; //montaCabecalhoConsulta(retorno, $scope);
                     if (estrutura.tipoListaConsulta != undefined && estrutura.tipoListaConsulta == "tabela") {
                         $scope.tipoListaConsulta = "tabela";

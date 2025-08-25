@@ -57,7 +57,8 @@ directivesPadrao.directive("listaConsultaTabela", [
                 scope.cancelarAlteracoesItem = FuncoesConsulta.cancelarAlteracoesItem;
 
                 // Usar função do serviço para mesclar campos
-                var camposMesclados = FuncoesConsulta.mesclarCampos(parametros.listaConsulta, parametros.campos);
+                //var camposMesclados = FuncoesConsulta.mesclarCampos(parametros.listaConsulta, parametros.campos);
+                var camposMesclados = parametros.listaConsulta;
 
                 // ==================== CONFIGURAÇÃO DOS CAMPOS ====================
 
@@ -799,7 +800,8 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                     var classeLista = classes.classeLista;
 
                     // Usar função do serviço para mesclar campos
-                    var camposMesclados = FuncoesConsulta.mesclarCampos(parametros.listaConsulta, parametros.campos);
+                    //var camposMesclados = FuncoesConsulta.mesclarCampos(parametros.listaConsulta, parametros.campos);
+                    var camposMesclados = parametros.listaConsulta;
 
                     var htmlCabecalho = `
                     <div class="col-xs-12 linhaFiltrosListaConsultaTabela" ng-if="tela=='consulta'">
@@ -898,11 +900,7 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                     <strong>Total de itens:</strong> {{listaConsultaCompleta ? listaConsultaCompleta.length : 0}}
                                 </div>
                                 <div class="pull-right font12" >
-                                    <strong>Exibindo:</strong> {{listaConsultaVisivel ? listaConsultaVisivel.length : 0}} itens
-                                    <span ng-if="getContadorFiltrosAtivos && getContadorFiltrosAtivos() > 0" style="margin-left: 15px;">
-                                        <i class="fa fa-filter text-success"></i> 
-                                        <strong>{{getContadorFiltrosAtivos()}} filtro(s) ativo(s)</strong>
-                                    </span>
+                                    <strong>Exibindo:</strong> {{listaConsultaVisivel ? listaConsultaVisivel.length : 0}} itens                                    
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
