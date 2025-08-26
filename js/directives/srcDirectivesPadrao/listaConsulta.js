@@ -11,16 +11,6 @@ directivesPadrao
                 replace: true,
                 template: "",
                 link: function (scope, elem) {
-                    // Verificar se deve usar a nova diretiva de tabela
-                    // Por enquanto, vamos usar uma verificação simples baseada em um parâmetro
-                    // if (scope.estrutura && scope.estrutura.tipoListaConsulta === 'tabela') {
-                    //     // Usar a nova diretiva listaConsultaTabela
-                    //     var html = '<lista-consulta-tabela></lista-consulta-tabela>';
-                    //     elem.html(html);
-                    //     $compile(elem.contents())(scope);
-                    //     return;
-                    // }
-                    
                     // Usar funções do serviço centralizado
                     var acao = FuncoesConsulta.obterParametrosUrl(scope.acao);
                     var infoUsuario = FuncoesConsulta.obterInformacoesUsuario();

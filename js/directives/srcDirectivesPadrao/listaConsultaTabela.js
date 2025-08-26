@@ -23,7 +23,7 @@ directivesPadrao.directive("listaConsultaTabela", [
 
                 // Configurações de performance
                 var CONFIG = {
-                    ITENS_POR_PAGINA: 20,
+                    ITENS_POR_PAGINA: 30,
                     DEBOUNCE_FILTRO: 300,
                     DEBOUNCE_SCROLL: 150,
                     TIMEOUT_CARREGAMENTO: 200,
@@ -116,15 +116,17 @@ directivesPadrao.directive("listaConsultaTabela", [
                     try {
                         if (estado.watchingUpdate) return;
 
-                        if (novaLista && novaLista.length > 0) {
+                        if (novaLista && novaLista.length > 0) {                            
                             // Salvar como lista completa
                             scope.listaConsultaCompleta = angular.copy(novaLista);
 
                             // Inicializar lazy loading
                             inicializarLazyLoading();
 
-                            // Carregar primeiros itens
-                            scope.carregarMaisItens();
+                            // Carregar primeiros itens imediatamente
+                            scope.$evalAsync(function () {
+                                scope.carregarDaListaAtual();
+                            });
                         } else {
                             limparListaVisivel();
                         }
@@ -247,43 +249,52 @@ directivesPadrao.directive("listaConsultaTabela", [
 
                 // Função para carregar mais itens
                 scope.carregarMaisItens = function () {
+                   
                     if (estado.carregando || !scope.temMaisItens) {
+                        console.log("❌ Não pode carregar");
                         return;
                     }
 
                     // Verificar se já carregamos todos os itens
                     if (scope.listaConsultaVisivel.length >= scope.listaConsultaCompleta.length) {
                         scope.temMaisItens = false;
+                        console.log("❌ Todos os itens já carregados");
                         return;
                     }
 
+                    console.log("✅ Iniciando carregamento...");
                     estado.carregando = true;
                     scope.carregandoMaisItens = true;
 
+                    // Usar timeout para garantir que a UI seja atualizada
                     $timeout(function () {
                         scope.carregarDaListaAtual();
-                    }, CONFIG.TIMEOUT_CARREGAMENTO);
+                    }, 50);
                 };
 
                 // Função para carregar dados da lista atual
                 scope.carregarDaListaAtual = function () {
                     try {
+                        console.log("=== CARREGAR DA LISTA ATUAL ===");
                         var listaParaUsar = scope.listaConsultaCompleta || [];
+                        console.log("Lista para usar:", listaParaUsar.length);
 
                         if (listaParaUsar && listaParaUsar.length > 0) {
                             var itensJaCarregados = scope.listaConsultaVisivel.length;
                             var itensRestantes = listaParaUsar.length - itensJaCarregados;
-                            var itensParaCarregar = Math.min(scope.itensPorCarregamento, itensRestantes);
+                            var itensParaCarregar = Math.min(scope.itensPorCarregamento, itensRestantes);                            
 
                             if (itensParaCarregar > 0) {
                                 var novosItens = listaParaUsar.slice(itensJaCarregados, itensJaCarregados + itensParaCarregar);
                                 scope.listaConsultaVisivel = scope.listaConsultaVisivel.concat(novosItens);
-                                scope.temMaisItens = itensJaCarregados + itensParaCarregar < listaParaUsar.length;
+                                scope.temMaisItens = itensJaCarregados + itensParaCarregar < listaParaUsar.length;                                
                             } else {
                                 scope.temMaisItens = false;
+                                console.log("❌ Nenhum item para carregar");
                             }
                         } else {
                             limparListaVisivel();
+                            console.log("❌ Lista vazia");
                         }
                     } catch (error) {
                         console.error("Erro ao carregar dados da lista:", error);
@@ -291,10 +302,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                     } finally {
                         estado.carregando = false;
                         scope.carregandoMaisItens = false;
-
-                        if (!scope.$$phase && !scope.$root.$$phase) {
-                            scope.$apply();
-                        }
+                        console.log("=== FIM DO CARREGAMENTO ===");
                     }
                 };
 
@@ -349,7 +357,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                 }
 
                 function gerarHtmlBotoes(parametros, habilitarSalvar) {
-                    var htmlBotoes = `<div class="col-acoes">`;
+                    var htmlBotoes = `<div class="col-acoes-excel">`;
 
                     // Botão detalhar
                     if (
@@ -357,7 +365,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                         (parametros.ocultarDetalhes == undefined || !parametros.ocultarDetalhes)
                     ) {
                         var funcaoDet = parametros.funcaoDetalhar != undefined ? parametros.funcaoDetalhar : "detalhar";
-                        htmlBotoes += `<button type="button" name="button" class="btn btn-modern btn-outline-secondary glyphicon"
+                        htmlBotoes += `<button type="button" name="button" class="btn btn-excel btn-outline-secondary glyphicon"
                     ng-class="{'glyphicon-plus' : !item.exibirDetalhes, 'glyphicon-minus':item.exibirDetalhes}" title="Ver Detalhes"  ng-click=${funcaoDet}(item)></button>`;
                     }
 
@@ -368,7 +376,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                         parametros.ocultarIconeBotaoAlterar == undefined || !parametros.ocultarIconeBotaoAlterar ? "glyphicon-pencil glyphicon" : "";
                     var classesBotaoAlterar =
                         parametros.classesBotaoAlterar == undefined || !parametros.classesBotaoAlterar
-                            ? "btn-modern btn-outline-primary"
+                            ? "btn-excel btn-outline-primary"
                             : parametros.classesBotaoAlterar;
                     var ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar}"` : "";
                     htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)" ${ocultarAlterar}>${textoBotaoAlterar}</button>`;
@@ -376,13 +384,13 @@ directivesPadrao.directive("listaConsultaTabela", [
                     // Botão excluir
                     var funcaoExc = parametros.funcaoExcluir != undefined ? parametros.funcaoExcluir : "excluir";
                     var ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir}"` : "";
-                    htmlBotoes += `<button type="button" class="btn btn-modern btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)" ${ocultarExcluir}></button>`;
+                    htmlBotoes += `<button type="button" class="btn btn-excel btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)" ${ocultarExcluir}></button>`;
 
                     // Botões de salvar/cancelar
                     if (habilitarSalvar) {
                         htmlBotoes += `
-                        <button type="button" class="btn btn-modern btn-success glyphicon glyphicon-ok" ng-click="salvarAlteracoesItem(item, $event)" ng-if="item.habilitarSalvar">
-                        <button type="button" class="btn btn-modern btn-danger glyphicon glyphicon-remove-circle" ng-click="cancelarAlteracoesItem(item, $event)" ng-if="item.habilitarSalvar">
+                        <button type="button" class="btn btn-excel btn-success glyphicon glyphicon-ok" ng-click="salvarAlteracoesItem(item, $event)" ng-if="item.habilitarSalvar">
+                        <button type="button" class="btn btn-excel btn-danger glyphicon glyphicon-remove-circle" ng-click="cancelarAlteracoesItem(item, $event)" ng-if="item.habilitarSalvar">
                     `;
                     }
 
@@ -415,12 +423,12 @@ directivesPadrao.directive("listaConsultaTabela", [
                             var tamanhoColuna = val.md || 12;
                             var classeColuna = `col-xs-12 col-md-${tamanhoColuna}`;
 
-                            html += `<div class="${classeColuna}">`;
+                            html += `<div class="${classeColuna} campo-excel">`;
 
                             if (val.tipo == "caixaSelecao") {
                                 html += `<monta-html campo="selecionado"></monta-html>`;
                             } else if (val.tipo == "imagem") {
-                                html += `<img ng-src="{{item.${key}}}" class="img-responsive" style="max-height:120px !important" imagem-dinamica>`;
+                                html += `<img ng-src="{{item.${key}}}" class="img-responsive img-excel" style="max-height:80px !important" imagem-dinamica>`;
                             } else if (val == "diretiva") {
                                 var nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
                                 html += `<${nomeDiretiva}></${nomeDiretiva}>`;
@@ -429,11 +437,11 @@ directivesPadrao.directive("listaConsultaTabela", [
                             } else if (val.tipo == "ordenacaoConsulta") {
                                 html += `<ordenacao-consulta campo="${key}"></ordenacao-consulta>`;
                             } else if (val.habilitarEdicao != undefined && val.habilitarEdicao) {
-                                html += `<input class="form-control input-xs" type="text" ng-model="item.${key}" campo="${key}" 
+                                html += `<input class="form-control input-excel" type="text" ng-model="item.${key}" campo="${key}" 
                                         ng-focus="aoEntrarInputConsulta(item, $event)" 
                                         ng-keyup="alteracaoItemConsulta(item, $event)">`;
                             } else {
-                                html += `<span>{{item.${key}}}</span>`;
+                                html += `<span class="texto-excel">{{item.${key}}}</span>`;
                             }
 
                             html += `</div>`;
@@ -464,15 +472,15 @@ directivesPadrao.directive("listaConsultaTabela", [
                         <h3>Nenhum Ítem Encontrado</h3>
                     </div>
                     <div class="conteudoBusca col-xs-12">                        
-                        <div class="table-responsive">
-                            <div class="table-container">
-                                <table class="table table-striped table-hover">
+                        <div class="table-responsive-excel">
+                            <div class="table-container-excel">
+                                <table class="table table-excel table-hover">
                                     <tbody>
-                                    <tr ng-repeat="item in listaConsultaVisivel track by $index" ng-if="tela != 'cadastro'" indice="{{$index}}" id="divItemConsulta_{{$index}}" class="itemConsulta">
-                                        <td colspan="100%" class="linhaListaConsulta row">
-                                            <div class="row">
+                                    <tr ng-repeat="item in listaConsultaVisivel track by $index" ng-if="tela != 'cadastro'" indice="{{$index}}" id="divItemConsulta_{{$index}}" class="itemConsulta-excel">
+                                        <td colspan="100%" class="linhaListaConsulta-excel">
+                                            <div class="row row-excel">
                                                 <div class="${classeLista}">
-                                                    <div class="row inicioItem">
+                                                    <div class="row inicioItem-excel">
                                                         ${htmlItemConsulta}
                                                     </div>
                                                 </div>
@@ -480,7 +488,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                                                     ${htmlBotoes}
                                                 </div>
                                             </div>
-                                            <div ng-if="item.exibirDetalhes" class="fundoDetalheConsulta">                        
+                                            <div ng-if="item.exibirDetalhes" class="fundoDetalheConsulta-excel">                        
                                                 <div class="row">
                                                     <div class="col-xs-12">
                                                         <h4 class="campoItemConsulta text-center fundobranco">${textoDetalhes}</h4>                    
@@ -495,31 +503,16 @@ directivesPadrao.directive("listaConsultaTabela", [
                                 </table>
                             </div>
                         </div>
-                        ${htmlAcoesRodapeConsulta}
+                                                ${htmlAcoesRodapeConsulta}
                     </div>
-                    <!-- Indicador de carregamento -->
-                     <div class="lazy-loading-indicator text-center" ng-show="carregandoMaisItens" style="padding: 20px;">
-                         <i class="fa fa-spinner fa-spin"></i> Carregando mais itens...
+                    
+                    <!-- Indicador de carregamento compacto -->
+                     <div class="lazy-loading-indicator text-center" ng-show="carregandoMaisItens" style="padding: 10px;">
+                         <i class="fa fa-spinner fa-spin"></i> Carregando...
                      </div>
                      
-                     <!-- Botões de controle -->
-                     <div class="text-center" ng-if="temMaisItens && !carregandoMaisItens" style="padding: 20px;">
-                         <button class="btn btn-primary" ng-click="carregarMaisItens()" style="margin-right: 10px;">
-                             <i class="fa fa-plus"></i> Carregar mais itens
-                         </button>
-                         <button class="btn btn-success" ng-click="carregarTodosItens()">
-                             <i class="fa fa-list"></i> Carregar todos os itens
-                         </button>
-                     </div>
-                     
-                     <!-- Informações de debug -->
-                     <div class="text-center" style="padding: 10px; background: #f8f9fa; border-top: 1px solid #dee2e6;">
-                         <small class="text-muted">
-                             Itens exibidos: {{listaConsultaVisivel.length}} | 
-                             Total na lista: {{listaConsultaCompleta.length}} | 
-                             Tem mais itens: {{temMaisItens}}
-                         </small>
-                     </div>
+                    
+ 
                     </div>
                 </div>`;
 
@@ -535,16 +528,23 @@ directivesPadrao.directive("listaConsultaTabela", [
                         }
 
                         estado.scrollTimeout = setTimeout(function () {
-                            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                            // Verificar se chegou próximo ao final da página
+                            var scrollTop = $(window).scrollTop();
+                            var windowHeight = $(window).height();
+                            var documentHeight = $(document).height();
+                            
+                            // Carregar mais itens quando estiver a 300px do final
+                            if (scrollTop + windowHeight >= documentHeight - 300) {
                                 if (!scope.carregandoMaisItens && scope.temMaisItens) {
                                     scope.$apply(function () {
                                         scope.carregarMaisItens();
                                     });
                                 }
                             }
-                        }, CONFIG.DEBOUNCE_SCROLL);
+                        }, 100); // Reduzir debounce para ser mais responsivo
                     };
 
+                    // Adicionar listener de scroll
                     $(window).on("scroll", estado.scrollListener);
                 }, 500);
 
@@ -559,10 +559,13 @@ directivesPadrao.directive("listaConsultaTabela", [
                         clearTimeout(estado.scrollTimeout);
                     }
 
-                    // Remover listener de scroll
+                    // Remover listener de scroll da janela
                     if (estado.scrollListener) {
                         $(window).off("scroll", estado.scrollListener);
                     }
+
+                    // Remover listener de scroll da tabela
+                    $(document).off("scroll", '.table-responsive-excel');
 
                     // Remover watchers
                     if (unwatchListaConsulta) {
@@ -580,10 +583,10 @@ directivesPadrao.directive("listaConsultaTabela", [
             },
         };
     },
-]);
+])
 
 // Diretiva para o cabeçalho da tabela de listaConsultaTabela
-directivesPadrao.directive("cabecalhoListaConsultaTabela", [
+.directive("cabecalhoListaConsultaTabela", [
     "$compile",
     "FuncoesConsulta",
     "$timeout",
@@ -592,6 +595,7 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
             restrict: "E",
             replace: true,
             template: "",
+            scope: false, // Herdar o scope do controller pai
             link: function (scope, elem) {
                 // Verificar se deve exibir o cabeçalho da tabela
                 if (scope.estrutura.tipoListaConsulta === "tabela" && scope.tela === "consulta") {
@@ -750,10 +754,7 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                         }
                     };
 
-                    // Função para alternar exibição de filtros
-                    scope.alterarExibicaoFiltros = function () {
-                        scope.exibirFiltros = !scope.exibirFiltros;
-                    };
+
 
                     // Função para obter contador de filtros ativos
                     scope.getContadorFiltrosAtivos = function () {
@@ -800,15 +801,15 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
 
                     var htmlCabecalho = `
                     <div class="col-xs-12 linhaFiltrosListaConsultaTabela" ng-if="tela=='consulta'">
-                        <div class="table-responsive">
-                            <div class="table-container">
-                                <table class="table table-striped table-hover">
+                        <div class="table-responsive-excel">
+                            <div class="table-container-excel-cabecalho">
+                                <table class="table table-excel table-hover">
                                     <thead>
                                         <tr>
-                                            <td colspan="100%" class="linhaListaConsulta">
-                                                <div class="row">
+                                            <td colspan="100%" class="linhaListaConsulta-excel">
+                                                <div class="row row-excel">
                                                     <div class="${classeLista}">
-                                                        <div class="row">`;
+                                                        <div class="row inicioItem-excel">`;
 
                     // Criar cabeçalhos baseados nos campos mesclados
                     angular.forEach(camposMesclados, function (val, key) {
@@ -825,8 +826,8 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                 texto = key;
                             }
 
-                            htmlCabecalho += `<div class="${classeColuna}">
-                                    <strong>${texto}</strong>
+                            htmlCabecalho += `<div class="${classeColuna} campo-excel">
+                                    <strong class="texto-cabecalho-excel">${texto}</strong>
                                 </div>`;
                         }
                     });
@@ -835,16 +836,16 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                                         </div>
                                                     </div>
                                                     <div class="${classeBotoes}">
-                                                        <strong>Ações</strong>                                                      
+                                                        <strong class="texto-cabecalho-excel">Ações</strong>                                                      
                                                     </div>
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr class="filtros-tabela">
-                                            <td colspan="100%" class="linhaListaConsultaCabecalho">
-                                                <div class="row">
+                                        <tr class="filtros-tabela-excel">
+                                            <td colspan="100%" class="linhaListaConsultaCabecalho-excel">
+                                                <div class="row row-excel">
                                                     <div class="${classeLista}">
-                                                        <div class="row">`;
+                                                        <div class="row inicioItem-excel">`;
 
                     // Criar filtros baseados nos campos mesclados
                     angular.forEach(camposMesclados, function (val, key) {
@@ -861,8 +862,8 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                 textoPlaceholder = key;
                             }
 
-                            htmlCabecalho += `<div class="${classeColuna}">`;
-                            htmlCabecalho += `<input type="text" class="form-control input-sm" placeholder="Filtrar ${textoPlaceholder}" ng-model="filtrosColuna['${key}']" ng-change="aplicarFiltroColuna()" ng-class="{'has-filters': filtrosAtivos['${key}']}">`;
+                            htmlCabecalho += `<div class="${classeColuna} campo-excel">`;
+                            htmlCabecalho += `<input type="text" class="form-control input-excel" placeholder="Filtrar ${textoPlaceholder}" ng-model="filtrosColuna['${key}']" ng-change="aplicarFiltroColuna()" ng-class="{'has-filters': filtrosAtivos['${key}']}">`;
                             htmlCabecalho += `</div>`;
                         }
                     });
@@ -872,10 +873,10 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                                     </div>
                                                     <div class="${classeBotoes}">
                                                         <div class="btn-group" role="group">
-                                                            <button class="btn btn-xs btn-warning" ng-click="limparFiltrosLocal()" title="Limpar filtros" ng-disabled="getContadorFiltrosAtivos() == 0">
+                                                            <button class="btn btn-excel btn-warning" ng-click="limparFiltrosLocal()" title="Limpar filtros" ng-disabled="getContadorFiltrosAtivos() == 0">
                                                                 <i class="fa fa-eraser"></i> Limpar
                                                             </button>
-                                                            <button type="button" class="btn btn-xs btn-info" ng-click="alterarExibicaoFiltros()" title="Alternar exibição de filtros">
+                                                            <button type="button" class="btn btn-excel btn-info" ng-click="alterarExibicaoConsulta()" title="Alternar exibição de filtros">
                                                                 <i class="fa fa-search"></i> Busca
                                                             </button>
                                                         </div>
@@ -888,66 +889,26 @@ directivesPadrao.directive("cabecalhoListaConsultaTabela", [
                                 </table>
                             </div>
                         </div>
-                        <!-- Linha de resumo da lista -->
-                        
+                        <!-- Linha de resumo da lista compacta -->
+                        <div class="resumo-lista-excel">
                             <div class="col-xs-12">
-                                <div class="pull-left font12">
-                                    <strong>Total de itens:</strong> {{listaConsultaCompleta ? listaConsultaCompleta.length : 0}}
+                                <div class="pull-left">
+                                    <strong>Total:</strong> {{listaConsultaCompleta ? listaConsultaCompleta.length : 0}}
                                 </div>
-                                <div class="pull-right font12" >
-                                    <strong>Exibindo:</strong> {{listaConsultaVisivel ? listaConsultaVisivel.length : 0}} itens                                    
+                                <div class="pull-right">
+                                    <strong>Exibindo:</strong> {{listaConsultaVisivel ? listaConsultaVisivel.length : 0}}                                    
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
-                        
+                        </div>
                     </div>`;
 
                     return htmlCabecalho;
                 }
 
-                // Adicionar CSS para filtros ativos
-                var css = `
-                    <style>
-                        .has-filters {
-                            border-color: #5cb85c !important;
-                            box-shadow: 0 0 5px rgba(92, 184, 92, 0.3) !important;
-                        }
-                        
-                        .btn-group .btn {
-                            margin-right: 2px;
-                        }
-                        
-                        .btn-group .btn:last-child {
-                            margin-right: 0;
-                        }
-                        
-                        .resumo-lista {
-                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                            border: 1px solid #dee2e6;
-                            border-radius: 5px;
-                            padding: 10px 15px;
-                            margin-bottom: 15px;
-                            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                        }
-                        
-                        .resumo-lista .pull-left,
-                        .resumo-lista .pull-right {
-                            font-size: 13px;
-                        }
-                        
-                        .resumo-lista .text-success {
-                            color: #28a745 !important;
-                        }
-                    </style>
-                `;
+                // CSS movido para formCabecalhoConsultaPadrao.css
 
-                // Inserir CSS no head se ainda não existir
-                if (!document.getElementById("filtros-css")) {
-                    var styleElement = document.createElement("div");
-                    styleElement.innerHTML = css;
-                    styleElement.id = "filtros-css";
-                    document.head.appendChild(styleElement);
-                }
+                // CSS já está no arquivo formCabecalhoConsultaPadrao.css
             },
         };
     },

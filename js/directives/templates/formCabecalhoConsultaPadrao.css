@@ -1,3 +1,5 @@
+/* ==================== ESTILOS GERAIS ==================== */
+
 .superFiltro, .refreshConsulta, .alteraExibicaoConsulta{
     padding: 0px !important;
     margin: 0px !important;
@@ -8,287 +10,268 @@
 }
 
 
-
-/* Estilos para a diretiva listaConsultaTabela */
-/* .cabecalhoConsulta {
-    position: fixed;
-    top: 10;
-    z-index: 1000;
-    background: #fff;
-} */
-/* 
-.conteudoBusca {
-    margin-top: 100px;
-} */
-
-.linhaListaConsulta{
-    padding-top: 1px !important;
-    margin-bottom: 1px !important;
-    height: 10px !important;
+.cabecalhoConsulta{
+    margin-top: 60px !important;
 }
+/* ==================== LAYOUT EXCEL - COMPACTO E EFICIENTE ==================== */
 
-.table-responsive {
-    /* margin-top: 20px; */
-    border-radius: 12px;
-    overflow: visible; /* Permitir que o conteúdo seja visível */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+/* Container principal da tabela */
+.table-responsive-excel {
+    border-radius: 6px;
+    overflow: visible;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     background: #fff;
-    /* Removida limitação de altura - permitir que cresça conforme necessário */
-    display: block; /* Mudança para block em vez de flex */
+    display: block;
     width: 100%;
     max-width: 100%;
     float: left;
 }
 
-.table-container {
-    /* Removidas limitações de flex e overflow */
+.table-container-excel {
     position: relative;
     width: 100%;
-    margin-top: 50px !important;
+    margin-top: 60px !important;
 }
 
-.table {
+/* Tabela principal */
+.table-excel {
     background-color: #fff;
     margin-bottom: 0;
-    border: none;
-    table-layout: fixed; /* Layout fixo para melhor performance */
+    border: 1px solid #e0e0e0;
+    table-layout: fixed;
     width: 100%;
     min-width: 100%;
 }
 
-.table span, html-detalhe *{
-    font-size: 13px !important;
-}
-
-
-.table thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #fff;
-}
-
-.table {
-    background-color: #fff;
-    margin-bottom: 0;
-    border: none;
-}
-
-.table thead th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Cabeçalho da tabela */
+.table-excel thead th {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
     color: #fff;
     font-weight: 600;
-    font-size: 12px;
-    padding: 8px 6px;
+    font-size: 10px;
+    padding: 2px 6px;
     text-align: left;
     vertical-align: middle;
-    border: none;
+    border: 1px solid #357abd;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     position: relative;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.table thead th:first-child {
-    border-top-left-radius: 12px;
+/* Linhas da tabela */
+.table-excel tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+    height: 25px;
 }
 
-.table thead th:last-child {
-    border-top-right-radius: 12px;
-}
-
-.table tbody {
-    /* Removida limitação de altura - permitir que todas as linhas sejam visíveis */
-    overflow: visible;
-    height: 400px !important;
-
-}
-
-.table tbody tr {
-    transition: all 0.3s ease;
-    border-bottom: 1px solid #f1f3f4;
-    height: 40px; /* Altura fixa para linhas mais compactas */
-}
-
-.table tbody tr:hover {
+.table-excel tbody tr:hover {
     background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 2px 6px rgba(74, 144, 226, 0.1);
 }
 
-.table tbody tr:last-child {
-    border-bottom: none;
-}
-
-.table tbody td {
-    padding: 6px 6px;
-    border: none;
+/* Células da tabela */
+.table-excel tbody td {
+    padding: 0px 6px;
+    border: 1px solid #f0f0f0;
     vertical-align: middle;
-    font-size: 12px;
+    font-size: 10px;
     color: #2c3e50;
-    line-height: 1.2;
+    line-height: 1.0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 0; /* Força ellipsis */
+    max-width: 0;
 }
 
-/* Estilos para a linha de filtros */
-.filtros-tabela {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-bottom: 2px solid #e9ecef;
-    position: sticky;
-    top: 0;
-    z-index: 9;
+/* Elementos específicos da lista */
+.itemConsulta-excel {
+    height: 25px !important;
+    min-height: 14px !important;
+    max-height: 25px !important;    
 }
 
-.filtros-tabela td {
-    padding: 8px 6px;
-    border: none;
-    background: transparent;
+.linhaListaConsulta-excel {
+    padding: 0px !important;
+    margin-bottom: 0px !important;
+    height: 2px !important;
+    min-height: 2px !important;
+    max-height: 2px !important;
 }
 
-.filtros-tabela input,
-.filtros-tabela select {
-    width: 100%;
-    padding: 6px 8px;
-    border: 2px solid #e9ecef;
-    border-radius: 4px;
-    font-size: 11px;
-    background: #fff;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.filtros-tabela input:focus,
-.filtros-tabela select:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-}
-
-.filtros-tabela input::placeholder {
-    color: #6c757d;
-    font-style: italic;
-}
-
-/* Estilos para o botão limpar filtros */
-.filtros-tabela .btn {
-    padding: 8px 10px;
-    font-size: 12px;
+.row-excel {
     margin: 0;
-    border-radius: 6px;
-    border: 2px solid #e9ecef;
+    padding: 0px 0;
+    height: 25px;
+    min-height: 25px;
+    max-height: 25px;
+}
+
+.inicioItem-excel {
+    margin: 0;
+    /* padding: 0px 0; */
+    height: 25px;
+    min-height: 25px;
+    max-height: 25px;
+    padding-top: 5px;
+}
+
+/* Campos compactos */
+.campo-excel {
+    padding: 0px 2px;
+    margin: 0;
+    height: 25px;
+    min-height: 25px;
+    max-height: 25px;
+    line-height: 25px;
+}
+
+.texto-excel {
+    font-size: 14px !important;
+    line-height: 14px !important;
+    color: #2c3e50;
+    height: 25px;
+    min-height: 25px;
+    max-height: 25px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.texto-cabecalho-excel {
+    font-size: 10px !important;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Inputs compactos */
+.input-excel {
+    height: 25px;
+    padding: 0px 6px;
+    font-size: 10px;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
     background: #fff;
-    color: #6c757d;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.filtros-tabela .btn:hover {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-    border-color: #ff6b6b;
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+.input-excel:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+    outline: none;
 }
 
-/* Indicador visual de filtro ativo */
-.filtros-tabela input:not(:placeholder-shown) {
-    background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
-    border-color: #ffc107;
-    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
-}
-
-/* Estilos para a coluna de ações */
-.col-acoes {
-    width: 100px;
-    text-align: center;
-}
-
-/* Estilos para o botão limpar filtros no cabeçalho */
-.col-acoes .btn-xs {
-    font-size: 9px;
-    padding: 2px 4px;
-    border-radius: 2px;
-    margin-left: 5px;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-    border: none;
-    color: white;
-    transition: all 0.3s ease;
-}
-
-.col-acoes .btn-xs:hover {
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
-}
-
-.col-acoes .btn {
+/* Botões compactos */
+.btn-excel {
     margin: 1px;
-    padding: 4px 6px;
+    padding: 1px 3px;
     font-size: 10px;
     border-radius: 3px;
-    border: none;
-    transition: all 0.3s ease;
+    border: 1px solid #d0d0d0;
+    transition: all 0.2s ease;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.2px;
-    min-width: 20px;
-    height: 24px;
-    line-height: 1;
+    letter-spacing: 0.1px;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
-.col-acoes .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+.btn-excel:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.col-acoes .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+.col-acoes-excel {
+    width: 80px;
+    text-align: center;
+    padding: 0px;
+    height: 22px;
+    min-height: 22px;
+    max-height: 22px;
+    line-height: 22px;
 }
 
-.col-acoes .btn-success {
-    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(86, 171, 47, 0.3);
+/* Filtros compactos */
+.filtros-tabela-excel {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    z-index: 9;
 }
 
-.col-acoes .btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(86, 171, 47, 0.4);
+.filtros-tabela-excel td {
+    padding: 2px 6px;
+    border: 1px solid #e9ecef;
+    background: transparent;
 }
 
-.col-acoes .btn-danger {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+.filtros-tabela-excel input,
+.filtros-tabela-excel select {
+    width: 100%;
+    padding: 1px 6px;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+    font-size: 9px;
+    background: #fff;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-.col-acoes .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.4);
+.filtros-tabela-excel input:focus,
+.filtros-tabela-excel select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
 }
 
-.col-acoes .btn-warning {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3);
+/* Indicador de filtro ativo */
+.has-filters {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 3px rgba(40, 167, 69, 0.2) !important;
+    background: #f8fff9 !important;
 }
 
-.col-acoes .btn-warning:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(240, 147, 251, 0.4);
+/* Resumo compacto */
+.resumo-lista-excel {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    font-size: 11px;
 }
 
-/* Estilos para detalhes expandidos */
+.resumo-lista-excel .pull-left,
+.resumo-lista-excel .pull-right {
+    font-size: 11px;
+}
+
+/* Imagens compactas */
+.img-excel {
+    max-height: 60px !important;
+    border-radius: 2px;
+}
+
+/* Detalhes expandidos compactos */
+.fundoDetalheConsulta-excel {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+    border-left: 3px solid #4a90e2;
+    position: relative;
+    padding: 8px;
+    margin: 2px 0;
+}
+
+/* ==================== ESTILOS LEGACY (mantidos para compatibilidade) ==================== */
+
+/* Estilos para detalhes expandidos (versão antiga) */
 .fundoDetalheConsulta {
     background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
     border-left: 4px solid #667eea;
@@ -403,103 +386,32 @@
     transform: translateY(-1px);
 }
 
-/* Responsividade */
+/* ==================== RESPONSIVIDADE ==================== */
+
 @media (max-width: 768px) {
-    .table-responsive {
-        font-size: 12px;
-        margin-top: 10px;
-        width: 100%;
-        max-width: 100%;
+    .table-excel tbody td {
+        font-size: 10px;
+        padding: 2px 4px;
     }
-
-    .table {
-        width: 100%;
-        min-width: 100%;
-    }
-
-    .table thead th,
-    .table tbody td {
-        padding: 8px 5px;
-    }
-
-    .col-acoes {
-        width: 100px;
-    }
-
-    .col-acoes .btn {
-        padding: 4px 6px;
+    
+    .btn-excel {
         font-size: 9px;
-        margin: 1px;
-    }
-
-    .col-acoes .btn-xs {
-        font-size: 8px;
         padding: 1px 3px;
+        min-width: 16px;
+        height: 16px;
     }
-
-    .filtros-tabela input,
-    .filtros-tabela select {
-        padding: 6px 8px;
-        font-size: 11px;
-    }
-
-    .filtros-tabela .btn {
-        padding: 6px 8px;
-        font-size: 11px;
+    
+    .input-excel {
+        height: 20px;
+        padding: 1px 4px;
+        font-size: 10px;
     }
 }
 
-@media (max-width: 576px) {
-    .table-responsive {
-        font-size: 11px;
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .table {
-        width: 100%;
-        min-width: 100%;
-    }
-
-    .table thead th,
-    .table tbody td {
-        padding: 6px 3px;
-    }
-
-    .col-acoes {
-        width: 80px;
-    }
-
-    .col-acoes .btn {
-        padding: 3px 5px;
-        font-size: 8px;
-        margin: 1px;
-    }
-
-    .col-acoes .btn-xs {
-        font-size: 7px;
-        padding: 1px 2px;
-    }
-}
-
-/* Animações */
-.table tbody tr {
-    animation: fadeInUp 0.4s ease-out;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+/* ==================== ANIMAÇÕES ==================== */
 
 /* Animação para filtros */
-.filtros-tabela {
+.filtros-tabela-excel {
     animation: slideDown 0.3s ease-out;
 }
 
@@ -515,7 +427,7 @@
 }
 
 /* Animação para detalhes expandidos */
-.fundoDetalheConsulta {
+.fundoDetalheConsulta-excel {
     animation: expandDetails 0.3s ease-out;
 }
 
@@ -564,8 +476,21 @@
     color: #667eea;
 }
 
-tr.itemConsulta{
-    max-height: 15px !important;
+/* Indicador de carregamento sutil para Excel */
+.lazy-loading-indicator-excel {
+    text-align: center;
+    padding: 5px;
+    color: #4a90e2;
+    font-size: 12px;
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 3px;
+    margin: 2px 0;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.lazy-loading-indicator-excel i {
+    font-size: 12px;
+    color: #4a90e2;
 }
 
 /* Estilos para mensagem de nenhum item encontrado */
@@ -588,37 +513,3 @@ tr.itemConsulta{
     letter-spacing: 0.8px;
 }
 
-/* Estilos adicionais para melhorar a aparência geral */
-.table-responsive {
-    position: relative;
-}
-
-.table-responsive::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(248,249,255,0.8) 100%);
-    pointer-events: none;
-    z-index: -1;
-}
-
-/* Estilo para zebra striping sutil */
-.table tbody tr:nth-child(even) {
-    background-color: rgba(248, 249, 255, 0.3);
-}
-
-.table tbody tr:nth-child(even):hover {
-    background: linear-gradient(135deg, #f0f2ff 0%, #e8ebff 100%);
-}
-
-/* Estilo para primeira e última linha */
-.table tbody tr:first-child {
-    border-top: 1px solid #f1f3f4;
-}
-
-.table tbody tr:last-child {
-    border-bottom: 1px solid #f1f3f4;
-}
