@@ -201,6 +201,8 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
             restrict: 'E',
             replace: true,
             link: function (scope, elem) {
+                console.log(elem);
+                
                 var nomeBloco = elem.attr('nome-bloco');
                 var dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, nomeBloco);
                 var indice = elem.attr('indice');

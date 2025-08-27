@@ -7,6 +7,14 @@ directivesPadrao.directive("listaConsultaTabela", [
     "$timeout",
     "$q",
     function ($compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta, $timeout, $q) {
+        // Carregar CSS específico para listaConsultaTabela
+        if (!document.querySelector('link[href*="listaConsultaTabela.css"]')) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = '/api-front/css/listaConsultaTabela.css';
+            document.head.appendChild(link);
+        }
         return {
             restrict: "E",
             replace: true,
@@ -79,6 +87,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                 scope.filtroResultado = filtro;
 
                 // ==================== GERAÇÃO DO HTML ====================
+                // CSS específico carregado dinamicamente em /api-front/css/listaConsultaTabela.css
 
                 var html = gerarHtmlTabela(camposMesclados, classeLista, classeBotoes, htmlBotoes, parametros);
                 elem.html(html);
@@ -453,7 +462,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                 function gerarHtmlTabela(camposMesclados, classeLista, classeBotoes, htmlBotoes, parametros) {
                     const htmlItemConsulta = gerarHtmlItemConsulta(camposMesclados);
                     var textoDetalhes = parametros.textoDetalhesConsulta != undefined ? parametros.textoDetalhesConsulta : "Mais Informações";
-                    var diretivaDetalhes = parametros.diretivaDetalhesConsulta != undefined ? parametros.diretivaDetalhesConsulta : "detalhes-item-consulta";
+                    var diretivaDetalhes = parametros.diretivaDetalhesConsulta != undefined ? parametros.diretivaDetalhesConsulta : "detalhes-item-consulta-tabela";
                     var htmlAnexos = parametros.anexos != undefined ? `<arquivos-anexos tela="detalhes" chave-array="key"></arquivos-anexos>` : "";
 
                     var htmlAcoesRodapeConsulta = "";
@@ -476,7 +485,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                             <div class="table-container-excel">
                                 <table class="table table-excel table-hover">
                                     <tbody>
-                                    <tr ng-repeat="item in listaConsultaVisivel track by $index" ng-if="tela != 'cadastro'" indice="{{$index}}" id="divItemConsulta_{{$index}}" class="itemConsulta-excel">
+                                    <tr ng-repeat="item in listaConsultaVisivel track by $index" ng-if="tela != 'cadastro'" indice="{{$index}}" id="divItemConsulta_{{$index}}" class="itemConsulta itemConsulta-excel">
                                         <td colspan="100%" class="linhaListaConsulta-excel">
                                             <div class="row row-excel">
                                                 <div class="${classeLista}">
@@ -503,16 +512,13 @@ directivesPadrao.directive("listaConsultaTabela", [
                                 </table>
                             </div>
                         </div>
-                                                ${htmlAcoesRodapeConsulta}
+                        ${htmlAcoesRodapeConsulta}
                     </div>
                     
                     <!-- Indicador de carregamento compacto -->
                      <div class="lazy-loading-indicator text-center" ng-show="carregandoMaisItens" style="padding: 10px;">
                          <i class="fa fa-spinner fa-spin"></i> Carregando...
-                     </div>
-                     
-                    
- 
+                     </div> 
                     </div>
                 </div>`;
 
@@ -912,4 +918,48 @@ directivesPadrao.directive("listaConsultaTabela", [
             },
         };
     },
-]);
+])
+.directive('detalhesItemConsultaTabela', ['$rootScope', '$compile', 'APIServ', 'EGFuncoes', 'APIAjuFor', function ($rootScope, $compile, APIServ, EGFuncoes, APIAjuFor) {
+    return {
+        restrict: 'E',
+        replace: true,
+        link: function (scope, elem) {
+            console.log('detalhesItemConsultaTabela');
+            
+            var indice = angular.element(elem).closest('.itemConsulta').attr('indice');
+
+            //Fazendo rotina para exibir detalhes quando for somente consulta
+            //20/11/2017 Acrescentei a juncao dos campos com os camposDetalhes quando existirem
+            var campos = scope.estrutura.camposDetalhes != undefined ? angular.merge(scope.estrutura.campos, scope.estrutura.camposDetalhes) : scope.estrutura.campos;
+
+            var html = '';
+
+            var camposNaoMostrar = Object.keys(scope.estrutura.listaConsulta);
+            let camposOcultarDetalhes = scope.estrutura.camposOcultarDetalhes != undefined ? scope.estrutura.camposOcultarDetalhes : [];
+            //console.log(camposNaoMostrar);
+
+
+            angular.forEach(campos, function (val, key) {
+                var mostrar = !APIServ.valorExisteEmVariavel(camposOcultarDetalhes, key);
+
+                if (mostrar) {
+                    if (key.substr(0, 5) == 'bloco') {
+                        html += `<bloco-html-detalhe nome-bloco="${key}" indice="${indice}"></bloco-html-detalhe>`; //_montaBlocoHtmlDetalhes(key, val);
+                    } else if (val == 'diretiva') {
+                        let nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
+                        html += `<${nomeDiretiva} indice="${indice}"></${nomeDiretiva}>`;
+
+                    } else if ((val.tipo == undefined || val.tipo != 'oculto') && key.substr(0, 5) != 'botao' && val.tipo != 'senha') {
+                        var mostrar = !APIServ.valorExisteEmVariavel(camposNaoMostrar, key);
+                        console.log(mostrar);
+                        if (mostrar) {
+                            html += `<html-detalhe campo="${key}" indice="${indice}"></html-detalhe>`
+                        }
+                    }
+                }
+            });
+            elem.html(html);
+            $compile(elem.contents())(scope);
+        }
+    }
+}])

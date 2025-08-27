@@ -115,7 +115,7 @@ app.directive("estruturaGerencia", [
 
             var montarEstrutura = function (estrutura) {
                 console.log(estrutura);
-                
+
                 var retorno = estrutura;
 
                 //Fazendo a validacao dos poderes do usuario
@@ -454,8 +454,8 @@ app.directive("estruturaGerencia", [
                 }
 
                 $scope.alterarExibicaoConsulta = () => {
-                    console.log('alterarExibicaoConsulta');
-                    
+                    console.log("alterarExibicaoConsulta");
+
                     $scope.exibirConsulta = !$scope.exibirConsulta;
                     if ($scope.exibirConsulta) {
                         if ($scope.filtros.length == 0) {
@@ -1359,7 +1359,7 @@ app.directive("estruturaGerencia", [
                 var html = "";
                 if (EGFuncoes.temConsulta(retorno)) {
                     console.log(estrutura.listaConsulta);
-                    
+
                     html += '<cabecalho-consulta class="cabecalhoConsulta " style="float: left;"></cabecalho-consulta>'; //montaCabecalhoConsulta(retorno, $scope);
                     if (estrutura.tipoListaConsulta != undefined && estrutura.tipoListaConsulta == "tabela") {
                         $scope.tipoListaConsulta = "tabela";
