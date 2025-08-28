@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html ng-app="testeApp">
+<head>
+    <title>Teste Modal Colunas</title>
+    <link rel="stylesheet" href="/api-front/css/listaConsultaTabela.css">
+    <link rel="stylesheet" href="/api-front/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/api-front/css/font-awesome.min.css">
+</head>
+<body ng-controller="TesteController">
+    
+    <div class="container-fluid">
+        <h2>Teste: Modal Sistema de Colunas</h2>
+        
+        <!-- Debug info -->
+        <div class="alert alert-info">
+            <strong>Debug:</strong> 
+            Este teste verifica se o sistema de colunas está funcionando no modal
+        </div>
+        
+        <!-- Debug adicional -->
+        <div class="alert alert-warning">
+            <strong>Status:</strong> 
+            Item selecionado: {{itemSelecionadoModal ? itemSelecionadoModal.nome : 'Nenhum'}} |
+            Item no escopo: {{item ? item.nome : 'Nenhum'}} |
+            Índice: {{indiceSelecionado}}
+        </div>
+        
+        <!-- Lista consulta tabela -->
+        <lista-consulta-tabela></lista-consulta-tabela>
+    </div>
+
+    <script src="/api-front/js/angular.min.js"></script>
+    <script src="/api-front/js/directives/directivesPadrao.js"></script>
+    <script src="/api-front/js/directives/srcDirectivesPadrao/listaConsultaTabela.js"></script>
+    
+    <script>
+        angular.module('testeApp', ['directivesPadrao'])
+        .controller('TesteController', function($scope) {
+            
+            // Dados de teste
+            $scope.listaConsulta = [
+                {
+                    id: 1,
+                    nome: 'João Silva',
+                    email: 'joao@email.com',
+                    telefone: '(11) 99999-9999',
+                    data_nascimento: '1985-03-15',
+                    endereco: 'Rua das Flores, 123',
+                    bairro: 'Centro',
+                    cidade: 'São Paulo',
+                    uf: 'SP'
+                },
+                {
+                    id: 2,
+                    nome: 'Maria Santos',
+                    email: 'maria@email.com',
+                    telefone: '(11) 88888-8888',
+                    data_nascimento: '1990-07-22',
+                    endereco: 'Av. Copacabana, 456',
+                    bairro: 'Copacabana',
+                    cidade: 'Rio de Janeiro',
+                    uf: 'RJ'
+                }
+            ];
+
+            // Estrutura com colunas específicas para teste
+            $scope.estrutura = {
+                nomeUsual: 'Pessoa',
+                tela: 'consulta',
+                tabela: 'pessoas',
+                campo_chave: 'id',
+                
+                // Título do modal
+                textoDetalhesConsulta: 'Detalhes da Pessoa',
+                
+                // Campos da lista
+                listaConsulta: {
+                    nome: { texto: 'Nome', md: 6 },
+                    email: { texto: 'E-mail', md: 6 }
+                },
+                
+                // Campos de detalhes com colunas específicas
+                campos: {
+                    telefone: { texto: 'Telefone', md: 6 },
+                    data_nascimento: { texto: 'Nascimento', md: 6 },
+                    endereco: { texto: 'Endereço', md: 12 },
+                    bairro: { texto: 'Bairro', md: 5 },
+                    cidade: { texto: 'Cidade', md: 5 },
+                    uf: { texto: 'UF', md: 2 }
+                }
+            };
+            
+            // Função para detalhar
+            $scope.detalhar = function(item) {
+                console.log('Detalhando item:', item.nome);
+                
+                if (!item.detalhes) {
+                    item.detalhes = {
+                        observacoes: 'Observações sobre ' + item.nome,
+                        data_cadastro: '2024-01-15',
+                        status: 'Ativo'
+                    };
+                }
+                
+                item.exibirDetalhes = !item.exibirDetalhes;
+                console.log('Modal aberto:', item.exibirDetalhes);
+            };
+            
+            // Funções de exemplo
+            $scope.alterarPessoa = function(item) {
+                alert('Alterar pessoa: ' + item.nome);
+            };
+            
+            $scope.excluirPessoa = function(item) {
+                if (confirm('Deseja excluir ' + item.nome + '?')) {
+                    alert('Pessoa excluída: ' + item.nome);
+                }
+            };
+        });
+    </script>
+</body>
+</html>
+
+<!-- 
+INSTRUÇÕES DE TESTE - MODAL COLUNAS:
+
+1. Abra este arquivo no navegador
+2. Clique no botão de detalhes (ícone +) de qualquer item
+3. Verifique se as colunas estão funcionando corretamente:
+   - Telefone e Nascimento devem estar na mesma linha (col-md-6 cada)
+   - Endereço deve ocupar toda a linha (col-md-12)
+   - Bairro, Cidade e UF devem estar na mesma linha (col-md-5, col-md-5, col-md-2)
+4. Teste redimensionando a janela para verificar responsividade
+
+CORREÇÕES IMPLEMENTADAS:
+
+✅ Removido padding do modal-detalhes-body que interferia nas colunas
+✅ Adicionado padding apenas no container dos detalhes
+✅ Ajustado sistema de colunas para funcionar corretamente
+✅ Definido padding específico para todas as classes de coluna
+✅ Ajustado responsividade para telas menores
+
+RESULTADO ESPERADO:
+
+- Sistema de colunas funcionando corretamente
+- Campos com col-md-5, col-md-5, col-md-2 ficam na mesma linha
+- Campos com col-md-6 ficam na mesma linha
+- Campos com col-md-12 ocupam toda a linha
+- Responsividade mantida em diferentes tamanhos de tela
+
+TESTE DE COLUNAS:
+
+1. Abra o modal
+2. Verifique se Bairro, Cidade e UF estão na mesma linha
+3. Verifique se Telefone e Nascimento estão na mesma linha
+4. Verifique se Endereço ocupa toda a linha
+5. Teste em diferentes tamanhos de tela
+-->

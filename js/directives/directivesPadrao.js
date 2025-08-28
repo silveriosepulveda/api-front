@@ -449,7 +449,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
                     classesDiv = classesDiv.concat(tamanho);
 
                     var html = `                    
-                    <div class="campoDetalheConsulta ${classesDiv.join(' ')}"  ${atributosDiv.join(' ')}>${label} {{item.detalhes.${campo}}}</div>`;
+                    <div class="campoDetalheConsulta ${classesDiv.join(' ')}"  ${atributosDiv.join(' ')}>${label} <strong> {{item.detalhes.${campo}}}</strong></div>`;
 
                     elem.html(html);
                     $compile(elem.contents())(scope);

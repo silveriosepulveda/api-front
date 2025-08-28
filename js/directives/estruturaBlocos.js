@@ -201,7 +201,6 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
             restrict: 'E',
             replace: true,
             link: function (scope, elem) {
-                console.log(elem);
                 
                 var nomeBloco = elem.attr('nome-bloco');
                 var dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, nomeBloco);
@@ -223,7 +222,7 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                             var nomeDiretiva = APIAjuFor.variavelParaDiretiva(campo);
                             html += `<${nomeDiretiva} nome-bloco="${nomeBloco}" indice="$index" ></${nomeDiretiva}>`;
                         } else if ((propriedades.tipo == undefined || propriedades.tipo != 'oculto') && APIServ.chaveExisteEmVariavel(dadosBloco.campos, campo) && campo.substr(0, 5) != 'botao') {
-                            var camposNaoMostrar = Object.keys(scope.estrutura.listaConsulta);
+                            var camposNaoMostrar = scope.estrutura.tipoListaConsulta == 'tabela' ? [] : Object.keys(scope.estrutura.listaConsulta);
                             var mostrar = !APIServ.valorExisteEmVariavel(camposNaoMostrar, campo);
                             if (mostrar) {
                                 html += `<html-detalhe campo="${campo}" indice="${indice}"></html-detalhe>`

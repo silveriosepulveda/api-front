@@ -330,7 +330,7 @@ formulario-cadastro .form-group label {
 }
 
 .campoDetalheConsulta {
-    margin-left: 1%;
+    /* margin-left: 1%; */
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     border-radius: 10px;

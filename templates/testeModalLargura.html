@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html ng-app="testeApp">
+<head>
+    <title>Teste Modal Largura</title>
+    <link rel="stylesheet" href="/api-front/css/listaConsultaTabela.css">
+    <link rel="stylesheet" href="/api-front/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/api-front/css/font-awesome.min.css">
+</head>
+<body ng-controller="TesteController">
+    
+    <div class="container-fluid">
+        <h2>Teste: Modal com 80% de Largura</h2>
+        
+        <!-- Debug info -->
+        <div class="alert alert-info">
+            <strong>Debug:</strong> 
+            Este teste verifica se o modal está com 80% da largura da tela
+        </div>
+        
+        <!-- Debug adicional -->
+        <div class="alert alert-warning">
+            <strong>Status:</strong> 
+            Item selecionado: {{itemSelecionadoModal ? itemSelecionadoModal.nome : 'Nenhum'}} |
+            Item no escopo: {{item ? item.nome : 'Nenhum'}} |
+            Índice: {{indiceSelecionado}}
+        </div>
+        
+        <!-- Lista consulta tabela -->
+        <lista-consulta-tabela></lista-consulta-tabela>
+    </div>
+
+    <script src="/api-front/js/angular.min.js"></script>
+    <script src="/api-front/js/directives/directivesPadrao.js"></script>
+    <script src="/api-front/js/directives/srcDirectivesPadrao/listaConsultaTabela.js"></script>
+    
+    <script>
+        angular.module('testeApp', ['directivesPadrao'])
+        .controller('TesteController', function($scope) {
+            
+            // Dados de teste
+            $scope.listaConsulta = [
+                {
+                    id: 1,
+                    nome: 'João Silva',
+                    email: 'joao@email.com',
+                    telefone: '(11) 99999-9999',
+                    data_nascimento: '1985-03-15',
+                    endereco: 'Rua das Flores, 123',
+                    bairro: 'Centro',
+                    cidade: 'São Paulo',
+                    uf: 'SP'
+                },
+                {
+                    id: 2,
+                    nome: 'Maria Santos',
+                    email: 'maria@email.com',
+                    telefone: '(11) 88888-8888',
+                    data_nascimento: '1990-07-22',
+                    endereco: 'Av. Copacabana, 456',
+                    bairro: 'Copacabana',
+                    cidade: 'Rio de Janeiro',
+                    uf: 'RJ'
+                }
+            ];
+
+            // Estrutura
+            $scope.estrutura = {
+                nomeUsual: 'Pessoa',
+                tela: 'consulta',
+                tabela: 'pessoas',
+                campo_chave: 'id',
+                
+                // Título do modal
+                textoDetalhesConsulta: 'Detalhes da Pessoa',
+                
+                // Campos da lista
+                listaConsulta: {
+                    nome: { texto: 'Nome', md: 6 },
+                    email: { texto: 'E-mail', md: 6 }
+                },
+                
+                // Campos de detalhes
+                campos: {
+                    telefone: { texto: 'Telefone', md: 6 },
+                    data_nascimento: { texto: 'Nascimento', md: 6 },
+                    endereco: { texto: 'Endereço', md: 6 },
+                    bairro: { texto: 'Bairro', md: 6 },
+                    cidade: { texto: 'Cidade', md: 6 },
+                    uf: { texto: 'UF', md: 6 }
+                }
+            };
+            
+            // Função para detalhar
+            $scope.detalhar = function(item) {
+                console.log('Detalhando item:', item.nome);
+                
+                if (!item.detalhes) {
+                    item.detalhes = {
+                        observacoes: 'Observações sobre ' + item.nome,
+                        data_cadastro: '2024-01-15',
+                        status: 'Ativo'
+                    };
+                }
+                
+                item.exibirDetalhes = !item.exibirDetalhes;
+                console.log('Modal aberto:', item.exibirDetalhes);
+            };
+            
+            // Funções de exemplo
+            $scope.alterarPessoa = function(item) {
+                alert('Alterar pessoa: ' + item.nome);
+            };
+            
+            $scope.excluirPessoa = function(item) {
+                if (confirm('Deseja excluir ' + item.nome + '?')) {
+                    alert('Pessoa excluída: ' + item.nome);
+                }
+            };
+        });
+    </script>
+</body>
+</html>
+
+<!-- 
+INSTRUÇÕES DE TESTE - MODAL LARGURA:
+
+1. Abra este arquivo no navegador
+2. Clique no botão de detalhes (ícone +) de qualquer item
+3. O modal deve aparecer com 80% da largura da tela
+4. Teste redimensionando a janela do navegador:
+   - Tela grande: modal deve ter 80% da largura
+   - Tela média (max-width: 768px): modal deve ter 95% da largura
+   - Tela pequena (max-width: 480px): modal deve ter 98% da largura
+5. Verifique se o conteúdo está bem distribuído na largura maior
+
+CORREÇÕES IMPLEMENTADAS:
+
+✅ Largura do modal aumentada para 80% da tela
+✅ Responsividade para diferentes tamanhos de tela
+✅ Ajustes de padding para telas menores
+✅ Tamanho de fonte ajustado para telas pequenas
+
+RESULTADO ESPERADO:
+
+- Modal ocupa 80% da largura da tela em desktops
+- Modal se adapta automaticamente em telas menores
+- Conteúdo bem distribuído na largura maior
+- Experiência responsiva em todos os dispositivos
+
+TESTE DE RESPONSIVIDADE:
+
+1. Abra o modal
+2. Redimensione a janela do navegador
+3. Verifique se o modal se adapta corretamente
+4. Teste em diferentes tamanhos de tela
+-->

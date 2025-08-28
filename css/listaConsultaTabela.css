@@ -1,5 +1,192 @@
 /* ==================== ESTILOS ESPECÍFICOS PARA LISTA CONSULTA TABELA ==================== */
 
+/* ==================== MODAL DE DETALHES ==================== */
+
+/* Modal de detalhes para cada item */
+.modal-detalhes-item {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99999 !important; /* Z-index muito alto para garantir que fique acima de tudo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-detalhes-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    max-height: 90%;
+    width: 80%; /* Aumentado para 80% da largura da tela */
+    overflow: hidden;
+    animation: slideIn 0.3s ease-out;
+    z-index: 100000 !important; /* Z-index ainda mais alto para o container */
+    position: relative;
+}
+
+.modal-detalhes-header {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: #fff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #357abd;
+}
+
+.modal-detalhes-titulo {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.btn-fechar-modal {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.btn-fechar-modal:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-detalhes-body {
+    padding: 0; /* Remover padding para não interferir no sistema de colunas */
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Scrollbar personalizada para o modal */
+.modal-detalhes-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-detalhes-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-detalhes-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.modal-detalhes-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Garantir que o modal sempre fique acima de elementos sticky */
+.modal-detalhes-item {
+    z-index: 99999 !important;
+}
+
+.modal-detalhes-item * {
+    z-index: inherit;
+}
+
+/* Sobrescrever qualquer z-index de elementos da lista que possam interferir */
+.filtros-tabela-excel {
+    z-index: 9 !important; /* Manter baixo */
+}
+
+.fundoDetalheConsulta td {
+    z-index: 1 !important; /* Manter baixo */
+}
+
+/* Garantir que elementos dentro do modal tenham z-index apropriado */
+.modal-detalhes-header {
+    z-index: 100001 !important;
+    position: relative;
+}
+
+.modal-detalhes-body {
+    z-index: 100001 !important;
+    position: relative;
+}
+
+/* Ajustes para o sistema de colunas no modal */
+.modal-detalhes-body .fundoDetalheConsulta-excel {
+    padding: 20px; /* Padding apenas no container dos detalhes */
+}
+
+.modal-detalhes-body .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Ajustar padding específico para os campos de detalhes */
+.modal-detalhes-body .campoDetalheConsulta {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-bottom: 10px;
+}
+
+/* Responsividade para o modal */
+@media (max-width: 768px) {
+    .modal-detalhes-container {
+        width: 95%; /* Em telas pequenas, usar quase toda a largura */
+        max-width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-detalhes-container {
+        width: 98%; /* Em telas muito pequenas, usar quase toda a largura */
+        max-width: 98%;
+    }
+    
+    .modal-detalhes-header {
+        padding: 10px 15px;
+    }
+    
+    .modal-detalhes-body {
+        padding: 0; /* Manter sem padding para não interferir nas colunas */
+    }
+    
+    .modal-detalhes-body .fundoDetalheConsulta-excel {
+        padding: 15px; /* Padding reduzido para telas pequenas */
+    }
+    
+    .modal-detalhes-body .campoDetalheConsulta {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-bottom: 8px;
+    }
+    
+    .modal-detalhes-titulo {
+        font-size: 16px;
+    }
+}
+
 /* ==================== LAYOUT EXCEL - COMPACTO E EFICIENTE ==================== */
 
 /* Container principal da tabela */
