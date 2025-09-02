@@ -18,6 +18,8 @@ app.directive("estruturaGerencia", [
         // console.log('inicializando estruturaGerencia');
 
         var controller = function ($rootScope, $scope, $element, $attrs, $route, $routeParams, EGFuncoes, APIAjuFor, PopUpModal) {
+            console.log('inicializando estruturaGerencia');
+            
             // Detectar contexto modal através do atributo local-exibicao
             $scope.localExibicao = $attrs.localExibicao || "normal";
             $scope.isModal = $scope.localExibicao === "modal";
@@ -115,9 +117,8 @@ app.directive("estruturaGerencia", [
 
             var montarEstrutura = function (estrutura) {
                 var retorno = estrutura;
-
                 //Fazendo a validacao dos poderes do usuario
-                var menuPainel = APIServ.buscaDadosLocais("menuPainel");
+                var menuPainel = APIServ.buscaDadosLocais("menuPainel");                
 
                 var parametrosUrl = APIServ.parametrosUrl();
 
@@ -177,6 +178,8 @@ app.directive("estruturaGerencia", [
                     $rS[acao]["acoes"] = menuPainel.acoes != undefined && menuPainel.acoes[acao] != undefined ? menuPainel.acoes[acao] : [];
                     $rS[acao]["campos"] = menuPainel.campos != undefined && menuPainel.campos[acao] != undefined ? menuPainel.campos[acao] : [];
                 }
+                console.log($rS[acao]);
+                
 
                 $scope.parametrosUrl = parametrosUrl;
 
@@ -792,7 +795,7 @@ app.directive("estruturaGerencia", [
                             APIServ.executaFuncaoClasse("classeGeral", "consulta", parametrosEnviarFiltro, $scope.tipoConsulta)
                                 .success(function (data) {
                                     //console.log(data); $rootScope.carregando = false;/*
-                                    //                                          console.log(data);
+                                                                              console.log(data);
                                     if (usarTimerConsulta) {
                                         $rootScope.reiniciarTimer();
                                     }
@@ -1372,7 +1375,7 @@ app.directive("estruturaGerencia", [
                     html += "<formulario-cadastro></formulario-cadastro>"; // montaInicioFormCadastro(retorno, raizModelo);
                 }
 
-                if (EGFuncoes.temCadastroDireto(retorno)) {
+                if (EGFuncoes.temCadastroDireto(retorno) || ($scope.estrutura.telaInicial != undefined && $scope.estrutura.telaInicial == "cadastro")) {
                     $scope.tela = "cadastro";
                 }
                 if (retorno.tipoEstrutura == "somenteCadastro") {

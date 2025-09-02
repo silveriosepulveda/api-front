@@ -69,7 +69,7 @@ div.conteudoBusca div.row.itemConsulta{
 
 @media screen and (max-width: 2200px) {
     a, a>span, span, label, select, option, .form-control, div, .ui-autocomplete-input, .btn {
-        font-size: 14px!important;
+        font-size: 12px!important;
     }
     .divItemCadastro {
         min-height: 80px !important;

@@ -36,13 +36,15 @@ app.directive("cabecalhoConsulta", [
 
                 var acao = scope.estrutura.acao != undefined ? scope.estrutura.acao : APIServ.parametrosUrl()[1];
                 $rS[acao] = $rS[acao] == undefined ? ($rS[acao] = {}) : $rS[acao];
+                console.log($rS[acao]);
+                
                 if ($rS[acao]["acoes"] == undefined) {
                     $rS[acao]["acoes"] = {
                         Cadastrar: scope.estrutura.acoes != undefined && scope.estrutura.acoes.Cadastrar != undefined ? scope.estrutura.acoes.Cadastrar : false,
                         Alterar: scope.estrutura.acoes != undefined && scope.estrutura.acoes.Alterar != undefined ? scope.estrutura.acoes.Alterar : false,
                         Excluir: scope.estrutura.acoes != undefined && scope.estrutura.acoes.Excluir != undefined ? scope.estrutura.acoes.Excluir : false,
                     };
-                }
+                }               
 
                 angular.element(".navbar-brand").html(parametros.textoPagina);
 
@@ -50,13 +52,16 @@ app.directive("cabecalhoConsulta", [
                 //     <div class="col-xs-12 col-md-3 form-group" ng-class="{'baixarbotao': !dispositivoMovel}">
                 //         <input type="text" ng-change="alterarFiltroResultado(filtroResultadoTela)" ng-model="filtroResultadoTela" class="form-control" placeholder="Buscar nos Ítens da Tela">
                 //     </div>`;
-                let html = `<div class="row">
-                {{}}
+                let html = `<div class="row">                
                     <h2 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'consulta'">${parametros.textoPagina} - Consulta</h2>
                     <h2 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'cadastro' && (${campoChave} == 0 || ${campoChave} == undefined)">${parametros.textoPagina} - Inclusão</h2>
                     <h2 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'cadastro' && ${campoChave} > 0">${parametros.textoPagina} - Alteração</h2>`;
-
-                if (EGFuncoes.temCadastro(parametros) && ($rS[acao]["acoes"]["Cadastrar"] || admSistema)) {
+                
+                    const temAcaoCadastrar = $rS[acao]["acoes"]["Cadastrar"] != undefined;
+                    const temCadastroParam = EGFuncoes.temCadastro(parametros);
+                    console.log(temAcaoCadastrar, temCadastroParam);
+                    
+                if ((temCadastroParam && temAcaoCadastrar) ) {
                     html += `<button class="col-xs-12 col-md-4 btn btn-success" ng-class="{'top10': !dispositivoMovel}" ng-if="tela != 'cadastro'" ng-click="mudaTela('cadastro')">${parametros.textoNovo}</button>`;
                 }
 

@@ -1459,8 +1459,9 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
     .directive('selectMes', () => {
         return {
             restrict: 'E',
+            replace: true,
             template: `
-                <select >
+                <select class="form-control input-xs" >
                     <option value="">Selecione</option>
                     <option value="1">Janeiro</option>
                     <option value="2">Fevereiro</option>
