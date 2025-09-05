@@ -464,7 +464,7 @@ var directivesPadrao = angular.module('directivesPadrao', ['angularUtils.directi
             link: function (scope, elem) {
                 if ($rootScope.autoCompletaCarregado == undefined) {
                     $rootScope.autoCompletaCarregado = true;
-                    $.getScript('src/api-front/js/directives/autoCompleta.js');
+                    $.getScript('/api-front/js/directives/autoCompleta.js');
                     //var domElem = '<script src="api/js/directives/autoCompleta.js" async defer></script>';
                     //angular.element(elem).append($compile(domElem)(scope));
                 }
