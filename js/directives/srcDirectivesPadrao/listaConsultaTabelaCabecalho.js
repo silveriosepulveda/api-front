@@ -212,19 +212,21 @@ app.directive("cabecalhoListaConsultaTabela", [
                     var camposMesclados = parametros.listaConsulta;
 
                     var htmlCabecalho = `
-                <div class="col-xs-12 linhaFiltrosListaConsultaTabela" ng-if="tela=='consulta'">
+                <div class=" linhaFiltrosListaConsultaTabela" ng-if="tela=='consulta'">
                     <div class="table-responsive-excel">
                         <div class="table-container-excel-cabecalho">
                             <table class="table table-excel table-hover">
                                 <thead>
                                     <tr>
                                         <td colspan="100%" class="linhaListaConsulta-excel">
-                                            <div class="row row-excel">
+                                            <div class="row-excel">
                                                 <div class="${classeLista}">
-                                                    <div class="row inicioItem-excel">`;
+                                                    <div class=" inicioItem-excel">`;
 
                     // Criar cabeçalhos baseados nos campos mesclados
                     angular.forEach(camposMesclados, function (val, key) {
+                        console.log(val, key);
+                        
                         if (val.tipo != "oculto") {
                             var tamanhoColuna = val.md || 12;
                             var classeColuna = `col-xs-12 col-md-${tamanhoColuna}`;
@@ -302,7 +304,7 @@ app.directive("cabecalhoListaConsultaTabela", [
                         </div>
                     </div>
                     <!-- Linha de resumo da lista compacta -->
-                    <div class="resumo-lista-excel">
+                    <!--div class="resumo-lista-excel">
                         <div class="col-xs-12">
                             <div class="pull-left">
                                 <strong>Total:</strong> {{listaConsultaCompleta ? listaConsultaCompleta.length : 0}}
@@ -312,7 +314,7 @@ app.directive("cabecalhoListaConsultaTabela", [
                             </div>
                             <div class="clearfix"></div>
                         </div>
-                    </div>
+                    </div-->
                 </div>`;
 
                     return htmlCabecalho;

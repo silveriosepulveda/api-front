@@ -11,7 +11,11 @@
 
 
 .cabecalhoConsulta{
-    margin-top: 60px !important;
+    margin-top: 30px !important;
+}
+
+.linhaListaConsultaCabecalho-excel{
+    padding: 0px !important;    
 }
 
 /* ==================== LAYOUT EXCEL - COMPACTO E EFICIENTE ==================== */
