@@ -1240,12 +1240,23 @@ var directivesPadrao = angular
                     scope.calcularResumoConsulta();
 
                     let html = `
-                <div class="col-xs-12 resumoConsulta"  >
+                <div class="col-xs-12 resumoConsulta">
                     <div class="row">
-                        <div ng-class="obterClassesTamanho(estrutura.resumoConsulta[key])" 
-                            class="divitemLista div6 itemResumoConsulta"
-                            ng-repeat="(key, val) in resumoConsulta">
-                            <span>{{estrutura.resumoConsulta[key]['texto']}}: <label>{{val}}</label></span>
+                        <div class="col-xs-12 col-md-4 divItemLista itemResumoConsulta" ng-if="listaConsulta && listaConsulta.length > 0">                            
+                            <strong>Total de registros:</strong> {{listaConsultaVisivel.length}} / {{listaConsulta.length}}
+                        </div>
+                        <div class="col-xs-12 col-md-4 divItemLista itemResumoConsulta" ng-if="!listaConsulta || listaConsulta.length === 0">
+                                Nenhum registro encontrado
+                        </div>
+                        
+                        <div class="col-md-8 col-xs-12">
+                            <div class="row">
+                                <div ng-class="obterClassesTamanho(estrutura.resumoConsulta[key])" 
+                                    class="divitemLista div6 itemResumoConsulta"
+                                    ng-repeat="(key, val) in resumoConsulta">
+                                    <span>{{estrutura.resumoConsulta[key]['texto']}}: <label>{{val}}</label></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

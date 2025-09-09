@@ -5,17 +5,9 @@ app.directive('rodape', ['$rootScope', function($rootScope) {
         replace: true,
         template: `
             <div class="rodape bordasuperior">
-                <div class="container-fluid">
-                <resumo-consulta></resumo-consulta>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <span ng-if="listaConsulta && listaConsulta.length > 0">
-                                <strong>Total de registros:</strong> {{listaConsultaVisivel.length}} / {{listaConsulta.length}}
-                            </span>
-                            <span ng-if="!listaConsulta || listaConsulta.length === 0">
-                                Nenhum registro encontrado
-                            </span>
-                        </div>                        
+                <div class="col-xs-12">                
+                    <div class="row">                   
+                        <resumo-consulta class="col-md-8"></resumo-consulta>          
                     </div>                  
                     
                 </div>
