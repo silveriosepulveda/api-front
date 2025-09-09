@@ -225,7 +225,7 @@ app.directive("cabecalhoListaConsultaTabela", [
 
                     // Criar cabeçalhos baseados nos campos mesclados
                     angular.forEach(camposMesclados, function (val, key) {
-                        console.log(val, key);
+                       // console.log(val, key);
                         
                         if (val.tipo != "oculto") {
                             var tamanhoColuna = val.md || 12;

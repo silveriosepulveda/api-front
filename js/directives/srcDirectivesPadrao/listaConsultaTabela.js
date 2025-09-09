@@ -522,7 +522,7 @@ directivesPadrao.directive("listaConsultaTabela", [
                     
                     <!-- Modal de detalhes independente -->
                     <${diretivaDetalhes}></${diretivaDetalhes}>
-                    
+                    <rodape></rodape>
                 </div>`;
 
                     return html;

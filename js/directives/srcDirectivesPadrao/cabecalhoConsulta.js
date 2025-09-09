@@ -36,7 +36,7 @@ app.directive("cabecalhoConsulta", [
 
                 var acao = scope.estrutura.acao != undefined ? scope.estrutura.acao : APIServ.parametrosUrl()[1];
                 $rS[acao] = $rS[acao] == undefined ? ($rS[acao] = {}) : $rS[acao];
-                console.log($rS[acao]);
+                //console.log($rS[acao]);
                 
                 if ($rS[acao]["acoes"] == undefined) {
                     $rS[acao]["acoes"] = {
@@ -59,7 +59,7 @@ app.directive("cabecalhoConsulta", [
                 
                     const temAcaoCadastrar = $rS[acao]["acoes"]["Cadastrar"] != undefined;
                     const temCadastroParam = EGFuncoes.temCadastro(parametros);
-                    console.log(temAcaoCadastrar, temCadastroParam);
+                   // console.log(temAcaoCadastrar, temCadastroParam);
                     
                 if ((temCadastroParam && temAcaoCadastrar) ) {
                     html += `<button class="col-xs-12 col-md-4 btn btn-success" ng-class="{'top10': !dispositivoMovel}" ng-if="tela != 'cadastro'" ng-click="mudaTela('cadastro')">${parametros.textoNovo}</button>`;
@@ -93,13 +93,8 @@ app.directive("cabecalhoConsulta", [
             </div>
             <hr>
 
-            <div class="col-xs-12 resumoConsulta"  ng-if="resumoConsulta != undefined">
-                <div class="row">
-                    <div class="col-xs-12 col-md-4 divitemLista div6 itemResumoConsulta" ng-repeat="(key, val) in resumoConsulta">
-                        <span>{{estrutura.resumoConsulta[key]['texto']}}: <label>{{val}}</label></span>
-                    </div>
-                </div>
-            </div>`;
+            <resumo-consulta ng-if="estrutura.tipoListaConsulta == 'lista'"></resumo-consulta>
+           `;
 
                 if (scope.estrutura.tipoListaConsulta == "tabela") {
                     html += "<cabecalho-lista-consulta-tabela></cabecalho-lista-consulta-tabela>";

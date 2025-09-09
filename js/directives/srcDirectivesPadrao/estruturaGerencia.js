@@ -18,7 +18,7 @@ app.directive("estruturaGerencia", [
         // console.log('inicializando estruturaGerencia');
 
         var controller = function ($rootScope, $scope, $element, $attrs, $route, $routeParams, EGFuncoes, APIAjuFor, PopUpModal) {
-            console.log('inicializando estruturaGerencia');
+            //console.log('inicializando estruturaGerencia');
             
             // Detectar contexto modal através do atributo local-exibicao
             $scope.localExibicao = $attrs.localExibicao || "normal";
@@ -184,6 +184,7 @@ app.directive("estruturaGerencia", [
                 $scope.parametrosUrl = parametrosUrl;
 
                 $scope.estrutura = retorno;
+                $rS.estrutura = retorno;
 
                 $scope.exibirConsulta = retorno.exibirConsulta != undefined && retorno.exibirConsulta;
 
@@ -795,7 +796,7 @@ app.directive("estruturaGerencia", [
                             APIServ.executaFuncaoClasse("classeGeral", "consulta", parametrosEnviarFiltro, $scope.tipoConsulta)
                                 .success(function (data) {
                                     //console.log(data); $rootScope.carregando = false;/*
-                                                                              console.log(data);
+                                      //                                        console.log(data);
                                     if (usarTimerConsulta) {
                                         $rootScope.reiniciarTimer();
                                     }

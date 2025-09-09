@@ -32,7 +32,7 @@ app.directive("listaConsultaTabelaDetalhes", [
         </div>
     `,
             link: function (scope, elem) {
-                console.log("detalhesItemConsultaTabela - Modal Global");
+               // console.log("detalhesItemConsultaTabela - Modal Global");
 
                 // Variáveis para controlar o modal
                 scope.itemSelecionadoModal = null;
