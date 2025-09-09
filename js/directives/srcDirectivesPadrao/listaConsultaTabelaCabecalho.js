@@ -177,6 +177,33 @@ app.directive("cabecalhoListaConsultaTabela", [
                         return contador;
                     };
 
+                    // Função para obter valores únicos de uma coluna
+                    scope.obterValoresUnicosColuna = function (nomeColuna) {
+                        var listaBase = scope.listaConsultaCompleta || scope.listaConsulta || [];
+                        var valoresUnicos = [];
+                        var valoresVistos = {};
+
+                        angular.forEach(listaBase, function (item) {
+                            var valor = item[nomeColuna];
+                            if (valor !== null && valor !== undefined && valor !== '') {
+                                var valorStr = String(valor).trim();
+                                if (!valoresVistos[valorStr]) {
+                                    valoresVistos[valorStr] = true;
+                                    valoresUnicos.push(valorStr);
+                                }
+                            }
+                        });
+
+                        // Ordenar valores
+                        return valoresUnicos.sort();
+                    };
+
+                    // Função para limpar filtro individual
+                    scope.limparFiltroIndividual = function (nomeColuna) {
+                        scope.filtrosColuna[nomeColuna] = '';
+                        scope.aplicarFiltroColuna();
+                    };
+
                     // Watch para detectar mudanças na lista completa
                     var unwatchListaCompleta = scope.$watch("listaConsultaCompleta", function (novaLista) {
                         if (novaLista && novaLista.length > 0) {
@@ -199,6 +226,63 @@ app.directive("cabecalhoListaConsultaTabela", [
 
                     elem.html(html);
                     $compile(elem.contents())(scope);
+
+                    // Adicionar CSS para o ícone de limpar no select
+                    var css = `
+                        <style>
+                        .select-with-clear {
+                            position: relative;
+                            display: inline-block;
+                            width: 100%;
+                        }
+                        
+                        .select-clearable {
+                            padding-right: 30px !important;
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+                            appearance: none;
+                            background-image: none !important;
+                        }
+                        
+                        .clear-icon {
+                            position: absolute;
+                            right: 8px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            cursor: pointer;
+                            color: #999;
+                            font-size: 14px;
+                            z-index: 10;
+                            padding: 2px;
+                            border-radius: 2px;
+                        }
+                        
+                        .clear-icon:hover {
+                            color: #d9534f;
+                            background-color: rgba(217, 83, 79, 0.1);
+                        }
+                        
+                        .select-clearable:not(.has-filters) {
+                            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23666' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") !important;
+                            background-repeat: no-repeat !important;
+                            background-position: right 8px center !important;
+                            background-size: 8px 10px !important;
+                        }
+                        
+                        /* Para navegadores que não suportam appearance: none */
+                        .select-clearable::-ms-expand {
+                            display: none;
+                        }
+                        </style>
+                    `;
+                    
+                    // Adicionar CSS ao head se ainda não foi adicionado
+                    if (!document.getElementById('select-clear-css')) {
+                        var styleElement = document.createElement('div');
+                        styleElement.id = 'select-clear-css';
+                        styleElement.innerHTML = css;
+                        document.head.appendChild(styleElement);
+                    }
                 }
 
                 // Função para gerar o cabeçalho da tabela
@@ -277,7 +361,16 @@ app.directive("cabecalhoListaConsultaTabela", [
                             }
 
                             htmlCabecalho += `<div class="${classeColuna} campo-excel">`;
-                            htmlCabecalho += `<input type="text" class="form-control input-excel" placeholder="Filtrar ${textoPlaceholder}" ng-model="filtrosColuna['${key}']" ng-change="aplicarFiltroColuna()" ng-class="{'has-filters': filtrosAtivos['${key}']}">`;
+                            
+                            // Select com valores únicos e ícone de borracha customizado
+                            htmlCabecalho += `<div class="select-with-clear">`;
+                            htmlCabecalho += `<select class="form-control input-excel select-clearable" ng-model="filtrosColuna['${key}']" ng-change="aplicarFiltroColuna()" ng-class="{'has-filters': filtrosAtivos['${key}']}" data-field="${key}">`;
+                            htmlCabecalho += `<option value="">Todos os ${textoPlaceholder}</option>`;
+                            htmlCabecalho += `<option ng-repeat="valor in obterValoresUnicosColuna('${key}')" value="{{valor}}">{{valor}}</option>`;
+                            htmlCabecalho += `</select>`;
+                            htmlCabecalho += `<i class="fa fa-eraser clear-icon" ng-click="limparFiltroIndividual('${key}')" ng-show="filtrosAtivos['${key}']" title="Limpar filtro ${textoPlaceholder}"></i>`;
+                            htmlCabecalho += `</div>`;
+                            
                             htmlCabecalho += `</div>`;
                         }
                     });
