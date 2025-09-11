@@ -7,4 +7,15 @@
     background-color: #f0f0f0;
     border-top: 1px solid #ccc;
     z-index: 1000;
+    font-size: 16px !important;
+}
+
+/* Regra mais específica para sobrescrever as media queries */
+.rodape,
+.rodape *,
+.rodape a,
+.rodape span,
+.rodape label,
+.rodape div {
+    font-size: 16px !important;
 }

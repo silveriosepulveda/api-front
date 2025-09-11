@@ -86,7 +86,7 @@ app.directive("cabecalhoConsulta", [
 
                 let ngIfAcoesInicioConsulta = !mostrarAcoesInicioConsultaSemResultado ? 'ng-if="listaConsulta.length > 0"' : "";
                 html += `
-            <div class="col-xs-12 acoesInicioConsulta teste" ${ngIfAcoesInicioConsulta}>
+            <div class="col-xs-12 acoesInicioConsulta" ${ngIfAcoesInicioConsulta}>
                 <div class="row">
                     ${acoesInicioConsulta}
                 </div>

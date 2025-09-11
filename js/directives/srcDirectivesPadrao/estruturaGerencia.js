@@ -19,7 +19,7 @@ app.directive("estruturaGerencia", [
 
         var controller = function ($rootScope, $scope, $element, $attrs, $route, $routeParams, EGFuncoes, APIAjuFor, PopUpModal) {
             //console.log('inicializando estruturaGerencia');
-            
+
             // Detectar contexto modal através do atributo local-exibicao
             $scope.localExibicao = $attrs.localExibicao || "normal";
             $scope.isModal = $scope.localExibicao === "modal";
@@ -118,7 +118,7 @@ app.directive("estruturaGerencia", [
             var montarEstrutura = function (estrutura) {
                 var retorno = estrutura;
                 //Fazendo a validacao dos poderes do usuario
-                var menuPainel = APIServ.buscaDadosLocais("menuPainel");                
+                var menuPainel = APIServ.buscaDadosLocais("menuPainel");
 
                 var parametrosUrl = APIServ.parametrosUrl();
 
@@ -179,12 +179,10 @@ app.directive("estruturaGerencia", [
                     $rS[acao]["campos"] = menuPainel.campos != undefined && menuPainel.campos[acao] != undefined ? menuPainel.campos[acao] : [];
                 }
                 console.log($rS[acao]);
-                
 
                 $scope.parametrosUrl = parametrosUrl;
 
                 $scope.estrutura = retorno;
-                $rS.estrutura = retorno;
 
                 $scope.exibirConsulta = retorno.exibirConsulta != undefined && retorno.exibirConsulta;
 
@@ -479,7 +477,7 @@ app.directive("estruturaGerencia", [
                         });
                     };
 
-                    $scope.adicionarFiltro();                    
+                    $scope.adicionarFiltro();
 
                     $scope.ordemFiltro = $scope.estrutura.campoOrdemPadraoFiltro != undefined ? $scope.estrutura.campoOrdemPadraoFiltro : "";
                     $scope.sentidoFiltro = $scope.estrutura.sentidoOrdemPadraoFiltro ? $scope.estrutura.sentidoOrdemPadraoFiltro : "";
@@ -796,7 +794,7 @@ app.directive("estruturaGerencia", [
                             APIServ.executaFuncaoClasse("classeGeral", "consulta", parametrosEnviarFiltro, $scope.tipoConsulta)
                                 .success(function (data) {
                                     //console.log(data); $rootScope.carregando = false;/*
-                                      //                                        console.log(data);
+                                    //                                        console.log(data);
                                     if (usarTimerConsulta) {
                                         $rootScope.reiniciarTimer();
                                     }
@@ -1321,6 +1319,7 @@ app.directive("estruturaGerencia", [
                         };
 
                         var funcao = function () {
+                            $rootScope.carregando = true;
                             APIServ.executaFuncaoClasse("classeGeral", "excluir", parametros).success(function (retorno) {
                                 console.log(retorno);
                                 if (retorno.erro != undefined) {
@@ -1328,10 +1327,13 @@ app.directive("estruturaGerencia", [
                                 } else if (retorno.chave >= 0) {
                                     var key = $scope.listaConsulta.indexOf(item);
                                     $scope.listaConsulta.splice(key, 1);
+                                    $scope.listaConsulta = retorno.novaConsulta.lista;
+
                                     APIServ.mensagemSimples("Confirmação", $scope.estrutura.nomeUsual + " Excluído!");
                                 } else if (retorno.chave > 0) {
                                     APIServ.mensagemSimples("Informação", $scope.estrutura.nomeUsual + " Está em Uso e não pode ser Excluído!");
                                 }
+                                $rootScope.carregando = false;
                             });
                         };
                         APIServ.dialogoSimples("Confirmação", "Excluir " + $scope.estrutura.nomeUsual + "!?", "Sim", "Não", funcao);
@@ -1359,7 +1361,7 @@ app.directive("estruturaGerencia", [
 
                 var html = "";
                 if (EGFuncoes.temConsulta(retorno)) {
-                    html += '<cabecalho-consulta class="cabecalhoConsulta " style="float: left;"></cabecalho-consulta>'; //montaCabecalhoConsulta(retorno, $scope);
+                    html += '<cabecalho-consulta class="cabecalhoConsulta "></cabecalho-consulta>'; //montaCabecalhoConsulta(retorno, $scope);
                     if (estrutura.tipoListaConsulta != undefined && estrutura.tipoListaConsulta == "tabela") {
                         $scope.tipoListaConsulta = "tabela";
                         html += '<lista-consulta-tabela class="listaConsulta"></lista-consulta-tabela>'; //  montaListaConsulta(estrutura);

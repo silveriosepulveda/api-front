@@ -260,6 +260,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 0;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+/* Garantir que todos os elementos dentro das células tenham texto cortado */
+.table-excel tbody td * {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 /* Elementos específicos da lista */
@@ -302,6 +314,11 @@
     min-height: 25px;
     max-height: 25px;
     line-height: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .texto-excel {
@@ -313,6 +330,12 @@
     max-height: 25px;
     display: inline-block;
     vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .texto-cabecalho-excel {
