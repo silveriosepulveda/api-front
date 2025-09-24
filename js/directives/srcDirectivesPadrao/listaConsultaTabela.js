@@ -368,8 +368,8 @@ directivesPadrao.directive("listaConsultaTabela", [
                     var htmlBotoes = `<div class="col-acoes-excel">`;
 
                     const acoes = APIServ.buscaDadosLocais("menuPainel");
-                    const temAlterar = acoes.acoes[scope.acao]["Alterar"] != undefined;
-                    const temExcluir = acoes.acoes[scope.acao]["Excluir"] != undefined;
+                    const temAlterar = acoes.acoes[scope.acao] != undefined && acoes.acoes[scope.acao]["Alterar"] != undefined;
+                    const temExcluir = acoes.acoes[scope.acao] != undefined && acoes.acoes[scope.acao]["Excluir"] != undefined;
 
                     // Botão detalhar
                     if (
