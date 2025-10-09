@@ -22,7 +22,9 @@ app.directive("cabecalhoConsulta", [
                 let acoesInicioConsulta = "";
                 let mostrarAcoesInicioConsultaSemResultado = false;
                 if (parametros.acoesInicioConsulta != undefined) {
+                    
                     angular.forEach(parametros.acoesInicioConsulta, function (val, key) {
+                        console.log('Acoes inicio consulta', val, key);
                         mostrarAcoesInicioConsultaSemResultado =
                             val.mostrarSemResultados != undefined && val.mostrarSemResultados ? true : mostrarAcoesInicioConsultaSemResultado;
                         if (val == "diretiva" || (val.tipo != undefined && val.tipo == "diretiva")) {

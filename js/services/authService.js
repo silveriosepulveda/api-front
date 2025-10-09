@@ -1,19 +1,20 @@
 // Serviço de autenticação SPA
 app.factory('AuthService', function ($http, $window, $rootScope, APIServ) {
     return {
-        login: function (user, pass) {
+        login: function (user, pass, tipoLogin = '') {
             return new Promise(function (resolve) {
                 // Chame o endpoint de login do backend (exemplo: /api/login.php)
                 // O backend deve retornar { token: '...', usuario: {...} } em caso de sucesso
 
                 var parametros = {
                     'login': user,
-                    'senha': pass
+                    'senha': pass,
+                    'tipoLogin' : tipoLogin
                 }
 
                 const fd = new FormData();
                 fd.append('parametros', JSON.stringify(parametros));
-
+                console.log('parametros login' ,    parametros);
                 APIServ.executaFuncaoClasse('usuarios', 'logarUsuario', parametros).success(function (data) {
                     console.log(data);
                     $window.localStorage.setItem('sessionId', data.sessionId);
@@ -32,7 +33,7 @@ app.factory('AuthService', function ($http, $window, $rootScope, APIServ) {
                     } else {
                         resolve(false);
                     }
-                }).error(function() {
+                }).error(function(err) {
                     resolve(false);
                 });
             });

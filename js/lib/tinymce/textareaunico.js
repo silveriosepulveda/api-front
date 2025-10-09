@@ -1,0 +1,25 @@
+// JavaScript Document
+tinymce.init({
+    language: 'pt_BR',
+    mode: "textareas",
+    plugins: [
+        "autolink link image lists charmap preview hr anchor pagebreak",
+        "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+        "table contextmenu directionality emoticons paste textcolor responsivefilemanager"
+    ],
+    toolbar1: "undo redo | styleselect | fontselect | fontsizeselect | forecolor backcolor | bold italic underline",
+    toolbar2: "| alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | responsivefilemanager | link unlink anchor | image media | print preview code ",
+    statusbar: false,
+    image_advtab: true,
+    subfolder: "",
+    content_css: "BaseArcabouco/tinymce/tinymce.css",
+    external_filemanager_path: "BaseArcabouco/tinymce/filemanager/",
+    filemanager_title: "Upload de Imagens para usar em Textos",
+    external_plugins: {"filemanager": "filemanager/plugin.min.js"}
+});
+
+setTimeout(function () {
+    var idtext = $('textarea').attr('id');
+    var altura = $('#' + idtext).attr('altura') - 140;
+    $('#' + idtext + '_ifr').css('height', altura + 'px');
+}, 500);

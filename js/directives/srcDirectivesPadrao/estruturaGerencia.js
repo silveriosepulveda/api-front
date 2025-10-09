@@ -110,7 +110,7 @@ app.directive("estruturaGerencia", [
             $scope.alturaTela = window.screen.availHeight;
             $scope.dispositivoMovel = $scope.larguraTela <= 900;
             $scope.tipoSalvar = "post";
-            $scope.tipoConsulta = "post";
+            $scope.tipoConsulta = "get";
 
             var html = "";
             $scope.fd = new FormData();
@@ -178,7 +178,6 @@ app.directive("estruturaGerencia", [
                     $rS[acao]["acoes"] = menuPainel.acoes != undefined && menuPainel.acoes[acao] != undefined ? menuPainel.acoes[acao] : [];
                     $rS[acao]["campos"] = menuPainel.campos != undefined && menuPainel.campos[acao] != undefined ? menuPainel.campos[acao] : [];
                 }
-                console.log($rS[acao]);
 
                 $scope.parametrosUrl = parametrosUrl;
 
@@ -467,7 +466,7 @@ app.directive("estruturaGerencia", [
                     }
                 };
 
-                if (EGFuncoes.temConsulta(retorno)) {
+                if (EGFuncoes.temConsulta(retorno)) {                                        
                     $scope.adicionarFiltro = function () {
                         $scope.filtros.push({
                             texto: "",
@@ -541,7 +540,10 @@ app.directive("estruturaGerencia", [
                         }
                     };
 
-                    $scope.filtros = Object.assign([], $scope.manipularFiltroLocal($scope.acao, "buscar"));
+
+                    $scope.filtros = Object.assign($scope.filtros, $scope.manipularFiltroLocal($scope.acao, "buscar"));
+                    console.log($scope.filtros);
+                    
 
                     // if (filtroLocal.length > 0) {
                     //     $scope.filtros = filtroLocal;
@@ -896,9 +898,9 @@ app.directive("estruturaGerencia", [
                                     //*/
                                 })
                                 .error(function (a, b, c) {
-                                    //console.log(a);
-                                    //console.log(b);
-                                    //console.log(c);
+                                    console.log(a);
+                                    console.log(b);
+                                    console.log(c);
                                     $rS.carregando = false;
                                     APIServ.mensagemSimples("Informação", "Erro ao Filtrar");
                                 });
@@ -968,8 +970,7 @@ app.directive("estruturaGerencia", [
 
                             //Vendo se o detalhe do item ja foi carregado
                             if (item["detalhes"] == undefined) {
-                                APIServ.executaFuncaoClasse("classeGeral", "detalhar", filtros).success(function (data) {
-                                    console.log(data);
+                                APIServ.executaFuncaoClasse("classeGeral", "detalhar", filtros).success(function (data) {                                    
                                     item["arquivosAnexados"] = data.arquivosAnexados;
                                     item["exibirDetalhes"] = true;
                                     item["detalhes"] = {};
@@ -1263,7 +1264,7 @@ app.directive("estruturaGerencia", [
 
                             var fd = new FormData();
                             fd.append("filtros", JSON.stringify(filtros));
-                            APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", fd, $scope.tipoConsulta)
+                            APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", filtros)
                                 .success(function (data) {
                                     $rS.carregando = false;
                                     if (usarTimerConsulta) {
@@ -1405,7 +1406,7 @@ app.directive("estruturaGerencia", [
                             }
                         });
 
-                        if ($scope.filtros[0]["valor"] == "" && $scope.exibirConsulta) {
+                        if ($scope.filtros != undefined && $scope.filtros.length > 0 && $scope.filtros[0]["valor"] == "" && $scope.exibirConsulta) {
                             angular.element("#filtros_0_valor").focus();
                         }
                     }, 200);

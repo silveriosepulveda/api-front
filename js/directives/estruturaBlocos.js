@@ -9,6 +9,10 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
 
             var bloco = APIServ.buscarValorVariavel(scope.estrutura, nomeBloco);
 
+            if (bloco == undefined) {
+                return false;
+            }
+
             if (bloco.campos == undefined || Object.keys(bloco.campos).length == 0) {
                 return false;
             }
@@ -403,3 +407,59 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
             }
         }
     }])
+    .directive("expandeComprimeBloco", function ($compile, APIServ, EGFuncoes) {
+        return {
+            restrict: "E",
+            replace: true,
+            template: '<button type="button" class="btn btn-default col-xs-3 col-md-1 glyphicon"></button>',
+            link: function (scope, elem, attr) {
+                var tamanho = elem.attr("tamanho") != undefined ? elem.attr("tamanho") : "pequeno";
+
+                var tamanhos = {
+                    original: "",
+                    pequeno: "iconePequeno",
+                    medio: "iconeMedio",
+                    grande: "iconeGrande",
+                };
+
+                var comprimir = false;
+
+                var classeIcone = "glyphicon-collapse-down";
+
+                //Fiz esta comaracao pois a diretiva pode ser chamanda de fora de uma estruturaGerencia
+                if (scope.estrutura != undefined) {
+                    dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, elem.attr("nome-bloco"));
+                    comprimir = dadosBloco.iniciarComprimido != undefined ? dadosBloco.iniciarComprimido : false;
+                    classeIcone = comprimir ? "glyphicon-expand" : "glyphicon-collapse-down";
+                } else {
+                    //Depois tenho que tratar para que eles se auto comprimam vindo pela atributo
+                    comprimir = attr.iniciarComprimido != undefined && attr.iniciarComprimido ? true : false;
+                    classeIcone = comprimir ? "glyphicon-expand" : "glyphicon-collapse-down";
+                }
+
+                elem.addClass(classeIcone);
+
+                elem.bind("click", function ($event) {   
+                    console.log($event);
+                                     
+                    let classeBloco = attr.classeBloco != undefined ? attr.classeBloco : "conteudoBloco";                    
+
+                    var obj = $event.target;
+                    //var objConteudo = angular.element(obj).parent('div').siblings('div.' + classeBloco);
+                    var objConteudo = $(obj).closest("monta-bloco-html").find(".conteudoBloco");
+
+                    var visible = !objConteudo.is(":visible");
+
+                    objConteudo.toggle("collapse");
+
+                    if (visible) {
+                        angular.element(obj).removeClass("glyphicon-expand").addClass("glyphicon-collapse-down");
+                    } else {
+                        angular.element(obj).removeClass("glyphicon-collapse-down").addClass("glyphicon-expand");
+                    }
+                });
+                elem.addClass(tamanhos[tamanho]);
+                $compile(elem.contents())(scope);
+            },
+        };
+    })

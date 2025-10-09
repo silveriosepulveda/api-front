@@ -1,0 +1,20 @@
+@charset "iso-8859-1";
+/* CSS Document */
+
+td{
+    vertical-align:top !important;
+    height: auto !important;
+}
+
+table{
+	/*
+   width:auto !important;
+   table-layout: auto !important;
+   */
+}
+
+
+body.mceContentBody {
+    background-color:#FFF !important;
+}
+

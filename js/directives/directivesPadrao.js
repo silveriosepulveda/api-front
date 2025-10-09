@@ -1,63 +1,5 @@
 var directivesPadrao = angular
     .module("directivesPadrao", ["angularUtils.directives.dirPagination"])
-    .directive("expandeComprimeBloco", function ($compile, APIServ, EGFuncoes) {
-        return {
-            restrict: "E",
-            replace: true,
-            template: '<button type="button" class="btn btn-default col-xs-3 col-md-1 glyphicon"></button>',
-            link: function (scope, elem, attr) {
-                var tamanho = elem.attr("tamanho") != undefined ? elem.attr("tamanho") : "pequeno";
-
-                var tamanhos = {
-                    original: "",
-                    pequeno: "iconePequeno",
-                    medio: "iconeMedio",
-                    grande: "iconeGrande",
-                };
-
-                var comprimir = false;
-
-                var classeIcone = "glyphicon-collapse-down";
-
-                //Fiz esta comaracao pois a diretiva pode ser chamanda de fora de uma estruturaGerencia
-                if (scope.estrutura != undefined) {
-                    dadosBloco = APIServ.buscarValorVariavel(scope.estrutura.campos, elem.attr("nome-bloco"));
-                    comprimir = dadosBloco.iniciarComprimido != undefined ? dadosBloco.iniciarComprimido : false;
-                    classeIcone = comprimir ? "glyphicon-expand" : "glyphicon-collapse-down";
-                } else {
-                    //Depois tenho que tratar para que eles se auto comprimam vindo pela atributo
-                    comprimir = attr.iniciarComprimido != undefined && attr.iniciarComprimido ? true : false;
-                    classeIcone = comprimir ? "glyphicon-expand" : "glyphicon-collapse-down";
-                }
-
-                elem.addClass(classeIcone);
-
-                elem.bind("click", function ($event) {
-                    console.log("teste");
-                    let classeBloco = attr.classeBloco != undefined ? attr.classeBloco : "conteudoBloco";
-                    console.log(classeBloco);
-
-                    var obj = $event.target;
-                    //var objConteudo = angular.element(obj).parent('div').siblings('div.' + classeBloco);
-                    var objConteudo = $(obj).closest("monta-bloco-html").find(".conteudoBloco");
-                    console.log(objConteudo);
-
-                    var visible = !objConteudo.is(":visible");
-
-                    objConteudo.toggle("collapse");
-
-                    if (visible) {
-                        angular.element(obj).removeClass("glyphicon-expand").addClass("glyphicon-collapse-down");
-                    } else {
-                        angular.element(obj).removeClass("glyphicon-collapse-down").addClass("glyphicon-expand");
-                    }
-                });
-                elem.addClass(tamanhos[tamanho]);
-                $compile(elem.contents())(scope);
-            },
-        };
-    })
-
     .directive("montaHtmlPosicao", [
         "$rootScope",
         "$parse",
@@ -440,8 +382,7 @@ var directivesPadrao = angular
                                 let nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
                                 html += `<${nomeDiretiva} indice="${indice}"></${nomeDiretiva}>`;
                             } else if ((val.tipo == undefined || val.tipo != "oculto") && key.substr(0, 5) != "botao" && val.tipo != "senha") {
-                                var mostrar = !APIServ.valorExisteEmVariavel(camposNaoMostrar, key);
-                                console.log(mostrar);
+                                var mostrar = !APIServ.valorExisteEmVariavel(camposNaoMostrar, key);                                
                                 if (mostrar) {
                                     html += `<html-detalhe campo="${key}" indice="${indice}"></html-detalhe>`;
                                 }

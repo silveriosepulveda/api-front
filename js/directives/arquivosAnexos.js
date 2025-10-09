@@ -1,4 +1,5 @@
-directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$rootScope', 'APIServ', function ($compile, $http, $parse, $rootScope, APIServ) {
+directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$rootScope', 'APIServ', 'config',
+     function ($compile, $http, $parse, $rootScope, APIServ, config) {
     return {
         restrict: "E",
         replace: true,
@@ -45,7 +46,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                 idForm = `formularioAnexoBloco_` + Math.floor(Math.random() * 100);
             }
 
-            var excluir = tela != 'detalhes' ? `<a href="#" class="col-xs-12 col-md-4 vermelho text-center" ng-click="excluirAnexo(${itemRepetir}, anexo, key)" 
+            var excluir = tela != 'detalhes' ? `<a href="" class="col-xs-12 col-md-4 vermelho text-center" ng-click="excluirAnexo(${itemRepetir}, anexo, key)" 
                 ng-if="anexo.tipoAnexo != 'Relacionado'">Excluir</a>` : '';
 
             var idArquivos = 'arquivos_' + chave;
@@ -192,7 +193,7 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
                     <div ng-repeat="(key, anexo) in ${itemRepetir}" item-repetir="${itemRepetir}" class="divListaAnexos">
                         <div class="col-xs-12 col-md-4 arquivoAnexo">                        
                             <objeto-visualizacao arquivo="{{anexo.grande}}" ng-if="anexo.tipo == 'arquivo'"></objeto-visualizacao>
-                            <img ng-src="{{anexo.mini}}" ng-if="anexo.tipo == 'imagem'" class="img-responsive imagemZoom" imagem-dinamica>
+                            <img ng-src="${config.urlSite}{{anexo.mini}}" ng-if="anexo.tipo == 'imagem'" class="img-responsive imagemZoom" imagem-dinamica>
                             <!--label ng-if="anexo.tipo != 'imagem'" class="text-center">{{anexo.titulo}}</label-->
                             `;
 
@@ -274,14 +275,14 @@ directivesPadrao.directive('arquivosAnexos', ['$compile', '$http', '$parse', '$r
 
                 if (enviar) {
                     $rootScope.carregando = true;
-                    return $http.post('api/anexarArquivos', fd, {
+                    return $http.post(config.baseUrl + 'anexarArquivos', fd, {
                         transformRequest: angular.identity,
                         headers: {
                             'Content-Type': undefined
                         }
                     })
                         .success(function (retorno) {
-                            console.log(retorno);
+               //             console.log(retorno);/*
                             //scope.df = new FormData();
                             $rS.carregando = false;
                             if (tela == 'cliente') {

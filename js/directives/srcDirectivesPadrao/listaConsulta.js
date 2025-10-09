@@ -5,7 +5,8 @@ directivesPadrao
         "EGFuncoes",
         "APIAjuFor",
         "FuncoesConsulta",
-        function ($compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta) {
+        "config",
+        function ($compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta, config) {
             return {
                 restrict: "E",
                 replace: true,
@@ -70,7 +71,7 @@ directivesPadrao
                                 var tamanho = EGFuncoes.montarTamanhos(val);
                                 htmlCamposLista += `<div class="col-xs-12 ${classesDivItemConsulta} campoItemConsulta ${tamanho.join(" ")}">`;
                                 htmlCamposLista += val.texto != "" ? `<label class="col-md-2">${val.texto}: </label>` : "";
-                                htmlCamposLista += `<img ng-src="{{item.${key}}}" class="img-responsive" style="max-height:120px !important" imagem-dinamica></div>`;
+                                htmlCamposLista += `<img ng-src="${config.urlSite}{{item.${key}}}" class="img-responsive" style="max-height:120px !important" imagem-dinamica></div>`;
                             } else if (val == "diretiva") {
                                 //console.log('diretiva');
                                 var nomeDiretiva = APIAjuFor.variavelParaDiretiva(key);
