@@ -55,7 +55,7 @@ app.directive("cabecalhoConsulta", [
                 //         <input type="text" ng-change="alterarFiltroResultado(filtroResultadoTela)" ng-model="filtroResultadoTela" class="form-control" placeholder="Buscar nos Ítens da Tela">
                 //     </div>`;
                 let html = `<div class="row">                
-                    <h2 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'consulta'">${parametros.textoPagina} - Consulta</h2>
+                    <h4 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'consulta'">${parametros.textoPagina} - Consulta</h4>
                     <h2 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'cadastro' && (${campoChave} == 0 || ${campoChave} == undefined)">${parametros.textoPagina} - Inclusão</h2>
                     <h2 class="col-xs-12 col-md-8" ng-if="!dispositivoMovel && tela == 'cadastro' && ${campoChave} > 0">${parametros.textoPagina} - Alteração</h2>`;
                 

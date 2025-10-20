@@ -110,7 +110,7 @@ app.directive("estruturaGerencia", [
             $scope.alturaTela = window.screen.availHeight;
             $scope.dispositivoMovel = $scope.larguraTela <= 900;
             $scope.tipoSalvar = "post";
-            $scope.tipoConsulta = "get";
+            $scope.tipoConsulta = "post";
 
             var html = "";
             $scope.fd = new FormData();
@@ -541,13 +541,13 @@ app.directive("estruturaGerencia", [
                     };
 
 
-                    $scope.filtros = Object.assign($scope.filtros, $scope.manipularFiltroLocal($scope.acao, "buscar"));
-                    console.log($scope.filtros);
+                    
+                    const filtrosLocal = $scope.manipularFiltroLocal($scope.acao, "buscar");
                     
 
-                    // if (filtroLocal.length > 0) {
-                    //     $scope.filtros = filtroLocal;
-                    // } else
+                    if (filtrosLocal.length > 0) {
+                        $scope.filtros = filtrosLocal;
+                    } else
                     if (estrutura.filtrosPadrao) {
                         //$scope.filtros = [];
                         var tirarPrimeiroFiltro = false;
@@ -796,7 +796,7 @@ app.directive("estruturaGerencia", [
                             APIServ.executaFuncaoClasse("classeGeral", "consulta", parametrosEnviarFiltro, $scope.tipoConsulta)
                                 .success(function (data) {
                                     //console.log(data); $rootScope.carregando = false;/*
-                                    console.log(data);
+                                    //console.log(data);
                                     if (usarTimerConsulta) {
                                         $rootScope.reiniciarTimer();
                                     }
@@ -1084,7 +1084,7 @@ app.directive("estruturaGerencia", [
                             // })
                             APIServ.executaFuncaoClasse("classeGeral", "manipula", parametrosEnviar, $scope.tipoSalvar)
                                 .success(function (retorno) {
-                                    // console.log(retorno); $scope.desabilitarSalvar = false; $rootScope.carregando = false; /*
+                                     //console.log(retorno); $scope.desabilitarSalvar = false; $rootScope.carregando = false; /*
                                     if ($scope.tipoSalvar == "get") {
                                         //console.log(retorno);
                                         return false;
@@ -1263,7 +1263,8 @@ app.directive("estruturaGerencia", [
                             }
 
                             var fd = new FormData();
-                            fd.append("filtros", JSON.stringify(filtros));
+                            fd.append("filtros", JSON.stringify(filtros));                            
+                            
                             APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", filtros)
                                 .success(function (data) {
                                     $rS.carregando = false;
@@ -1317,6 +1318,7 @@ app.directive("estruturaGerencia", [
                             tabela: $scope.estrutura.tabela,
                             campo_chave: $scope.estrutura.campo_chave,
                             chave: item[$scope.estrutura.campo_chave],
+                            refazerConsulta: true,
                         };
 
                         var funcao = function () {
@@ -1398,11 +1400,14 @@ app.directive("estruturaGerencia", [
                 //Fiz esta rotina para ver se poe as mascaras nos campos de pesquisa, quando sao padrao
                 if ($scope.tela == "consulta" && estrutura.filtrosPadrao) {
                     setTimeout(function () {
-                        angular.forEach($scope.filtros, function (item, key) {
-                            if (item.campo != "" && estrutura.filtrosPadrao[item["campo"]] != undefined) {
+                        angular.forEach($scope.filtros, function (item, key) {                           
+                            if (item.campo !== null && item.campo != undefined && item.campo != "" && estrutura.filtrosPadrao[item["campo"]] != undefined) {
                                 angular.element(`#filtros_${key}_campo`).trigger("change");
-                                $scope.filtros[key]["valor"] =
-                                    estrutura.filtrosPadrao[item["campo"]]["valor"] != undefined ? estrutura.filtrosPadrao[item["campo"]]["valor"] : "";
+                                
+                                const campoF = item['campo'];
+                                const valorFiltroPadrao = estrutura.filtrosPadrao[campoF] != undefined && estrutura.filtrosPadrao[campoF]["valor"] != undefined ? 
+                                    estrutura.filtrosPadrao[campoF]["valor"] : "";
+                                $scope.filtros[key]["valor"] =valorFiltroPadrao;
                             }
                         });
 
@@ -1467,7 +1472,7 @@ app.directive("estruturaGerencia", [
                 }
 
                 APIServ.executaFuncaoClasse("classeGeral", "buscarEstrutura", paramEnviarBuscaEstrutura, $scope.tipoConsulta).success((retorno) => {
-                    // console.log(retorno);
+                     //console.log(retorno);
                     montarEstrutura(retorno);
                 });
             }

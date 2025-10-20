@@ -168,7 +168,7 @@ a:hover {
 /************** PADROES PAINEL ****************/
 
 .ui-datepicker {
-    z-index: 99 !important
+    z-index: 99999 !important
 }
 
 .form-control {

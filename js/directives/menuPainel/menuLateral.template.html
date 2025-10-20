@@ -1,0 +1,94 @@
+<div class="menu-lateral-container">
+    <nav class="menu-lateral" id="menuLateral" ng-click="$event.stopPropagation()">
+        <!-- Cabeçalho do Menu -->
+        <div class="menu-header">
+            <!-- Campo de Busca -->
+            <div class="menu-busca">
+                <input type="text" 
+                       class="menu-busca-input" 
+                       placeholder="Buscar no menu..."
+                       ng-model="ml.buscaTexto"
+                       autocomplete="off"
+                       aria-label="Buscar no menu">
+                <i class="fa fa-search menu-busca-icone"></i>
+            </div>
+            
+            <!-- Botão Expandir/Colapsar Todos -->
+            <button type="button" 
+                    class="menu-btn-expandir" 
+                    ng-click="ml.toggleTodosMenus()"
+                    title="{{ml.todosExpandidos ? 'Recolher todos' : 'Expandir todos'}}"
+                    aria-label="{{ml.todosExpandidos ? 'Recolher todos' : 'Expandir todos'}}">
+                <i class="fa" ng-class="ml.todosExpandidos ? 'fa-compress' : 'fa-expand'"></i>
+            </button>
+        </div>
+
+        <!-- Lista de Menus -->
+        <div class="menu-lista">
+            <!-- Seção de Favoritos -->
+            <div class="menu-secao favoritos-secao" 
+                 ng-if="ml.favoritos.length > 0"
+                 ng-class="{'expandido': ml.favoritosExpandido}">
+                
+                <div class="menu-secao-header" ng-click="ml.toggleFavoritosExpansao()">
+                    <i class="fa fa-star menu-icone"></i>
+                    <span class="menu-secao-titulo">Favoritos ({{ml.favoritos.length}})</span>
+                    <i class="fa fa-chevron-down menu-seta"></i>
+                </div>
+
+                <ul class="menu-secao-itens" ng-show="ml.favoritosExpandido">
+                    <li class="menu-item favorito-item" 
+                        ng-repeat="fav in ml.favoritos track by (fav.pagina + fav.acao + fav.subacao)">
+                        
+                        <i class="fa fa-star menu-item-favorito ativo" 
+                           ng-click="ml.toggleFavorito(fav); $event.stopPropagation()"
+                           title="Remover dos favoritos"></i>
+                        
+                        <a href="javascript:void(0)" 
+                           class="menu-item-link"
+                           ng-click="ml.navegar(fav.pagina, fav.acao, fav.subacao)">
+                            {{fav.item}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Separador -->
+            <div class="menu-separador" ng-if="ml.favoritos.length > 0"></div>
+
+            <!-- Menus Principais -->
+            <div class="menu-secao" 
+                 ng-repeat="(index, menu) in ml.menus" 
+                 ng-if="menu.exibir && ml.filtrarMenu(menu)"
+                 ng-class="{'expandido': menu.expandido}">
+                
+                <div class="menu-secao-header" ng-click="ml.toggleMenuExpansao(index, menu)">
+                    <i class="fa fa-folder menu-icone"></i>
+                    <span class="menu-secao-titulo">{{menu.menu}}</span>
+                    <i class="fa fa-chevron-down menu-seta"></i>
+                </div>
+
+                <ul class="menu-secao-itens" ng-show="menu.expandido">
+                    <li class="menu-item" 
+                        ng-repeat="(key, item) in menu.itens"
+                        ng-if="ml.filtrarItem(item)">
+                        
+                        <!-- Estrela de Favorito -->
+                        <i class="fa fa-star menu-item-favorito" 
+                           ng-class="{'ativo': ml.isFavorito(item)}" 
+                           ng-click="ml.toggleFavorito(item); $event.stopPropagation()"
+                           title="{{ml.isFavorito(item) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}}"></i>
+                        
+                        <!-- Link do Item -->
+                        <a href="javascript:void(0)" 
+                           class="menu-item-link"
+                           ng-click="ml.navegar(item.pagina, item.acao, item.subacao)">
+                            {{item.item}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+

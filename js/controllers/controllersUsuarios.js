@@ -20,40 +20,16 @@ angular
         };
     })
     .controller("usuarioCtrl", function ($rootScope, $scope, APIServ, $http) {
-        // $scope.sair = () => {
-        //     APIServ.apagaDadosLocais("usuario");
-        //     APIServ.apagaDadosLocais("menuPainel");
-        //     APIServ.apagaDadosLocais("sessionId");
-        //     APIServ.apagaDadosLocais('filtros');
-        //     window.location = "./?sair";
-        // };
-
         $scope.abrirAlterarSenha = (item) => {
             console.log(item);
             item.alterarSenha = !item.alterarSenha;
         };
 
-        $scope.buscarUsuarios = function () {
-            var filtro = [
-                {
-                    campo: "chave_usuario",
-                    operador: ">",
-                    valor: "1",
-                },
-            ];
+        $scope.buscarUsuarios = function () {        
+            APIServ.executaFuncaoClasse("usuarios", "buscarUsuariosExibirPerfil", "*").success(function (data) {
+                //console.log("usuario", data);
 
-            var filtros = {
-                tabela: "view_usuarios",
-                filtros: filtro,
-                campo_chave: "chave_usuario",
-                campos: ["chave_usuario", "nome", "administrador", "login", "tipo_usuario", "chave_perfil_padrao"],
-                ordemFiltro: "nome",
-            };
-
-            APIServ.executaFuncaoClasse("classeGeral", "consulta", filtros).success(function (data) {
-                console.log("usuario", data);
-
-                $scope.usuarios = data.lista;
+                $scope.usuarios = data;
                 // Inicializa a lista filtrada com todos os usuários
                 $scope.inicializarListaFiltrada();
             });
@@ -78,9 +54,8 @@ angular
 
             // Verificar se $scope.usuarios é um array ou objeto
             if (Array.isArray($scope.usuarios)) {
-                angular.forEach($scope.usuarios, function (usuario, index) {
-                    console.log(usuario);
-
+                
+                angular.forEach($scope.usuarios, function (usuario, index) {                    
                     var usuarioComChave = angular.copy(usuario);
                     usuarioComChave.chaveOriginal = index;
                     $scope.usuariosFiltrados.push(usuarioComChave);
@@ -88,8 +63,6 @@ angular
             } else if ($scope.usuarios && typeof $scope.usuarios === "object") {
                 // Se for um objeto, usar as chaves como índices
                 angular.forEach($scope.usuarios, function (usuario, key) {
-                    console.log(usuario);
-
                     var usuarioComChave = angular.copy(usuario);
                     usuarioComChave.chaveOriginal = key;
                     $scope.usuariosFiltrados.push(usuarioComChave);
@@ -174,7 +147,7 @@ angular
             if (usuarioOriginal) {
                 $scope.chave_usuario = usuarioOriginal.chave_usuario || usuarioOriginal.chave_usuario;
                 $scope.chave_perfil_padrao = usuarioOriginal.chave_perfil_padrao;
-                $scope.buscarPerfilUsuario();
+                $scope.buscarPerfilUsuario(usuario);
             }
             $scope.isUpdatingList = false;
         };
@@ -326,6 +299,8 @@ angular
                 fd.append("menus", angular.toJson($scope.menus));
                 fd.append("chave_usuario", $scope.usuarios[$scope.keyUsuarioIndex]["chave_usuario"]);
                 fd.append("chave_perfil_padrao", $scope.chave_perfil_padrao);
+                if($scope.usuarios[$scope.keyUsuarioIndex]["tipo_usuario"] != undefined) 
+                    fd.append("tipo_usuario", $scope.usuarios[$scope.keyUsuarioIndex]["tipo_usuario"]);
                 //$rS.carregando = true;
                 APIServ.executaFuncaoClasse("usuarios", "salvarPerfilUsuario", fd, "post").success(function (retorno) {
                     if (retorno.sucesso != undefined) {
@@ -393,10 +368,14 @@ angular
             //*/
         };
 
-        $scope.buscarPerfilUsuario = function () {
+        $scope.buscarPerfilUsuario = function (usuario) {
             $scope.limparMenus();
-            if ($scope.chave_usuario >= 0) {
-                APIServ.executaFuncaoClasse("usuarios", "buscarPerfilUsuario", $scope.chave_usuario).success(function (retorno) {
+            if (usuario.chave_usuario >= 0) {
+                const parametros = {
+                    chave_usuario: usuario.chave_usuario,
+                    tipo_usuario: usuario.tipo_usuario,
+                }
+                APIServ.executaFuncaoClasse("usuarios", "buscarPerfilUsuario", parametros).success(function (retorno) {
                     console.log(retorno);
 
                     angular.forEach(retorno, function (perfilPadrao) {
@@ -440,6 +419,7 @@ angular
 
         $scope.alterarSenha = function () {
             var fd = new FormData();
+            $scope.usuarioAlterarSenha;            
             fd.append("dados", angular.toJson($scope.usuarioAlterarSenha));
 
             // $rS.carregando = true;
@@ -475,102 +455,7 @@ angular
             }
         };
 
-        // $scope.toggleMenu = function (keyM) {
-        //     if ($scope.menus && $scope.menus[keyM]) {
-        //         $scope.menus[keyM].expanded = !$scope.menus[keyM].expanded;
-        //     }
-        // };
-
-        // $scope.toggleItem = function (keyM, keyI) {
-        //     if ($scope.menus && $scope.menus[keyM] && $scope.menus[keyM].itens && $scope.menus[keyM].itens[keyI]) {
-        //         $scope.menus[keyM].itens[keyI].expanded = !$scope.menus[keyM].itens[keyI].expanded;
-        //     }
-        // };
-
-        // $scope.expandirTodos = function () {
-        //     if ($scope.menus) {
-        //         angular.forEach($scope.menus, function (menu, keyM) {
-        //             menu.expanded = true;
-        //             if (menu.itens) {
-        //                 angular.forEach(menu.itens, function (item, keyI) {
-        //                     item.expanded = true;
-        //                 });
-        //             }
-        //         });
-        //     }
-        // };
-
-        // $scope.colapsarTodos = function () {
-        //     if ($scope.menus) {
-        //         angular.forEach($scope.menus, function (menu, keyM) {
-        //             menu.expanded = false;
-        //             if (menu.itens) {
-        //                 angular.forEach(menu.itens, function (item, keyI) {
-        //                     item.expanded = false;
-        //                 });
-        //             }
-        //         });
-        //     }
-        // };
-
-        // $scope.filtrarArvoreMenus = function (menu) {
-        //     if (!$scope.filtroArvoreMenus) return true;
-
-        //     var filtro = $scope.filtroArvoreMenus.toLowerCase();
-
-        //     // Buscar no nome do menu
-        //     if (menu.menu && menu.menu.toLowerCase().indexOf(filtro) !== -1) {
-        //         return true;
-        //     }
-
-        //     // Buscar nos itens
-        //     if (menu.itens) {
-        //         for (var keyI in menu.itens) {
-        //             var item = menu.itens[keyI];
-        //             if (item.item && item.item.toLowerCase().indexOf(filtro) !== -1) {
-        //                 return true;
-        //             }
-
-        //             // Buscar nas ações
-        //             if (item.acoes) {
-        //                 for (var keyA in item.acoes) {
-        //                     var acao = item.acoes[keyA];
-        //                     if (acao.acao && acao.acao.toLowerCase().indexOf(filtro) !== -1) {
-        //                         return true;
-        //                     }
-        //                 }
-        //             }
-
-        //             // Buscar nos campos
-        //             if (item.campos) {
-        //                 for (var keyC in item.campos) {
-        //                     var campo = item.campos[keyC];
-        //                     if (campo.titulo_campo && campo.titulo_campo.toLowerCase().indexOf(filtro) !== -1) {
-        //                         return true;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-
-        //     return false;
-        // };
-
-        // $scope.contemFiltro = function (texto) {
-        //     if (!$scope.filtroArvoreMenus || !texto) return false;
-        //     return texto.toLowerCase().indexOf($scope.filtroArvoreMenus.toLowerCase()) !== -1;
-        // };
-
-        // $scope.limparFiltroArvore = function () {
-        //     $scope.filtroArvoreMenus = "";
-        // };
-
-        // // Watch para expandir automaticamente quando filtrar
-        // $scope.$watch("filtroArvoreMenus", function (newValue) {
-        //     if (newValue && newValue.length > 0) {
-        //         $scope.expandirTodos();
-        //     }
-        // });
+       
     })
     .directive("alterarSenha", [
         "$compile",
