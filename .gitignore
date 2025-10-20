@@ -7,6 +7,11 @@ yarn-error.log*
 # Arquivos de build
 dist/
 build/
+package-github.json
+PUBLISH-GUIDE.md
+publish.sh
+setup-token.sh
+publish-npm.sh
 
 # Arquivos temporários
 .tmp/
