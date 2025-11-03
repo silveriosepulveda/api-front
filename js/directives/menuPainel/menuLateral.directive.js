@@ -22,7 +22,7 @@
     function MenuLateralDirective() {
         return {
             restrict: 'E',
-            templateUrl: 'api-front/js/directives/menuPainel/menuLateral.template.html',
+            templateUrl: '/api-front/js/directives/menuPainel/menuLateral.template.html',
             controller: MenuLateralController,
             controllerAs: 'ml',
             bindToController: true,
@@ -151,15 +151,11 @@
             var estadoGlobal = localStorage.getItem('todos_menus_expandidos');
             ml.todosExpandidos = estadoGlobal ? JSON.parse(estadoGlobal) : false;
             
-            // Em desktop, abrir menu por padrão se não estiver marcado para ocultar
-            if (window.innerWidth >= 1000) {
-                var manterOculto = localStorage.getItem('menu_manter_oculto') === 'true';
-                if (!manterOculto) {
-                    $timeout(function() {
-                        abrirMenu();
-                    }, 100);
-                }
-            }
+            // SEMPRE abrir menu por padrão quando há usuário logado
+            $timeout(function() {
+                abrirMenu();
+                console.log('🎯 Menu lateral aberto por padrão conforme solicitado');
+            }, 500); // Delay para garantir que o DOM esteja pronto
         }
 
         /**
@@ -262,7 +258,8 @@
             
             var botao = document.getElementById('botaoMenu');
             if (botao) {
-                botao.setAttribute('title', aberto ? 'Fechar Menu' : 'Abrir Menu');
+                botao.setAttribute('title', aberto ? 'Ocultar Menu' : 'Mostrar Menu');
+                botao.textContent = aberto ? 'Ocultar Menu' : 'Mostrar Menu';
             }
         }
 

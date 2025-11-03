@@ -1369,7 +1369,7 @@ var directivesPadrao = angular
             link: function (scope, elem, attr) {},
         };
     })
-    .directive("imagemDinamica", ($compile) => {
+    .directive("imagemDinamica", ($compile, config) => {
         return {
             restrict: "A",
             link: function (scope, elem, attr) {
@@ -1382,7 +1382,7 @@ var directivesPadrao = angular
                 if (elem.hasClass("imagemZoom")) {
                     $(elem).mouseover(() => {
                         let indice = scope.$index;
-                        let imagem = scope.item.arquivosAnexados[indice]["grande"];
+                        let imagem = config.urlSite + scope.item.arquivosAnexados[indice]["grande"];
                         let larguraDiv = 500;
                         let alturaDiv = 500;
 

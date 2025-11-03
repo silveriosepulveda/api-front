@@ -110,7 +110,7 @@ app.directive("estruturaGerencia", [
             $scope.alturaTela = window.screen.availHeight;
             $scope.dispositivoMovel = $scope.larguraTela <= 900;
             $scope.tipoSalvar = "post";
-            $scope.tipoConsulta = "post";
+            $scope.tipoConsulta = "get";
 
             var html = "";
             $scope.fd = new FormData();
@@ -655,7 +655,9 @@ app.directive("estruturaGerencia", [
                         $scope.filtrar = eval("$scope." + $scope.estrutura.funcaoFiltrar);
                     }
 
+                    console.log($scope.filtrar);
                     if ($scope.filtrar == undefined) {
+
                         $scope.filtrar = function (pagina = 1, origem = "filtro") {
                             //Testando por limite no filtro inicial, para buscar apenas os últimos 500 registros
                             var limite = 0; // pagina == 0 ? 500 : 0;
@@ -906,6 +908,8 @@ app.directive("estruturaGerencia", [
                                 });
                             //*/
                         };
+                    }else{
+
                     }
 
                     if (($scope.estrutura.filtrarAoIniciar == undefined || $scope.estrutura.filtrarAoIniciar == true) && $scope.tela == "consulta") {
@@ -1267,6 +1271,7 @@ app.directive("estruturaGerencia", [
                             
                             APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", filtros)
                                 .success(function (data) {
+                                    
                                     $rS.carregando = false;
                                     if (usarTimerConsulta) {
                                         $rootScope.iniciarTimer();
@@ -1321,18 +1326,24 @@ app.directive("estruturaGerencia", [
                             refazerConsulta: true,
                         };
 
+                        let novaLista = [];
+
+                        const novaConsulta = function(){
+                            $parse('listaConsulta').assign($scope, novaLista);
+                            $parse('listaConsultaVisivel').assign($scope, novaLista);
+                            $scope.$apply();
+                        }      
+
                         var funcao = function () {
-                            $rootScope.carregando = true;
+                            $rootScope.carregando = true;                            
+                            
                             APIServ.executaFuncaoClasse("classeGeral", "excluir", parametros).success(function (retorno) {
                                 console.log(retorno);
                                 if (retorno.erro != undefined) {
                                     APIServ.mensagemSimples(retorno.erro);
-                                } else if (retorno.chave >= 0) {
-                                    var key = $scope.listaConsulta.indexOf(item);
-                                    $scope.listaConsulta.splice(key, 1);
-                                    $scope.listaConsulta = retorno.novaConsulta.lista;
-
-                                    APIServ.mensagemSimples("Confirmação", $scope.estrutura.nomeUsual + " Excluído!");
+                                } else if (retorno.chave >= 0) {       
+                                    novaLista = retorno.novaConsulta.lista;
+                                    APIServ.mensagemSimples("Confirmação", $scope.estrutura.nomeUsual + " Excluído!", novaConsulta);
                                 } else if (retorno.chave > 0) {
                                     APIServ.mensagemSimples("Informação", $scope.estrutura.nomeUsual + " Está em Uso e não pode ser Excluído!");
                                 }
@@ -1471,7 +1482,7 @@ app.directive("estruturaGerencia", [
                     paramEnviarBuscaEstrutura = fdEnviarBuscaEstrutura;
                 }
 
-                APIServ.executaFuncaoClasse("classeGeral", "buscarEstrutura", paramEnviarBuscaEstrutura, $scope.tipoConsulta).success((retorno) => {
+                APIServ.executaFuncaoClasse("classeGeral", "buscarEstrutura", parametrosBuscaEstrutura).success((retorno) => {
                      //console.log(retorno);
                     montarEstrutura(retorno);
                 });

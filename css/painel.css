@@ -35,7 +35,7 @@ div.modalPopUp {
     margin-left: var(--menu-width);
     padding: 5px;
     min-height: calc(100vh - 60px);
-    margin-top: 60px;
+    /* margin-top: 60px; */
 }
 
 .input-group-addon.btn{

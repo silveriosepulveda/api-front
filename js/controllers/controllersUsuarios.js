@@ -2,7 +2,7 @@ angular
     .module("app.controllersUsuarios", [])
     .filter("toArray", function () {
         return function (obj) {
-            if (!obj || typeof obj !== "object") return [];
+            if (!obj || typeof obj !== "object") return [];''
             if (Array.isArray(obj)) return obj;
 
             return Object.keys(obj).map(function (key) {
@@ -20,8 +20,7 @@ angular
         };
     })
     .controller("usuarioCtrl", function ($rootScope, $scope, APIServ, $http) {
-        $scope.abrirAlterarSenha = (item) => {
-            console.log(item);
+        $scope.abrirAlterarSenha = (item) => {            
             item.alterarSenha = !item.alterarSenha;
         };
 
@@ -267,6 +266,7 @@ angular
 
         $scope.salvarPerfilPadrao = function (perfil) {
             var p = perfil;
+            $rootScope.carregando = true;
             if (p.chave_perfil_padrao == undefined && p.novoPerfil == undefined) {
                 APIServ.mensagemSimples("Solicitação", "Defina o Perfil ou o nome do Novo Perfil");
             } else {
@@ -281,10 +281,10 @@ angular
                 //  $rS.carregando = true;
 
                 APIServ.executaFuncaoClasse("usuarios", "salvarPerfilPadrao", fd, "post").success((retorno) => {
-                    $rS.carregando = false;
+                    $rootScope.carregando = false;
                     if (retorno.sucesso != undefined) {
-                        $scope.buscarPerfisPadrao();
-                        $scope.limparMenus();
+                        //$scope.buscarPerfisPadrao();
+                       // $scope.limparMenus();
                         APIServ.mensagemSimples("Confirmação", "Perfil Salvo com Sucesso!");
                     }
                 });

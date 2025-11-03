@@ -87,7 +87,7 @@
     <h2>Gerenciamento de Perfis de Usuários</h2>
     <hr>
     <div class="form-group col-md-4 col-sm-6" ng-init="buscarUsuarios()">
-        <label>Selecione o Usuário</label> {{keyUsuario}}
+        <label>Selecione o Usuário</label> 
         <div class="select-editavel form-group">
             <div class="input-group">
 
@@ -100,7 +100,7 @@
             <div class="lista-usuarios" ng-show="mostrarListaUsuarios && usuariosFiltrados.length > 0">
                 <div class="item-usuario" ng-repeat="usuario in usuariosFiltrados" ng-click="selecionarUsuario($index, usuario)"
                     ng-mousedown="$event.preventDefault()">
-                    {{usuario.nome}} -- {{usuario.login}}
+                    {{usuario.nome}} --- {{usuario.login}}
                 </div>
             </div>
         </div>

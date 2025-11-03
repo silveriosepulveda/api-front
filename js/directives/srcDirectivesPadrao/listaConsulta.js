@@ -130,7 +130,7 @@ directivesPadrao
                             parametros.classesBotaoAlterar == undefined || !parametros.classesBotaoAlterar
                                 ? "btn-modern btn-outline-primary"
                                 : parametros.classesBotaoAlterar;
-                        var ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar}"` : "";
+                        var ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar == 'true'}"` : "";
                         htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)"
                             ${ocultarAlterar}>${textoBotaoAlterar}</button>`;
                         //htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)">${textoBotaoAlterar}</button>`;
@@ -142,9 +142,9 @@ directivesPadrao
                     //         $rS[acao]["acoes"]["Excluir"])
                     // ) {
                         var funcaoExc = parametros.funcaoExcluir != undefined ? parametros.funcaoExcluir : "excluir";
-                        var ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir}"` : "";
+                        var ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir == 'true'}"` : "";
                         htmlBotoes += `<button type="button" class="btn btn-modern btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"
-                            ${ocultarExcluir}></button>`;
+                            ${ocultarExcluir }></button>`;
                         //htmlBotoes += `<button type="button" class="btn btn-default glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"></button>`;
                     //}
 

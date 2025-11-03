@@ -31,6 +31,7 @@ angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).fact
         if (sessionId) {
             headers['X-Session-Id'] = sessionId;
         }
+        
         if (tipo == 'get') {
             var temp = _converteParametrosparaUrl(parametros);            
             
