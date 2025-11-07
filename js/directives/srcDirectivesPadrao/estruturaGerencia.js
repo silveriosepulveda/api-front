@@ -20,12 +20,30 @@ app.directive("estruturaGerencia", [
         var controller = function ($rootScope, $scope, $element, $attrs, $route, $routeParams, EGFuncoes, APIAjuFor, PopUpModal) {
             //console.log('inicializando estruturaGerencia');
 
+            // Usar o $scope do Angular diretamente como escopo
+            const escopo = $scope;
+
             // Detectar contexto modal através do atributo local-exibicao
-            $scope.localExibicao = $attrs.localExibicao || "normal";
-            $scope.isModal = $scope.localExibicao === "modal";
+            const localExibicao = $attrs.localExibicao || "normal";
+            const isModal = localExibicao === "modal";
+
+            var classe;
+            // Se estiver em modal, priorizar atributo sobre rota atual
+            if (isModal && $attrs.classe != undefined) {
+                classe = $attrs.classe;
+                //console.log('🔍 [estruturaGerencia] Modal detectado - usando classe do atributo:', classe);
+            } else if ($route.current && $route.current.classe != undefined) {
+                classe = $route.current.classe;
+                //console.log('🔍 [estruturaGerencia] Usando classe da rota atual:', classe);
+            } else if ($attrs.classe != undefined) {
+                classe = $attrs.classe;
+                //console.log('🔍 [estruturaGerencia] Usando classe do atributo:', classe);
+            }            
+
+            $element.attr('classe', classe);
 
             // Se estiver em contexto modal, aplicar CSS para ocultar elementos
-            if ($scope.isModal) {
+            if (isModal) {
                 //console.log('🎭 [estruturaGerencia] Contexto MODAL detectado - aplicando ocultação');
 
                 // CSS completo para contexto modal (unificado - antes havia duplicação com PopUpModal)
@@ -95,7 +113,8 @@ app.directive("estruturaGerencia", [
                 //console.log('🌐 [estruturaGerencia] Classe "estrutura-modal-ativa" aplicada ao body');
 
                 // Configurar limpeza quando o escopo for destruído
-                $scope.$on("$destroy", function () {
+                // Usar escopo diretamente pois $rootScope['estruturas'][classe] ainda não foi criado
+                escopo.$on("$destroy", function () {
                     document.body.classList.remove("estrutura-modal-ativa");
                     if ($element[0]) {
                         $element[0].classList.remove("estrutura-modal");
@@ -104,19 +123,50 @@ app.directive("estruturaGerencia", [
                 });
             }
 
-            $scope.popUp = document.getElementById("popUp") != undefined && document.getElementById("popUp").value;
+            escopo.popUp = document.getElementById("popUp") != undefined && document.getElementById("popUp").value;
 
-            $scope.larguraTela = window.screen.availWidth;
-            $scope.alturaTela = window.screen.availHeight;
-            $scope.dispositivoMovel = $scope.larguraTela <= 900;
-            $scope.tipoSalvar = "post";
-            $scope.tipoConsulta = "get";
+            escopo.larguraTela = window.screen.availWidth;
+            escopo.alturaTela = window.screen.availHeight;
+            escopo.dispositivoMovel = escopo.larguraTela <= 900;
+            escopo.tipoSalvar = "post";
+            escopo.tipoConsulta = "post";
 
             var html = "";
-            $scope.fd = new FormData();
+            escopo.fd = new FormData();
 
             var montarEstrutura = function (estrutura) {
                 var retorno = estrutura;
+                const elementoEstrutura = $element[0];                
+               
+                // Recuperar e processar o atributo parametros se existir
+                var parametrosRecebidos = null;
+                if ($attrs.parametros) {
+                    try {
+                        // Tentar fazer parse do JSON se for string
+                        var parametrosStr = $attrs.parametros;
+                        if (typeof parametrosStr === 'string' && parametrosStr.trim().startsWith('{')) {
+                            parametrosRecebidos = JSON.parse(parametrosStr);
+                        } else if (typeof parametrosStr === 'string' && parametrosStr.trim().startsWith('[')) {
+                            parametrosRecebidos = JSON.parse(parametrosStr);
+                        } else {
+                            // Se não for JSON, tentar usar diretamente ou avaliar como expressão Angular
+                            try {
+                                var parseFn = $parse(parametrosStr);
+                                parametrosRecebidos = parseFn($scope);
+                            } catch (e) {
+                                // Se não conseguir avaliar, manter como string
+                                parametrosRecebidos = parametrosStr;
+                            }
+                        }
+                    } catch (e) {
+                        // Se não conseguir fazer parse, usar como string
+                        parametrosRecebidos = $attrs.parametros;
+                    }
+                    
+                    // Disponibilizar no scope para uso posterior
+                    escopo.parametrosRecebidos = parametrosRecebidos;
+                }
+                                                
                 //Fazendo a validacao dos poderes do usuario
                 var menuPainel = APIServ.buscaDadosLocais("menuPainel");
 
@@ -125,7 +175,7 @@ app.directive("estruturaGerencia", [
                 var parametrosLocal = undefined;
                 var parametrosLocalTemp = { pagina: "", acao: "", subAcao: "" };
 
-                if (!$scope.popUp) {
+                if (!escopo.popUp) {
                     APIServ.apagaDadosLocais("parametrosUrl");
                 }
 
@@ -140,11 +190,12 @@ app.directive("estruturaGerencia", [
                 var subacao;
                 var parametrosAcao;
 
-                if ($scope.isModal) {
+                if (escopo.isModal) {
                     //  pagina = $attrs.classe;
                     acao = $attrs.subacao || "";
                     subacao = $attrs.subacao || "";
-                    parametrosAcao = $attrs.parametros || "";
+                    // Usar os parâmetros processados se disponíveis, senão usar atributo direto
+                    parametrosAcao = escopo.parametrosRecebidos != null ? escopo.parametrosRecebidos : ($attrs.parametros || "");
                 } else {
                     pagina = parametrosUrl[0] != undefined ? parametrosUrl[0] : parametrosLocal["pagina"];
                     acao = parametrosUrl[1] != undefined ? parametrosUrl[1] : parametrosLocal["acao"];
@@ -156,21 +207,9 @@ app.directive("estruturaGerencia", [
                             : "";
                 }
 
-                $scope.pagina = pagina;
-                $scope.acao = acao;
-                $scope.subacao = subacao;
-
-                // var subacao = parametrosUrl[2] != undefined ?
-                //     parametrosUrl[2] : parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined ?
-                //         parametrosLocal['subAcao'] : '';
-
-                // var subacao = '';
-                // if(parametrosUrl[2] != undefined)
-                //     subacao = parametrosUrl[2];
-                // else if( parametrosLocal != undefined && parametrosLocal['subAcao'] != undefined)
-                //     subacao = parametrosLocal['subAcao'];
-                // else if($attrs.subacao != undefined)
-                //     subacao = $attrs.subacao;
+                escopo.pagina = pagina;
+                escopo.acao = acao;
+                escopo.subacao = subacao;              
 
                 $rS["acao"] = acao;
                 if ($rS[acao] == undefined) {
@@ -179,24 +218,24 @@ app.directive("estruturaGerencia", [
                     $rS[acao]["campos"] = menuPainel.campos != undefined && menuPainel.campos[acao] != undefined ? menuPainel.campos[acao] : [];
                 }
 
-                $scope.parametrosUrl = parametrosUrl;
+                escopo.parametrosUrl = parametrosUrl;
 
-                $scope.estrutura = retorno;
+                escopo.estrutura = retorno;
 
-                $scope.exibirConsulta = retorno.exibirConsulta != undefined && retorno.exibirConsulta;
+                escopo.exibirConsulta = retorno.exibirConsulta != undefined && retorno.exibirConsulta;
 
-                if ($scope.antesCarregar != undefined) {
-                    $scope.antesCarregar();
+                if (escopo.antesCarregar != undefined) {
+                    escopo.antesCarregar();
                 }
                 retorno["tipoEstrutura"] = retorno.tipoEstrutura != undefined ? retorno.tipoEstrutura : "padrao";
 
                 var _montarCamposFiltroConsulta = function (campos, retornoEnt) {
                     //Despois tenho que por opcoes de pesquisar por tabelas relacionadas
                     var retornoMCFC = retornoEnt != undefined ? retornoEnt : [];
-                    var filtrosPersonalizados = $scope.estrutura.camposFiltroPesquisa != undefined ? $scope.estrutura.camposFiltroPesquisa : {};
+                    var filtrosPersonalizados = escopo.estrutura.camposFiltroPesquisa != undefined ? escopo.estrutura.camposFiltroPesquisa : {};
 
                     angular.forEach(campos, function (val, campo) {
-                        var temCampoFiltro = $scope.estrutura.camposFiltroPesquisa != undefined && $scope.estrutura.camposFiltroPesquisa[campo] != undefined;
+                        var temCampoFiltro = escopo.estrutura.camposFiltroPesquisa != undefined && escopo.estrutura.camposFiltroPesquisa[campo] != undefined;
 
                         if (EGFuncoes.eBloco(campo) && val.nome == undefined) {
                             retornoMCFC = _montarCamposFiltroConsulta(val.campos, retornoMCFC);
@@ -208,23 +247,23 @@ app.directive("estruturaGerencia", [
                             val.tipo != "diretiva"
                         ) {
                             var ocultarCampoFiltro =
-                                $scope.estrutura.camposOcultarFiltroPesquisa != undefined &&
-                                APIServ.valorExisteEmVariavel($scope.estrutura.camposOcultarFiltroPesquisa, campo);
+                                escopo.estrutura.camposOcultarFiltroPesquisa != undefined &&
+                                APIServ.valorExisteEmVariavel(escopo.estrutura.camposOcultarFiltroPesquisa, campo);
 
                             if (!ocultarCampoFiltro) {
                                 var campoEmCampos = null;
                                 if (temCampoFiltro) {
                                     campoEmCampos = Object.assign(
-                                        APIServ.buscarValorVariavel($scope.estrutura.campos, campo),
-                                        $scope.estrutura.camposFiltroPesquisa[campo]
+                                        APIServ.buscarValorVariavel(escopo.estrutura.campos, campo),
+                                        escopo.estrutura.camposFiltroPesquisa[campo]
                                     );
-                                } else campoEmCampos = APIServ.buscarValorVariavel($scope.estrutura.campos, campo);
+                                } else campoEmCampos = APIServ.buscarValorVariavel(escopo.estrutura.campos, campo);
 
                                 retornoMCFC[campo] =
                                     filtrosPersonalizados[campo] != undefined ? Object.assign(campoEmCampos, filtrosPersonalizados[campo], val) : val;
                             }
                         } else {
-                            //console.log($scope.estrutura.camposFiltroPesquisa);
+                            //console.log(escopo.estrutura.camposFiltroPesquisa);
                         }
                     });
 
@@ -253,27 +292,27 @@ app.directive("estruturaGerencia", [
                     return obj1;
                 };
 
-                var camposPes = $scope.estrutura.camposFiltroPesquisa != undefined ? Object.assign({}, $scope.estrutura.camposFiltroPesquisa) : {};
+                var camposPes = escopo.estrutura.camposFiltroPesquisa != undefined ? Object.assign({}, escopo.estrutura.camposFiltroPesquisa) : {};
 
-                var incluirCamposNoFiltro = $scope.estrutura.camposOcultarFiltroPesquisa == undefined || $scope.estrutura.camposOcultarFiltroPesquisa != "*";
-                var camposMontagemFiltro = incluirCamposNoFiltro ? Object.assign({}, Object.assign({}, $scope.estrutura.campos)) : {};
+                var incluirCamposNoFiltro = escopo.estrutura.camposOcultarFiltroPesquisa == undefined || escopo.estrutura.camposOcultarFiltroPesquisa != "*";
+                var camposMontagemFiltro = incluirCamposNoFiltro ? Object.assign({}, Object.assign({}, escopo.estrutura.campos)) : {};
                 var campoEnviarMontarfiltro = MergeRecursive(camposPes, camposMontagemFiltro);
 
-                $scope.camposFiltroPesquisa = _montarCamposFiltroConsulta(campoEnviarMontarfiltro);
+                escopo.camposFiltroPesquisa = _montarCamposFiltroConsulta(campoEnviarMontarfiltro);
 
-                $scope.campo_chave = retorno.campo_chave;
+                escopo.campo_chave = retorno.campo_chave;
                 var estrutura = retorno;
-                $scope.operadoresConsulta = operadoresConsulta;
-                $scope.filtros = [];
-                $scope.ordemFiltro = "";
-                //$scope.itensPagina = "25";
-                $scope.opcaoSelecionarTodosItensConsulta =
-                    $scope.estrutura.opcaoSelecionarTodosItensConsulta != undefined && $scope.estrutura.opcaoSelecionarTodosItensConsulta;
-                $scope.ocultarItensPagina = $scope.estrutura.itensPagina != undefined && $scope.estrutura.itensPagina == -1;
-                $scope.itensPagina = $scope.estrutura.itensPagina != undefined ? $scope.estrutura.itensPagina : "50";
+                escopo.operadoresConsulta = operadoresConsulta;
+                escopo.filtros = [];
+                escopo.ordemFiltro = "";
+                //escopo.itensPagina = "25";
+                escopo.opcaoSelecionarTodosItensConsulta =
+                    escopo.estrutura.opcaoSelecionarTodosItensConsulta != undefined && escopo.estrutura.opcaoSelecionarTodosItensConsulta;
+                escopo.ocultarItensPagina = escopo.estrutura.itensPagina != undefined && escopo.estrutura.itensPagina == -1;
+                escopo.itensPagina = escopo.estrutura.itensPagina != undefined ? escopo.estrutura.itensPagina : "50";
 
                 //Vendo se ha a subAcao se sim ponho ela como tela, mais usado no caso de popup
-                $scope.tela = $scope.tela != undefined ? $scope.tela : subacao != undefined && subacao != "" ? subacao : "consulta";
+                escopo.tela = escopo.tela != undefined ? escopo.tela : subacao != undefined && subacao != "" ? subacao : "consulta";
 
                 $scope[retorno.raizModelo] = {};
 
@@ -286,36 +325,36 @@ app.directive("estruturaGerencia", [
                         key = e.keyCode;
 
                     if (key == 107) {
-                        if ($scope.tela != "cadastro") {
-                            $scope.mudaTela("cadastro");
-                            $scope.$apply();
+                        if (escopo.tela != "cadastro") {
+                            escopo.mudaTela("cadastro");
+                            escopo.$apply();
                         }
                         e.preventDefault();
                     }
                 };
 
-                $scope.abrirVisualizacao = (arquivo, largura, altura) => {
+                escopo.abrirVisualizacao = (arquivo, largura, altura) => {
                     var retorno = [];
                     var temp = window.location.href;
                     var raiz = temp.split("?")[0];
                     window.open(raiz + arquivo, "popup", "width=" + largura + ",height=" + largura);
                 };
 
-                $scope.alterarFiltroResultado = function (filtro) {
+                escopo.alterarFiltroResultado = function (filtro) {
                     $parse("filtroResultado").assign($scope, filtro);
                 };
 
-                $scope.limparCampo = (e) => {
+                escopo.limparCampo = (e) => {
                     var input = $(event.target).closest("monta-html").find(":input");
                     var campo = input.attr("campo");
                     var modelo = input.attr("ng-model");
                     //console.log(modelo);
-                    var modeloChave = $scope.estrutura.raizModelo + '["' + input.attr("modelo-chave") + '"]';
+                    var modeloChave = escopo.estrutura.raizModelo + '["' + input.attr("modelo-chave") + '"]';
 
                     var indice = input.attr("indice");
                     var indiceSuperior = input.attr("indice-superior");
 
-                    var campoEstrutura = APIServ.buscarValorVariavel($scope.estrutura.campos, campo);
+                    var campoEstrutura = APIServ.buscarValorVariavel(escopo.estrutura.campos, campo);
 
                     var desabilitado = input.attr("disabled") == "disabled";
 
@@ -339,7 +378,7 @@ app.directive("estruturaGerencia", [
 
                         if (desabilitado) {
                             input.attr("disabled", false);
-                            //console.log($scope.temporada);
+                            //console.log(escopo.temporada);
                         }
                     };
 
@@ -354,7 +393,9 @@ app.directive("estruturaGerencia", [
                     input.focus();
                 };
 
-                $scope.limparCampoConsulta = function (event) {
+                escopo.limparCampoConsulta = function (event) {
+                    console.log(event);
+                    
                     var input = $(event.target).closest("monta-html").find(":input");
                     var campo = input.attr("campo");
                     var modelo = input.attr("ng-model");
@@ -381,28 +422,28 @@ app.directive("estruturaGerencia", [
                     input.focus();
                 };
 
-                $scope[estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo($scope.estrutura);
+                $scope[estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
 
-                $scope.adicionarItemRepeticao = function (nomeBloco, obj, valor) {
+                escopo.adicionarItemRepeticao = function (nomeBloco, obj, valor) {
                     var objEnviar = obj != undefined ? obj : this;
                     return EGFuncoes.adicionarItemRepeticao($scope, nomeBloco, objEnviar, valor);
                 };
 
-                $scope.adicionarTodosItensRepeticao = function (nomeBloco) {
-                    var dadosBloco = APIServ.buscarValorVariavel($scope.estrutura.campos, nomeBloco);
+                escopo.adicionarTodosItensRepeticao = function (nomeBloco) {
+                    var dadosBloco = APIServ.buscarValorVariavel(escopo.estrutura.campos, nomeBloco);
                     var autoCompleta = APIServ.buscarValorVariavel(dadosBloco, "autoCompleta");
                     var parametros = {
                         tabela: autoCompleta.tabela,
                     };
                 };
 
-                if ($scope.removerItemRepeticao == undefined) {
-                    $scope.removerItemRepeticao = function (nomeBloco) {
+                if (escopo.removerItemRepeticao == undefined) {
+                    escopo.removerItemRepeticao = function (nomeBloco) {
                         return EGFuncoes.removerItemRepeticao($scope, nomeBloco);
                     };
                 }
 
-                $scope.trocarPosicao = (idElemento) => {
+                escopo.trocarPosicao = (idElemento) => {
                     var objeto = angular.element("#" + idElemento);
                     var posicaoAtual = Number(objeto.attr("indice")) + 1;
                     var posicaoNova = objeto.val().split(":")[1];
@@ -411,7 +452,7 @@ app.directive("estruturaGerencia", [
                     var indiceNovo = parseInt(posicaoNova) - 1;
 
                     var nomeVariavelRepeticao = objeto.attr("item-repetir");
-                    var variavelRepeticao = eval("$scope." + objeto.attr("item-repetir"));
+                    var variavelRepeticao = eval("escopo." + objeto.attr("item-repetir"));
 
                     var valorAtual = variavelRepeticao[indiceAtual];
                     valorAtual["posicao"] = parseInt(posicaoNova);
@@ -421,44 +462,44 @@ app.directive("estruturaGerencia", [
                     variavelRepeticao[indiceNovo] = valorAtual;
                 };
 
-                $scope.mudaTela = function (tela) {
+                escopo.mudaTela = function (tela) {
                     if (angular.element("#popUp").val() == "true") {
                         window.close();
                     }
 
-                    $scope.tela = tela;
-                    $scope[estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo($scope.estrutura);
+                    escopo.tela = tela;
+                    $scope[estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
 
                     if (tela == "cadastro") {
-                        if ($scope.aoCarregar != undefined) {
-                            $scope.aoCarregar();
+                        if (escopo.aoCarregar != undefined) {
+                            escopo.aoCarregar();
                         }
                         if (usarTimerConsulta) {
                             $rootScope.pausarTimer();
                         }
-                        $scope.desabilitarSalvar = false;
+                        escopo.desabilitarSalvar = false;
                     } else if (tela == "consulta" && usarTimerConsulta) {
                         $rS.reiniciarTimer();
                     }
 
-                    if ((tela == "cadastro" || tela == "consulta") && $scope.carregarTinyMCE != undefined && $scope.estrutura.usarTinyMCE == true) {
-                        $scope.carregarTinyMCE();
+                    if ((tela == "cadastro" || tela == "consulta") && escopo.carregarTinyMCE != undefined && escopo.estrutura.usarTinyMCE == true) {
+                        escopo.carregarTinyMCE();
                     }
                 };
 
-                if (($scope.tela == undefined && retorno.tipoEstrutura == "cadastroDireto") || retorno.tipoEstrutura == "cadastroUnico") {
-                    $scope.mudaTela("cadastro");
-                } else if ($scope.tela == undefined && retorno.tipoEstrutura == "consulta") {
-                    $scope.mudaTela("consulta");
+                if ((escopo.tela == undefined && retorno.tipoEstrutura == "cadastroDireto") || retorno.tipoEstrutura == "cadastroUnico") {
+                    escopo.mudaTela("cadastro");
+                } else if (escopo.tela == undefined && retorno.tipoEstrutura == "consulta") {
+                    escopo.mudaTela("consulta");
                 }
 
-                $scope.alterarExibicaoConsulta = () => {
+                escopo.alterarExibicaoConsulta = () => {
                     console.log("alterarExibicaoConsulta");
 
-                    $scope.exibirConsulta = !$scope.exibirConsulta;
-                    if ($scope.exibirConsulta) {
-                        if ($scope.filtros.length == 0) {
-                            $scope.adicionarFiltro();
+                    escopo.exibirConsulta = !escopo.exibirConsulta;
+                    if (escopo.exibirConsulta) {
+                        if (escopo.filtros.length == 0) {
+                            escopo.adicionarFiltro();
                         }
                         // $rootScope.pausarTimer();
                     } else {
@@ -467,8 +508,8 @@ app.directive("estruturaGerencia", [
                 };
 
                 if (EGFuncoes.temConsulta(retorno)) {                                        
-                    $scope.adicionarFiltro = function () {
-                        $scope.filtros.push({
+                    escopo.adicionarFiltro = function () {
+                        escopo.filtros.push({
                             texto: "",
                             campo: "",
                             operador: "like",
@@ -476,57 +517,57 @@ app.directive("estruturaGerencia", [
                         });
                     };
 
-                    $scope.adicionarFiltro();
+                    escopo.adicionarFiltro();
 
-                    $scope.ordemFiltro = $scope.estrutura.campoOrdemPadraoFiltro != undefined ? $scope.estrutura.campoOrdemPadraoFiltro : "";
-                    $scope.sentidoFiltro = $scope.estrutura.sentidoOrdemPadraoFiltro ? $scope.estrutura.sentidoOrdemPadraoFiltro : "";
-                    //  $scope.limiteFiltro =
+                    escopo.ordemFiltro = escopo.estrutura.campoOrdemPadraoFiltro != undefined ? escopo.estrutura.campoOrdemPadraoFiltro : "";
+                    escopo.sentidoFiltro = escopo.estrutura.sentidoOrdemPadraoFiltro ? escopo.estrutura.sentidoOrdemPadraoFiltro : "";
+                    //  escopo.limiteFiltro =
 
-                    $scope.manipularFiltro = function (key, filtro) {
-                        $scope.filtros[key]["valor"] = "";
+                    escopo.manipularFiltro = function (key, filtro) {
+                        escopo.filtros[key]["valor"] = "";
                     };
 
-                    $scope.removerFiltro = function (chave) {
+                    escopo.removerFiltro = function (chave) {
                         var novoFiltro = [];
-                        angular.forEach($scope.filtros, function (val, key) {
+                        angular.forEach(escopo.filtros, function (val, key) {
                             if (key != chave) {
-                                novoFiltro.push($scope.filtros[key]);
+                                novoFiltro.push(escopo.filtros[key]);
                             }
                         });
-                        $scope.filtros = novoFiltro;
+                        escopo.filtros = novoFiltro;
                     };
 
-                    $scope.limparFiltros = function () {
-                        $scope.manipularFiltroLocal($scope.acao, "limpar");
+                    escopo.limparFiltros = function () {
+                        escopo.manipularFiltroLocal(escopo.acao, "limpar");
 
-                        $scope.filtros = [];
-                        $scope.adicionarFiltro();
-                        if ($scope.estrutura.filtrosPadrao != undefined) {
-                            for (var x in $scope.estrutura.filtrosPadrao) {
+                        escopo.filtros = [];
+                        escopo.adicionarFiltro();
+                        if (escopo.estrutura.filtrosPadrao != undefined) {
+                            for (var x in escopo.estrutura.filtrosPadrao) {
                                 var obrigatorio =
-                                    $scope.estrutura.filtrosPadrao[x]["obrigatorio"] != undefined && $scope.estrutura.filtrosPadrao[x]["obrigatorio"];
+                                    escopo.estrutura.filtrosPadrao[x]["obrigatorio"] != undefined && escopo.estrutura.filtrosPadrao[x]["obrigatorio"];
                                 //console.log(obrigatorio);
 
                                 if (obrigatorio) {
                                     var novoFiltro = {
                                         campo: x,
-                                        operador: $scope.estrutura.filtrosPadrao[x]["operador"],
-                                        valor: $scope.estrutura.filtrosPadrao[x]["valor"],
-                                        exibir: $scope.estrutura.filtrosPadrao[x]["exibir"] == undefined || $scope.estrutura.filtrosPadrao[x]["exibir"],
+                                        operador: escopo.estrutura.filtrosPadrao[x]["operador"],
+                                        valor: escopo.estrutura.filtrosPadrao[x]["valor"],
+                                        exibir: escopo.estrutura.filtrosPadrao[x]["exibir"] == undefined || escopo.estrutura.filtrosPadrao[x]["exibir"],
                                     };
-                                    $scope.filtros.push(novoFiltro);
+                                    escopo.filtros.push(novoFiltro);
                                 }
                             }
                         }
-                        //console.log($scope.filtros);
+                        //console.log(escopo.filtros);
                     };
 
-                    $scope.limparFiltroResultado = (filtroResultado) => {
+                    escopo.limparFiltroResultado = (filtroResultado) => {
                         $("#filtro_resultado").val("");
                         $parse("filtroResultado").assign($scope, "");
                     };
 
-                    $scope.manipularFiltroLocal = function (tela, acao = "buscar", filtros) {
+                    escopo.manipularFiltroLocal = function (tela, acao = "buscar", filtros) {
                         var filtrosLocal = APIServ.buscaDadosLocais("filtros") || {};
 
                         if (acao == "buscar") {
@@ -542,18 +583,18 @@ app.directive("estruturaGerencia", [
 
 
                     
-                    const filtrosLocal = $scope.manipularFiltroLocal($scope.acao, "buscar");
+                    const filtrosLocal = escopo.manipularFiltroLocal(escopo.acao, "buscar");
                     
 
                     if (filtrosLocal.length > 0) {
-                        $scope.filtros = filtrosLocal;
+                        escopo.filtros = filtrosLocal;
                     } else
                     if (estrutura.filtrosPadrao) {
-                        //$scope.filtros = [];
+                        //escopo.filtros = [];
                         var tirarPrimeiroFiltro = false;
                         angular.forEach(estrutura.filtrosPadrao, function (val, key) {
                             var incluirFiltroPadrao = true;
-                            angular.forEach($scope.filtros, function (valF, keyF) {
+                            angular.forEach(escopo.filtros, function (valF, keyF) {
                                 incluirFiltroPadrao = valF.campo != key || valF.operador != val.operador || valF.valor != val.valor ? true : false;
                             });
                             if (incluirFiltroPadrao) {
@@ -569,7 +610,7 @@ app.directive("estruturaGerencia", [
                                 }
 
                                 //console.log(key);
-                                $scope.filtros.push({
+                                escopo.filtros.push({
                                     campo: key,
                                     operador: val.operador,
                                     valor: val.valor == "data" ? APIAjuFor.dataAtual() : val.valor,
@@ -582,18 +623,18 @@ app.directive("estruturaGerencia", [
                             }
                         });
                         if (tirarPrimeiroFiltro) {
-                            $scope.filtros.splice(0, 1);
+                            escopo.filtros.splice(0, 1);
                         }
                     }
 
-                    $scope.converterFiltroParaEnvio = function () {
+                    escopo.converterFiltroParaEnvio = function () {
                         var retorno = [];
 
-                        if ($scope.estrutura.camposFiltroPersonalizado != undefined) {
-                            var camposPer = Object.assign({}, $scope.estrutura.camposFiltroPersonalizado);
+                        if (escopo.estrutura.camposFiltroPersonalizado != undefined) {
+                            var camposPer = Object.assign({}, escopo.estrutura.camposFiltroPersonalizado);
                             for (i in camposPer) {
                                 var campoPerFil = camposPer[i]["campoFiltro"] != undefined ? camposPer[i]["campoFiltro"] : i;
-                                var valor = eval("$scope." + $scope.estrutura.raizModelo + "." + campoPerFil);
+                                var valor = eval("escopo." + escopo.estrutura.raizModelo + "." + campoPerFil);
                                 if (valor != undefined) {
                                     retorno.push({
                                         campo: campoPerFil,
@@ -602,10 +643,10 @@ app.directive("estruturaGerencia", [
                                     });
                                 }
                             }
-                            //console.log(eval('$scope.' + $scope.estrutura.raizModelo + '.codigo_tipo_passaro'));
+                            //console.log(eval('escopo.' + escopo.estrutura.raizModelo + '.codigo_tipo_passaro'));
                         }
 
-                        angular.forEach($scope.filtros, function (filtro, key) {
+                        angular.forEach(escopo.filtros, function (filtro, key) {
                             if (filtro.tipo != undefined && filtro.tipo == "intervaloDatas") {
                                 retorno.push({
                                     campo: filtro.campo,
@@ -617,13 +658,13 @@ app.directive("estruturaGerencia", [
                             } else {
                                 //Trocando o campo chave do filtro para o valor do objChave do auto completa caso exista
                                 if (
-                                    $scope.estrutura.camposFiltroPesquisa != undefined &&
-                                    $scope.estrutura.camposFiltroPesquisa[filtro["campo"]] != undefined &&
-                                    $scope.estrutura.camposFiltroPesquisa[filtro["campo"]]["autoCompleta"] != undefined &&
-                                    $scope.estrutura.camposFiltroPesquisa[filtro["campo"]]["autoCompleta"]["objChave"] != undefined &&
+                                    escopo.estrutura.camposFiltroPesquisa != undefined &&
+                                    escopo.estrutura.camposFiltroPesquisa[filtro["campo"]] != undefined &&
+                                    escopo.estrutura.camposFiltroPesquisa[filtro["campo"]]["autoCompleta"] != undefined &&
+                                    escopo.estrutura.camposFiltroPesquisa[filtro["campo"]]["autoCompleta"]["objChave"] != undefined &&
                                     filtro["campo_chave"] != undefined
                                 )
-                                    filtro["campo_chave"] = $scope.estrutura.camposFiltroPesquisa[filtro["campo"]]["autoCompleta"]["objChave"];
+                                    filtro["campo_chave"] = escopo.estrutura.camposFiltroPesquisa[filtro["campo"]]["autoCompleta"]["objChave"];
 
                                 filtro["valor"] = filtro["valor"] != "" && filtro["valor"] != undefined ? filtro["valor"].toString().split("--")[0].trim() : "";
                                 retorno.push(filtro);
@@ -632,9 +673,9 @@ app.directive("estruturaGerencia", [
                         return retorno;
                     };
 
-                    $scope.atualizarCampoFiltro = (campo, valor) => {
+                    escopo.atualizarCampoFiltro = (campo, valor) => {
                         $parse(campo).assign($scope, valor);
-                        var campoOrdenar = $scope.ordemFiltro;
+                        var campoOrdenar = escopo.ordemFiltro;
 
                         function crescente(varA, varB) {
                             return varA[campoOrdenar] > varB[campoOrdenar] ? 1 : varB[campoOrdenar] > varA[campoOrdenar] ? -1 : 0;
@@ -643,31 +684,30 @@ app.directive("estruturaGerencia", [
                             return varA[campoOrdenar] < varB[campoOrdenar] ? 1 : varB[campoOrdenar] < varA[campoOrdenar] ? -1 : 0;
                         }
 
-                        if ($scope.sentidoFiltro == "") {
-                            $scope.listaConsulta.sort(crescente);
+                        if (escopo.sentidoFiltro == "") {
+                            escopo.listaConsulta.sort(crescente);
                         } else {
-                            $scope.listaConsulta.sort(decrescente);
+                            escopo.listaConsulta.sort(decrescente);
                         }
                     };
 
                     //Vendo se a funcao de filtrar e personalizada e tem outro nome
-                    if ($scope.estrutura.funcaoFiltrar != undefined) {
-                        $scope.filtrar = eval("$scope." + $scope.estrutura.funcaoFiltrar);
+                    if (escopo.estrutura.funcaoFiltrar != undefined) {
+                        escopo.filtrar = eval("escopo." + escopo.estrutura.funcaoFiltrar);
                     }
+                    
+                    if (escopo.filtrar == undefined) {
 
-                    console.log($scope.filtrar);
-                    if ($scope.filtrar == undefined) {
-
-                        $scope.filtrar = function (pagina = 1, origem = "filtro") {
+                        escopo.filtrar = function (pagina = 1, origem = "filtro") {
                             //Testando por limite no filtro inicial, para buscar apenas os últimos 500 registros
                             var limite = 0; // pagina == 0 ? 500 : 0;
 
-                            if ($scope.antesDeFiltrar != undefined) {
-                                $scope.antesDeFiltrar();
+                            if (escopo.antesDeFiltrar != undefined) {
+                                escopo.antesDeFiltrar();
                             }
 
-                            if ($scope.estrutura.filtroObrigatorio != undefined && $scope.estrutura.filtroObrigatorio) {
-                                var filtroVer = $scope.filtros[0];
+                            if (escopo.estrutura.filtroObrigatorio != undefined && escopo.estrutura.filtroObrigatorio) {
+                                var filtroVer = escopo.filtros[0];
                                 var temValor =
                                     filtroVer.valor != "" ||
                                     (filtroVer.di != undefined && filtroVer.di != "") ||
@@ -680,8 +720,8 @@ app.directive("estruturaGerencia", [
 
                             //Esta funcao foi criada, pois pode haver casos de ter intervalo de datas no filtro, ai tenho que divilo em dois.
 
-                            $scope.manipularFiltroLocal($scope.acao, "salvar", $scope.filtros);
-                            $scope.filtroEnviar = $scope.converterFiltroParaEnvio();
+                            escopo.manipularFiltroLocal(escopo.acao, "salvar", escopo.filtros);
+                            escopo.filtroEnviar = escopo.converterFiltroParaEnvio();
 
                             //if (estrutura.mostrarAguardeAoFiltrar == undefined || estrutura.mostrarAguardeAoFiltrar) {
                             $rS.carregando = true;
@@ -697,7 +737,7 @@ app.directive("estruturaGerencia", [
                             }
 
                             var addFiltro = function (campo, operador, valor, exibir) {
-                                $scope.filtroEnviar.push({
+                                escopo.filtroEnviar.push({
                                     campo: campo,
                                     operador: operador,
                                     valor: valor,
@@ -718,7 +758,7 @@ app.directive("estruturaGerencia", [
                             }
 
                             var campos = [];
-                            angular.forEach($scope.estrutura.listaConsulta, function (itemLC, keyLC) {
+                            angular.forEach(escopo.estrutura.listaConsulta, function (itemLC, keyLC) {
                                 if (angular.isObject(itemLC)) {
                                     campos.push(keyLC);
                                 } else {
@@ -731,38 +771,38 @@ app.directive("estruturaGerencia", [
                             var ordemFiltro =
                                 ordemCampoTela != undefined && ordemCampoTela != "" > 0
                                     ? angular.element("#ordemFiltro").val().split(":")[1]
-                                    : $scope.ordemFiltro != ""
-                                    ? $scope.ordemFiltro
+                                    : escopo.ordemFiltro != ""
+                                    ? escopo.ordemFiltro
                                     : "";
 
                             var sentidoFiltro =
                                 angular.element("#sentidoFiltro").length > 0
                                     ? angular.element("#sentidoFiltro").val()
-                                    : $scope.sentidoFiltro != ""
-                                    ? $scope.sentidoFiltro
+                                    : escopo.sentidoFiltro != ""
+                                    ? escopo.sentidoFiltro
                                     : "";
 
-                            if (usarDataAlteracaoAoFiltrar && $scope.dataUltimaConsulta != undefined && origem == "timer") {
-                                var data_alteracao = APIAjuFor.dateParaTimestamp($scope.dataUltimaConsulta);
+                            if (usarDataAlteracaoAoFiltrar && escopo.dataUltimaConsulta != undefined && origem == "timer") {
+                                var data_alteracao = APIAjuFor.dateParaTimestamp(escopo.dataUltimaConsulta);
                                 addFiltro("data_alteracao", ">=", data_alteracao, false);
                             }
 
                             var filtros = {
-                                tabela: $scope.estrutura.tabela,
-                                tabelaConsulta: $scope.estrutura.tabelaConsulta != undefined ? $scope.estrutura.tabelaConsulta : $scope.estrutura.tabela,
+                                tabela: escopo.estrutura.tabela,
+                                tabelaConsulta: escopo.estrutura.tabelaConsulta != undefined ? escopo.estrutura.tabelaConsulta : escopo.estrutura.tabela,
                                 tela: acao,
-                                campo_chave: $scope.estrutura.campo_chave,
+                                campo_chave: escopo.estrutura.campo_chave,
                                 pagina: pagina,
-                                campos: campos, // Object.keys($scope.estrutura.listaConsulta),
-                                filtros: $scope.filtroEnviar,
+                                campos: campos, // Object.keys(escopo.estrutura.listaConsulta),
+                                filtros: escopo.filtroEnviar,
                                 ordemFiltro: ordemFiltro != "" ? ordemFiltro + " " + sentidoFiltro : "",
                                 itensPagina: "",
                                 resumoConsulta: resumo,
-                                dispositivoMovel: $scope.dispositivoMovel,
-                                tabelasRelacionadas: $scope.estrutura.tabelasRelacionadas,
-                                todosItensSelecionados: $scope.todosItensSelecionados != undefined ? $scope.todosItensSelecionados : false,
-                                tirarCampoChaveConsulta: $scope.estrutura.tirarCampoChaveConsulta,
-                                acaoAposFiltrar: $scope.estrutura.acaoAposFiltrar != undefined ? $scope.estrutura.acaoAposFiltrar : undefined,
+                                dispositivoMovel: escopo.dispositivoMovel,
+                                tabelasRelacionadas: escopo.estrutura.tabelasRelacionadas,
+                                todosItensSelecionados: escopo.todosItensSelecionados != undefined ? escopo.todosItensSelecionados : false,
+                                tirarCampoChaveConsulta: escopo.estrutura.tirarCampoChaveConsulta,
+                                acaoAposFiltrar: escopo.estrutura.acaoAposFiltrar != undefined ? escopo.estrutura.acaoAposFiltrar : undefined,
                                 limite: limite,
                             };
 
@@ -786,16 +826,16 @@ app.directive("estruturaGerencia", [
                             var fd = new FormData();
                             fd.append("parametros", angular.toJson(filtros));
 
-                            var parametrosEnviarFiltro = $scope.tipoConsulta == "post" ? fd : filtros;
+                            var parametrosEnviarFiltro = escopo.tipoConsulta == "post" ? fd : filtros;
 
-                            // if (usarTimerConsulta && $scope.listaConsulta == undefined) {
+                            // if (usarTimerConsulta && escopo.listaConsulta == undefined) {
                             //     setTimeout(() => {
                             //         $rootScope.pausarTimer();
                             //     }, 300);
                             // }
 
                             //APIServ.executaFuncaoClasse('classeGeral', 'consulta', filtros)
-                            APIServ.executaFuncaoClasse("classeGeral", "consulta", parametrosEnviarFiltro, $scope.tipoConsulta)
+                            APIServ.executaFuncaoClasse("classeGeral", "consulta", parametrosEnviarFiltro, escopo.tipoConsulta)
                                 .success(function (data) {
                                     //console.log(data); $rootScope.carregando = false;/*
                                     //console.log(data);
@@ -804,25 +844,25 @@ app.directive("estruturaGerencia", [
                                     }
 
                                     if (usarDataAlteracaoAoFiltrar) {
-                                        $scope.dataUltimaConsulta = new Date();
-                                        //console.log($scope.dataUltimaConsulta);
+                                        escopo.dataUltimaConsulta = new Date();
+                                        //console.log(escopo.dataUltimaConsulta);
                                     }
 
                                     $rS.carregando = false;
                                     if (typeof data === "object") {
-                                        $scope.todosItensSelecionados = false;
+                                        escopo.todosItensSelecionados = false;
                                         angular.element("#todosItensSelecionados").attr("checked", false);
 
-                                        $scope.pagina = pagina;
+                                        escopo.pagina = pagina;
 
                                         if (
                                             usarDataAlteracaoAoFiltrar &&
-                                            $scope.dataUltimaConsulta != undefined &&
+                                            escopo.dataUltimaConsulta != undefined &&
                                             origem == "timer" &&
-                                            $scope.listaConsulta != undefined
+                                            escopo.listaConsulta != undefined
                                         ) {
                                             var novaLista = Object.assign([], data.lista);
-                                            var listaAtual = Object.assign([], $scope.listaConsulta);
+                                            var listaAtual = Object.assign([], escopo.listaConsulta);
                                             var novaListaDefinitiva = Object.assign([], novaLista);
 
                                             if (Object.keys(novaLista).length > 0) {
@@ -848,37 +888,37 @@ app.directive("estruturaGerencia", [
                                             // Implementação do Lazy Loading
                                             if (origem === "lazyLoad") {
                                                 // Para lazy loading, adicionar novos itens à lista existente
-                                                if ($scope.listaConsulta === undefined) {
-                                                    $scope.listaConsulta = [];
+                                                if (escopo.listaConsulta === undefined) {
+                                                    escopo.listaConsulta = [];
                                                 }
 
                                                 if (data.lista && data.lista.length > 0) {
                                                     // Adicionar novos itens evitando duplicatas
-                                                    var itensExistentes = $scope.listaConsulta.map((item) => item[estrutura.campo_chave]);
+                                                    var itensExistentes = escopo.listaConsulta.map((item) => item[estrutura.campo_chave]);
                                                     var novosItens = data.lista.filter((item) => !itensExistentes.includes(item[estrutura.campo_chave]));
 
-                                                    $scope.listaConsulta = $scope.listaConsulta.concat(novosItens);
+                                                    escopo.listaConsulta = escopo.listaConsulta.concat(novosItens);
 
                                                     // Atualizar lista visível no lazy loading
-                                                    if ($scope.listaConsultaVisivel === undefined) {
-                                                        $scope.listaConsultaVisivel = [];
+                                                    if (escopo.listaConsultaVisivel === undefined) {
+                                                        escopo.listaConsultaVisivel = [];
                                                     }
-                                                    $scope.listaConsultaVisivel = $scope.listaConsultaVisivel.concat(novosItens);
-                                                    $scope.temMaisItens = data.lista.length >= (data.paginacao ? data.paginacao.itensPagina : 20);
-                                                    $scope.carregandoMaisItens = false;
+                                                    escopo.listaConsultaVisivel = escopo.listaConsultaVisivel.concat(novosItens);
+                                                    escopo.temMaisItens = data.lista.length >= (data.paginacao ? data.paginacao.itensPagina : 20);
+                                                    escopo.carregandoMaisItens = false;
                                                 } else {
-                                                    $scope.temMaisItens = false;
-                                                    $scope.carregandoMaisItens = false;
+                                                    escopo.temMaisItens = false;
+                                                    escopo.carregandoMaisItens = false;
                                                 }
                                             } else {
                                                 // Carregamento normal - substituir lista completa
                                                 $parse("listaConsulta").assign($scope, data.lista);
 
                                                 // Inicializar variáveis de lazy loading para filtro normal
-                                                $scope.listaConsultaVisivel = undefined; // Será inicializada pela diretiva
-                                                $scope.carregandoMaisItens = false;
-                                                $scope.temMaisItens = true;
-                                                $scope.ultimaPaginaCarregada = 0;
+                                                escopo.listaConsultaVisivel = undefined; // Será inicializada pela diretiva
+                                                escopo.carregandoMaisItens = false;
+                                                escopo.temMaisItens = true;
+                                                escopo.ultimaPaginaCarregada = 0;
                                             }
                                         }
 
@@ -890,8 +930,8 @@ app.directive("estruturaGerencia", [
                                             $parse("resumoConsultaPersonalizado").assign($scope, data.resumoConsultaPersonalizado);
                                         }
 
-                                        if ($scope.aposFiltrar != undefined) {
-                                            $scope.aposFiltrar();
+                                        if (escopo.aposFiltrar != undefined) {
+                                            escopo.aposFiltrar();
                                         }
                                     } else {
                                         APIServ.mensagemSimples("Informação", "Erro ao Filtrar");
@@ -912,64 +952,64 @@ app.directive("estruturaGerencia", [
 
                     }
 
-                    if (($scope.estrutura.filtrarAoIniciar == undefined || $scope.estrutura.filtrarAoIniciar == true) && $scope.tela == "consulta") {
+                    if ((escopo.estrutura.filtrarAoIniciar == undefined || escopo.estrutura.filtrarAoIniciar == true) && escopo.tela == "consulta") {
                         setTimeout(function () {
-                            $scope.filtrar(0);
+                            escopo.filtrar(0);
                         }, 100);
                     }
 
-                    if ($scope.selecionarItemConsulta == undefined) {
-                        $scope.selecionarItemConsulta = function (key, item) {
+                    if (escopo.selecionarItemConsulta == undefined) {
+                        escopo.selecionarItemConsulta = function (key, item) {
                             var parametros = {
                                 tela: acao,
                                 key: key,
-                                campo_chave: $scope.estrutura.campo_chave,
-                                chave: item[$scope.estrutura.campo_chave],
+                                campo_chave: escopo.estrutura.campo_chave,
+                                chave: item[escopo.estrutura.campo_chave],
                                 selecionado: item.selecionado != undefined && item.selecionado,
                             };
                             APIServ.executaFuncaoClasse("classeGeral", "selecionarItemConsulta", parametros).success(function (retorno) {});
                         };
                     }
 
-                    $scope.itensPaginaPaginacao = () => {
+                    escopo.itensPaginaPaginacao = () => {
                         //console.log(app.current_page);
                     };
 
-                    if ($scope.selecionarTodosItensConsulta == undefined) {
-                        $scope.selecionarTodosItensConsulta = function () {
-                            var teste = $scope.itensPaginaPaginacao();
+                    if (escopo.selecionarTodosItensConsulta == undefined) {
+                        escopo.selecionarTodosItensConsulta = function () {
+                            var teste = escopo.itensPaginaPaginacao();
                             //console.log(teste);
 
-                            $scope.todosItensSelecionados = $scope.todosItensSelecionados == "false" || !$scope.todosItensSelecionados;
-                            if ($scope.listaConsulta != undefined && Object.keys($scope.listaConsulta).length > 0) {
+                            escopo.todosItensSelecionados = escopo.todosItensSelecionados == "false" || !escopo.todosItensSelecionados;
+                            if (escopo.listaConsulta != undefined && Object.keys(escopo.listaConsulta).length > 0) {
                                 var parametros = {
                                     tela: acao,
-                                    selecionado: $scope.todosItensSelecionados,
+                                    selecionado: escopo.todosItensSelecionados,
                                 };
                                 APIServ.executaFuncaoClasse("classeGeral", "selecionarTodosItensConsulta", parametros).success(function () {
-                                    angular.forEach($scope.listaConsulta, function (item) {
-                                        item.selecionado = $scope.todosItensSelecionados;
+                                    angular.forEach(escopo.listaConsulta, function (item) {
+                                        item.selecionado = escopo.todosItensSelecionados;
                                     });
                                 });
                             }
                         };
                     }
 
-                    if ($scope.detalhar == undefined) {
-                        $scope.detalhar = function (item) {
+                    if (escopo.detalhar == undefined) {
+                        escopo.detalhar = function (item) {
                             var retorno = [];
                             var keyRetorno = 0;
                             //Monto o filtro com a chave do item
 
                             var filtros = {
-                                tabela: $scope.estrutura.tabela,
-                                campo_chave: $scope.estrutura.campo_chave,
-                                chave: item[$scope.estrutura.campo_chave],
+                                tabela: escopo.estrutura.tabela,
+                                campo_chave: escopo.estrutura.campo_chave,
+                                chave: item[escopo.estrutura.campo_chave],
                             };
 
                             //Vendo se ha tabelas relac
-                            if ($scope.estrutura.tabelasRelacionadas != undefined) {
-                                filtros["tabelasRelacionadas"] = $scope.estrutura.tabelasRelacionadas;
+                            if (escopo.estrutura.tabelasRelacionadas != undefined) {
+                                filtros["tabelasRelacionadas"] = escopo.estrutura.tabelasRelacionadas;
                             }
 
                             //Vendo se o detalhe do item ja foi carregado
@@ -979,8 +1019,8 @@ app.directive("estruturaGerencia", [
                                     item["exibirDetalhes"] = true;
                                     item["detalhes"] = {};
                                     item["detalhes"] = data;
-                                    if ($scope.aoDetalhar != undefined) {
-                                        $scope.aoDetalhar(item);
+                                    if (escopo.aoDetalhar != undefined) {
+                                        escopo.aoDetalhar(item);
                                     }
                                 });
                             } else {
@@ -995,40 +1035,41 @@ app.directive("estruturaGerencia", [
                         $scope[retorno.variavelValidarAoSubmeter] = false;
                     }
 
-                    if ($scope.salvar == undefined) {
-                        $scope.salvar = function (dadosTela, nomeForm) {
+                    if (escopo.salvar == undefined) {
+                        escopo.salvar = function (dadosTela, nomeForm) {                            
+                            
                             $invalidos = document.getElementsByClassName("erro").length > 0;
-                            if ($scope.formularioInvalido || $invalidos) {
+                            if (escopo.formularioInvalido || $invalidos) {
                                 return true;
                             }
 
-                            $scope.desabilitarSalvar = true;
+                            escopo.desabilitarSalvar = true;
 
-                            if ($scope.antesSalvar != undefined) {
-                                $scope.antesSalvar();
+                            if (escopo.antesSalvar != undefined) {
+                                escopo.antesSalvar();
                             }
 
                             var indice = dadosTela["indiceVariavel"];
                             var dados = APIServ.transporVariavel($scope[estrutura.raizModelo]);
 
                             $rootScope.carregando = true;
-                            var fd = $scope.fd;
+                            var fd = escopo.fd;
 
                             var textoSalvou =
-                                $scope.estrutura.textoConfirmaSalvamento != undefined
-                                    ? $scope.estrutura.textoConfirmaSalvamento
+                                escopo.estrutura.textoConfirmaSalvamento != undefined
+                                    ? escopo.estrutura.textoConfirmaSalvamento
                                     : "Dados Inseridos com Sucesso!";
 
                             fd.append("dados", angular.toJson(dados));
 
                             //Definindo as configuracoes
                             var configuracoes = {
-                                tabela: $scope.estrutura.tabela,
-                                campo_chave: $scope.estrutura.campoChave != undefined ? $scope.estrutura.campoChave : $scope.estrutura.campo_chave,
-                                classe: $scope.estrutura.classe != undefined ? $scope.estrutura.classe : $scope.estrutura.tabela,
-                                funcaoEstrutura: $scope.funcaoEstrutura != undefined ? $scope.funcaoEstrutura : undefined,
-                                funcaoManipula: $scope.estrutura.funcaoManipula,
-                                tabelasRelacionadas: $scope.estrutura.tabelasRelacionadas,
+                                tabela: escopo.estrutura.tabela,
+                                campo_chave: escopo.estrutura.campoChave != undefined ? escopo.estrutura.campoChave : escopo.estrutura.campo_chave,
+                                classe: escopo.estrutura.classe != undefined ? escopo.estrutura.classe : escopo.estrutura.tabela,
+                                funcaoEstrutura: escopo.funcaoEstrutura != undefined ? escopo.funcaoEstrutura : undefined,
+                                funcaoManipula: escopo.estrutura.funcaoManipula,
+                                tabelasRelacionadas: escopo.estrutura.tabelasRelacionadas,
                                 camposSeVazios: [],
                             };
 
@@ -1058,21 +1099,21 @@ app.directive("estruturaGerencia", [
                                 });
                             };
 
-                            varrerCamposVerificarAnexos($scope.estrutura.campos);
+                            varrerCamposVerificarAnexos(escopo.estrutura.campos);
 
-                            if ($scope.estrutura.relacionamentosVerificar != undefined) {
-                                configuracoes["relacionamentosVerificar"] = $scope.estrutura.relacionamentosVerificar;
+                            if (escopo.estrutura.relacionamentosVerificar != undefined) {
+                                configuracoes["relacionamentosVerificar"] = escopo.estrutura.relacionamentosVerificar;
                             }
 
                             var parametrosEnviar;
-                            if ($scope.tipoSalvar == "post") {
+                            if (escopo.tipoSalvar == "post") {
                                 fd.append("configuracoes", angular.toJson(configuracoes));
 
                                 angular.forEach($rootScope.$files, function (value, key) {
-                                    $scope.fd.append(key, value);
+                                    escopo.fd.append(key, value);
                                 });
                                 parametrosEnviar = fd;
-                            } else if ($scope.tipoSalvar == "get") {
+                            } else if (escopo.tipoSalvar == "get") {
                                 parametrosEnviar = {
                                     dados: dadosTela,
                                     configuracoes: configuracoes,
@@ -1086,17 +1127,17 @@ app.directive("estruturaGerencia", [
                             //         'Content-Type': undefined
                             //     }
                             // })
-                            APIServ.executaFuncaoClasse("classeGeral", "manipula", parametrosEnviar, $scope.tipoSalvar)
+                            APIServ.executaFuncaoClasse("classeGeral", "manipula", parametrosEnviar, escopo.tipoSalvar)
                                 .success(function (retorno) {
-                                     //console.log(retorno); $scope.desabilitarSalvar = false; $rootScope.carregando = false; /*
-                                    if ($scope.tipoSalvar == "get") {
+                                     //console.log(retorno); escopo.desabilitarSalvar = false; $rootScope.carregando = false; /*
+                                    if (escopo.tipoSalvar == "get") {
                                         //console.log(retorno);
                                         return false;
                                     }
 
-                                    $scope.fd = new FormData();
+                                    escopo.fd = new FormData();
                                     $rootScope.carregando = false;
-                                    $scope.desabilitarSalvar = false;
+                                    escopo.desabilitarSalvar = false;
 
                                     if (retorno.erro != undefined) {
                                         APIServ.mensagemSimples(retorno.erro);
@@ -1107,88 +1148,74 @@ app.directive("estruturaGerencia", [
                                     } else if (typeof retorno === "string") {
                                         APIServ.mensagemSimples("Informação", "Erro ao Salvar, tente novamente!");
                                     } else {
+                                        //Cadastrado com sucesso, tratando acoes
+
                                         var cadastroDiretoUrl = parametrosUrl[2] != undefined && parametrosUrl[2] == "cadastro" ? true : false;
                                         var funcao = function () {
-                                            if (EGFuncoes.temConsulta($scope.estrutura) && !cadastroDiretoUrl) {
-                                                $scope.tela = "consulta";
+                                            if (EGFuncoes.temConsulta(escopo.estrutura) && !cadastroDiretoUrl) {
+                                                escopo.tela = "consulta";
 
                                                 setTimeout(function () {
                                                     //angular.element('#filtrar').trigger('click');
-                                                    if ($scope.estrutura.filtrarAoIniciar != undefined && $scope.estrutura.filtrarAoIniciar) {
-                                                        $scope.filtrar();
+                                                    if (escopo.estrutura.filtrarAoIniciar != undefined && escopo.estrutura.filtrarAoIniciar) {
+                                                        escopo.filtrar();
                                                     }
                                                 }, 100);
                                             }
 
                                             // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
                                             if (
-                                                ($scope.estrutura.recarregarAposSalvar != undefined && $scope.estrutura.recarregarAposSalvar) ||
+                                                (escopo.estrutura.recarregarAposSalvar != undefined && escopo.estrutura.recarregarAposSalvar) ||
                                                 cadastroDiretoUrl
                                             ) {
                                                 // Se estiver em modal, não recarregar a página - apenas fechar o modal
-                                                if ($scope.isModal || ($scope.localExibicao && $scope.localExibicao === "modal")) {
+                                                if (escopo.isModal || (escopo.localExibicao && escopo.localExibicao === "modal")) {
                                                     console.log("🎭 [estruturaGerencia] Contexto modal detectado - evitando window.location.reload()");
 
-                                                    // Fechar o modal se estiver em contexto modal
-                                                    if (window.bootstrap && window.bootstrap.Modal) {
-                                                        // Bootstrap 5
-                                                        var modals = document.querySelectorAll(".modal.show");
-                                                        modals.forEach(function (modal) {
-                                                            var modalInstance = window.bootstrap.Modal.getInstance(modal);
-                                                            if (modalInstance) modalInstance.hide();
-                                                        });
-                                                    } else if (window.$ && window.$.fn.modal) {
-                                                        // Bootstrap 4/jQuery
-                                                        $(".modal.show, .popup-modal.show, .popup-modal.in").modal("hide");
+                                                    // Fechar apenas o modal que contém este formulário
+                                                    if (PopUpModal && typeof PopUpModal.identificarEFecharModalAtual === 'function') {
+                                                        PopUpModal.identificarEFecharModalAtual($element[0]);
                                                     }
 
                                                     // Resetar modelo se necessário
-                                                    if ($scope.estrutura.raizModelo) {
-                                                        $scope[$scope.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo($scope.estrutura);
+                                                    if (escopo.estrutura.raizModelo) {
+                                                        $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
                                                     }
                                                 } else {
                                                     // Comportamento normal fora do modal
                                                     window.location.reload();
                                                 }
                                             } else {
-                                                $scope[$scope.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo($scope.estrutura);
+                                                $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
                                             }
                                             if (angular.element("#popUp").val() == "true") {
                                                 window.close();
                                             }
-                                            if ($scope.estrutura.executarAposSalvar != undefined) {
-                                                $scope[$scope.estrutura.executarAposSalvar.funcao](retorno);
-                                            } else if ($scope.executarAposSalvar != undefined) {
-                                                $scope.executarAposSalvar();
+                                            if (escopo.estrutura.executarAposSalvar != undefined) {
+                                                $scope[escopo.estrutura.executarAposSalvar.funcao](retorno);
+                                            } else if (escopo.executarAposSalvar != undefined) {
+                                                escopo.executarAposSalvar();
                                             }
                                         };
 
-                                        if ($scope.aoSalvar != undefined) {
-                                            $scope.aoSalvar(retorno);
-                                        } else if ($scope.estrutura.tipoEstrutura == "cadastroUnico") {
+                                        if (escopo.aoSalvar != undefined) {
+                                            escopo.aoSalvar(retorno);
+                                        } else if (escopo.estrutura.tipoEstrutura == "cadastroUnico" || escopo.estrutura.tipoEstrutura == 'cadastroDireto') {
                                             var funcaoCadUnico = () => {
                                                 // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
-                                                if ($scope.isModal || ($scope.localExibicao && $scope.localExibicao === "modal")) {
+                                                if (escopo.isModal || (escopo.localExibicao && escopo.localExibicao === "modal")) {
                                                     console.log(
                                                         "🎭 [estruturaGerencia] CadastroUnico - contexto modal detectado - evitando window.location.reload()"
                                                     );
 
-                                                    // Fechar o modal se estiver em contexto modal
-                                                    if (window.bootstrap && window.bootstrap.Modal) {
-                                                        // Bootstrap 5
-                                                        var modals = document.querySelectorAll(".modal.show");
-                                                        modals.forEach(function (modal) {
-                                                            var modalInstance = window.bootstrap.Modal.getInstance(modal);
-                                                            if (modalInstance) modalInstance.hide();
-                                                        });
-                                                    } else if (window.$ && window.$.fn.modal) {
-                                                        // Bootstrap 4/jQuery
-                                                        $(".modal.show, .popup-modal.show, .popup-modal.in").modal("hide");
+                                                    // Fechar apenas o modal que contém este formulário
+                                                    if (PopUpModal && typeof PopUpModal.identificarEFecharModalAtual === 'function') {
+                                                        PopUpModal.identificarEFecharModalAtual($element[0]);
                                                     }
 
                                                     // Resetar modelo se necessário
-                                                    if ($scope.estrutura.raizModelo) {
-                                                        $scope[$scope.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo($scope.estrutura);
+                                                    if (escopo.estrutura.raizModelo) {
+                                                        $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
                                                     }
                                                 } else {
                                                     // Comportamento normal fora do modal
@@ -1198,12 +1225,12 @@ app.directive("estruturaGerencia", [
 
                                             APIServ.mensagemSimples("Confirmação", textoSalvou, funcaoCadUnico);
                                         } else if (
-                                            $scope.estrutura.naoMostrarConfirmacaoAoSalvar == undefined ||
-                                            $scope.estrutura.naoMostrarConfirmacaoAoSalvar == false
+                                            escopo.estrutura.naoMostrarConfirmacaoAoSalvar == undefined ||
+                                            escopo.estrutura.naoMostrarConfirmacaoAoSalvar == false
                                         ) {
                                             if (
-                                                $scope.estrutura.usarChaveTextoConfirmaSalvamento != undefined &&
-                                                $scope.estrutura.usarChaveTextoConfirmaSalvamento
+                                                escopo.estrutura.usarChaveTextoConfirmaSalvamento != undefined &&
+                                                escopo.estrutura.usarChaveTextoConfirmaSalvamento
                                             ) {
                                                 textoSalvou += " Com código: " + retorno.chave;
                                             }
@@ -1216,7 +1243,7 @@ app.directive("estruturaGerencia", [
                                 })
                                 .error(function (a, b, c) {
                                     //console.log(a);
-                                    $scope.desabilitarSalvar = false;
+                                    escopo.desabilitarSalvar = false;
                                     $rootScope.carregando = false;
                                     APIServ.mensagemSimples("Informação", "Erro ao Salvar. Tente Novamente!");
                                 });
@@ -1224,21 +1251,21 @@ app.directive("estruturaGerencia", [
                         };
                     }
 
-                    if ($scope.estrutura.tipoEstrutura == "cadastroUnico") {
+                    if (escopo.estrutura.tipoEstrutura == "cadastroUnico") {
                         var filtros = {
-                            tabela: $scope.estrutura.tabela,
-                            campo_chave: $scope.estrutura.campo_chave,
-                            campos: $scope.estrutura.listaConsulta != undefined ? Object.keys($scope.estrutura.listaConsulta) : "*",
+                            tabela: escopo.estrutura.tabela,
+                            campo_chave: escopo.estrutura.campo_chave,
+                            campos: escopo.estrutura.listaConsulta != undefined ? Object.keys(escopo.estrutura.listaConsulta) : "*",
                             chave: 1,
                         };
 
                         APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", filtros).success(function (data) {
-                            $scope[$scope.estrutura.raizModelo] = data;
+                            $scope[escopo.estrutura.raizModelo] = data;
                         });
                     }
 
-                    if ($scope.alterar == undefined) {
-                        $scope.alterar = function (valor) {
+                    if (escopo.alterar == undefined) {
+                        escopo.alterar = function (valor) {
                             //console.log(valor);
                             //console.log('alterando');
                             if (usarTimerConsulta) {
@@ -1247,23 +1274,23 @@ app.directive("estruturaGerencia", [
                             $rS.carregando = true;
                             var indiceVariavel = this.$index;
                             var filtros = {
-                                tabela: $scope.estrutura.tabela,
-                                tabelaConsulta: $scope.estrutura.tabelaConsulta,
-                                campo_chave: $scope.estrutura.campo_chave,
-                                chave: valor[$scope.estrutura.campo_chave],
+                                tabela: escopo.estrutura.tabela,
+                                tabelaConsulta: escopo.estrutura.tabelaConsulta,
+                                campo_chave: escopo.estrutura.campo_chave,
+                                chave: valor[escopo.estrutura.campo_chave],
                             };
 
-                            if ($scope.estrutura.tabelasRelacionadas != undefined) {
-                                filtros["tabelasRelacionadas"] = $scope.estrutura.tabelasRelacionadas;
+                            if (escopo.estrutura.tabelasRelacionadas != undefined) {
+                                filtros["tabelasRelacionadas"] = escopo.estrutura.tabelasRelacionadas;
                             }
 
-                            if ($scope.estrutura.campoChaveSecundaria != undefined && valor[$scope.estrutura.campoChaveSecundaria] != undefined) {
-                                filtros["campoChaveSecundaria"] = $scope.estrutura.campoChaveSecundaria;
-                                filtros["valorChaveSecundaria"] = valor[$scope.estrutura.campoChaveSecundaria];
+                            if (escopo.estrutura.campoChaveSecundaria != undefined && valor[escopo.estrutura.campoChaveSecundaria] != undefined) {
+                                filtros["campoChaveSecundaria"] = escopo.estrutura.campoChaveSecundaria;
+                                filtros["valorChaveSecundaria"] = valor[escopo.estrutura.campoChaveSecundaria];
                             }
 
-                            if ($scope.antesDeBuscarParaAlterar != undefined) {
-                                $scope.antesDeBuscarParaAlterar(filtros);
+                            if (escopo.antesDeBuscarParaAlterar != undefined) {
+                                escopo.antesDeBuscarParaAlterar(filtros);
                             }
 
                             var fd = new FormData();
@@ -1284,28 +1311,28 @@ app.directive("estruturaGerencia", [
                                         APIServ.mensagemSimples("Informação", "Erro, Tente Novamente");
                                     } else {
                                         data["indiceVariavel"] = indiceVariavel;
-                                        $scope[$scope.estrutura.raizModelo] = data;
+                                        $scope[escopo.estrutura.raizModelo] = data;
 
-                                        $scope.tela = "cadastro";
+                                        escopo.tela = "cadastro";
                                         if (usarTimerConsulta) {
                                             $rootScope.pausarTimer();
                                         }
 
-                                        //$scope.mudaTela('cadastro');
+                                        //escopo.mudaTela('cadastro');
                                         if (
-                                            ($scope.tela == "cadastro" || $scope.tela == "consulta") &&
-                                            $scope.estrutura.usarTinyMCE == true &&
-                                            $scope.carregarTinyMCE != undefined
+                                            (escopo.tela == "cadastro" || escopo.tela == "consulta") &&
+                                            escopo.estrutura.usarTinyMCE == true &&
+                                            escopo.carregarTinyMCE != undefined
                                         ) {
                                             //console.log('mudando');
-                                            $scope.carregarTinyMCE();
+                                            escopo.carregarTinyMCE();
                                         }
 
-                                        if ($scope.estrutura.funcaoAoAlterar != undefined) {
-                                            var nomeFuncaoAlterar = eval("$scope." + $scope.estrutura.funcaoAoAlterar);
+                                        if (escopo.estrutura.funcaoAoAlterar != undefined) {
+                                            var nomeFuncaoAlterar = eval("escopo." + escopo.estrutura.funcaoAoAlterar);
                                             nomeFuncaoAlterar(data);
-                                        } else if ($scope.aoAlterar != undefined) {
-                                            $scope.aoAlterar(data);
+                                        } else if (escopo.aoAlterar != undefined) {
+                                            escopo.aoAlterar(data);
                                         }
                                     }
                                 })
@@ -1317,12 +1344,12 @@ app.directive("estruturaGerencia", [
                 }
 
                 //Fazendo esta comparaca para nao sobrescrever a funcao caso seja declarada no controller
-                if ($scope.excluir == undefined) {
-                    $scope.excluir = function (item) {
+                if (escopo.excluir == undefined) {
+                    escopo.excluir = function (item) {
                         var parametros = {
-                            tabela: $scope.estrutura.tabela,
-                            campo_chave: $scope.estrutura.campo_chave,
-                            chave: item[$scope.estrutura.campo_chave],
+                            tabela: escopo.estrutura.tabela,
+                            campo_chave: escopo.estrutura.campo_chave,
+                            chave: item[escopo.estrutura.campo_chave],
                             refazerConsulta: true,
                         };
 
@@ -1331,7 +1358,7 @@ app.directive("estruturaGerencia", [
                         const novaConsulta = function(){
                             $parse('listaConsulta').assign($scope, novaLista);
                             $parse('listaConsultaVisivel').assign($scope, novaLista);
-                            $scope.$apply();
+                            escopo.$apply();
                         }      
 
                         var funcao = function () {
@@ -1343,20 +1370,20 @@ app.directive("estruturaGerencia", [
                                     APIServ.mensagemSimples(retorno.erro);
                                 } else if (retorno.chave >= 0) {       
                                     novaLista = retorno.novaConsulta.lista;
-                                    APIServ.mensagemSimples("Confirmação", $scope.estrutura.nomeUsual + " Excluído!", novaConsulta);
+                                    APIServ.mensagemSimples("Confirmação", escopo.estrutura.nomeUsual + " Excluído!", novaConsulta);
                                 } else if (retorno.chave > 0) {
-                                    APIServ.mensagemSimples("Informação", $scope.estrutura.nomeUsual + " Está em Uso e não pode ser Excluído!");
+                                    APIServ.mensagemSimples("Informação", escopo.estrutura.nomeUsual + " Está em Uso e não pode ser Excluído!");
                                 }
                                 $rootScope.carregando = false;
                             });
                         };
-                        APIServ.dialogoSimples("Confirmação", "Excluir " + $scope.estrutura.nomeUsual + "!?", "Sim", "Não", funcao);
+                        APIServ.dialogoSimples("Confirmação", "Excluir " + escopo.estrutura.nomeUsual + "!?", "Sim", "Não", funcao);
                     };
                 }
 
-                $scope.mostrarInformacoes = (campo) => {
+                escopo.mostrarInformacoes = (campo) => {
                     var elemento = $(event.target);
-                    var campoTemp = APIServ.buscarValorVariavel($scope.estrutura.campos, campo);
+                    var campoTemp = APIServ.buscarValorVariavel(escopo.estrutura.campos, campo);
                     var mensagem = campoTemp.informacoes;
                     var elementoPai = elemento.closest("div.form-group");
                     elementoPai
@@ -1366,21 +1393,16 @@ app.directive("estruturaGerencia", [
                             placement: "bottom",
                         })
                         .popover("show");
-
-                    /*
-                    $scope[raizModelo]['mostrarInformacoes_' + campo] = !$scope[raizModelo]['mostrarInformacoes_' + campo];
-                    console.log($scope[raizModelo]['mostrarInformacoes_' + campo]);
-                    */
                 };
 
                 var html = "";
                 if (EGFuncoes.temConsulta(retorno)) {
-                    html += '<cabecalho-consulta class="cabecalhoConsulta "></cabecalho-consulta>'; //montaCabecalhoConsulta(retorno, $scope);
+                    html += `<cabecalho-consulta class="cabecalhoConsulta" classe="${classe}"></cabecalho-consulta>`; //montaCabecalhoConsulta(retorno, $scope);
                     if (estrutura.tipoListaConsulta != undefined && estrutura.tipoListaConsulta == "tabela") {
-                        $scope.tipoListaConsulta = "tabela";
-                        html += '<lista-consulta-tabela class="listaConsulta"></lista-consulta-tabela>'; //  montaListaConsulta(estrutura);
+                        escopo.tipoListaConsulta = "tabela";
+                            html += '<lista-consulta-tabela class="listaConsulta"></lista-consulta-tabela>'; //  montaListaConsulta(estrutura);
                     } else {
-                        $scope.tipoListaConsulta = "lista";
+                        escopo.tipoListaConsulta = "lista";
                         html += '<lista-consulta class="listaConsulta"></lista-consulta>'; //  montaListaConsulta(estrutura);
                     }
                 }
@@ -1389,76 +1411,69 @@ app.directive("estruturaGerencia", [
                 $scope["campo_vazio"] = {};
 
                 if (EGFuncoes.temCadastro(retorno)) {
-                    html += "<formulario-cadastro></formulario-cadastro>"; // montaInicioFormCadastro(retorno, raizModelo);
+                    html += `<formulario-cadastro classe="${escopo.classe}"></formulario-cadastro>`; // montaInicioFormCadastro(retorno, raizModelo);
                 }
 
-                if (EGFuncoes.temCadastroDireto(retorno) || ($scope.estrutura.telaInicial != undefined && $scope.estrutura.telaInicial == "cadastro")) {
-                    $scope.tela = "cadastro";
+                if (EGFuncoes.temCadastroDireto(retorno) || (escopo.estrutura.telaInicial != undefined && escopo.estrutura.telaInicial == "cadastro")) {
+                    escopo.tela = "cadastro";
                 }
                 if (retorno.tipoEstrutura == "somenteCadastro") {
-                    $scope.tela = "cadastro";
+                    escopo.tela = "cadastro";
                 }
+
+                console.log('classe', classe);
+                if($rootScope['estruturas'] == undefined) {
+                    $rootScope['estruturas'] = {};
+                }
+                $rootScope['estruturas'][classe] = escopo;
+                
 
                 if (retorno.tipoEstrutura != "personalizado") {
                     $element.html(html);
-                    $compile($element.contents())($scope);
+                    $compile($element.contents())($rootScope['estruturas'][classe]);
                 }
 
-                if ($scope.aoCarregar != undefined) {
-                    $scope.aoCarregar();
+                if (escopo.aoCarregar != undefined) {
+                    escopo.aoCarregar();
                 }
 
                 //Fiz esta rotina para ver se poe as mascaras nos campos de pesquisa, quando sao padrao
-                if ($scope.tela == "consulta" && estrutura.filtrosPadrao) {
+                if (escopo.tela == "consulta" && estrutura.filtrosPadrao) {
                     setTimeout(function () {
-                        angular.forEach($scope.filtros, function (item, key) {                           
+                        angular.forEach(escopo.filtros, function (item, key) {                           
                             if (item.campo !== null && item.campo != undefined && item.campo != "" && estrutura.filtrosPadrao[item["campo"]] != undefined) {
                                 angular.element(`#filtros_${key}_campo`).trigger("change");
                                 
                                 const campoF = item['campo'];
                                 const valorFiltroPadrao = estrutura.filtrosPadrao[campoF] != undefined && estrutura.filtrosPadrao[campoF]["valor"] != undefined ? 
                                     estrutura.filtrosPadrao[campoF]["valor"] : "";
-                                $scope.filtros[key]["valor"] =valorFiltroPadrao;
+                                escopo.filtros[key]["valor"] =valorFiltroPadrao;
                             }
                         });
 
-                        if ($scope.filtros != undefined && $scope.filtros.length > 0 && $scope.filtros[0]["valor"] == "" && $scope.exibirConsulta) {
+                        if (escopo.filtros != undefined && escopo.filtros.length > 0 && escopo.filtros[0]["valor"] == "" && escopo.exibirConsulta) {
                             angular.element("#filtros_0_valor").focus();
                         }
                     }, 200);
                 }
 
-                if (!$scope.exibirConsulta && document.querySelector("#filtro_resultado") !== null) {
+                if (!escopo.exibirConsulta && document.querySelector("#filtro_resultado") !== null) {
                     setTimeout(() => {
                         document.querySelector("#filtro_resultado").focus();
                     }, 200);
                 }
-                //Fim das rotinas do timer da consulta
+                
+                
             };
 
             var rotaAtual = $route.current;
             var parametrosRota = $routeParams;
-
-            //console.log('Dados da rota atual:', rotaAtual);
-            //console.log('Parâmetros da rota:', parametrosRota);
-
-            //var url = $attrs.urlTemplate; Descontinuado, era para carregar arquivos .tmpls.js que continham as estruturas nas versões anteriores do sistema
-            //var classe = $attrs.classe;
-            var classe;
-            if ($route.current.classe != undefined) classe = $route.current.classe;
-            else if ($attrs.classe != undefined) classe = $attrs.classe;
-
-            //Descontinuada
-            // if (url != undefined && $scope.estrutura == undefined) {
-            //     $http.get(url).success(function (retorno) {
-            //         montarEstrutura(retorno);
-            //     })
-            // } else
-            if ($scope.estrutura != undefined) {
-                montarEstrutura($scope.estrutura);
+    
+            if (escopo.estrutura != undefined) {
+                montarEstrutura(escopo.estrutura);
             } else if ($element.attr("variavelEstrutura") != undefined) {
-                $scope.estrutura = $scope[$element.attr("variavelEstrutura")];
-                montarEstrutura($scope.estrutura);
+                escopo.estrutura = $scope[$element.attr("variavelEstrutura")];
+                montarEstrutura(escopo.estrutura);
             } else if (classe != undefined) {
                 let parametrosBuscaEstrutura = {
                     classe: classe,
@@ -1466,17 +1481,23 @@ app.directive("estruturaGerencia", [
                 };
 
                 var funcaoEstrutura;
-                if ($route.current.funcaoEstrutura != undefined) funcaoEstrutura = $route.current.funcaoEstrutura;
-                else if ($attrs.funcaoEstrutura != undefined) funcaoEstrutura = $attrs.funcaoEstrutura;
+                // Se estiver em modal, priorizar atributo sobre rota atual
+                if (isModal && $attrs.funcaoEstrutura != undefined) {
+                    funcaoEstrutura = $attrs.funcaoEstrutura;
+                } else if ($route.current && $route.current.funcaoEstrutura != undefined) {
+                    funcaoEstrutura = $route.current.funcaoEstrutura;
+                } else if ($attrs.funcaoEstrutura != undefined) {
+                    funcaoEstrutura = $attrs.funcaoEstrutura;
+                }
 
                 if (funcaoEstrutura != undefined) {
                     parametrosBuscaEstrutura["funcaoEstrutura"] = funcaoEstrutura;
-                    $scope.funcaoEstrutura = funcaoEstrutura;
+                    escopo.funcaoEstrutura = funcaoEstrutura;
                 }
 
                 let paramEnviarBuscaEstrutura = parametrosBuscaEstrutura;
 
-                if ($scope.tipoConsulta == "post") {
+                if (escopo.tipoConsulta == "post") {
                     let fdEnviarBuscaEstrutura = new FormData();
                     fdEnviarBuscaEstrutura.append("parametros", JSON.stringify(parametrosBuscaEstrutura));
                     paramEnviarBuscaEstrutura = fdEnviarBuscaEstrutura;

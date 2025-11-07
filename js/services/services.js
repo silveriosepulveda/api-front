@@ -271,6 +271,31 @@ angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).fact
         $mdDialog.hide();
     };
 
+    /**
+     * Busca o atributo 'classe' do elemento pai estrutura-gerencia
+     * @param {HTMLElement|jQuery} elemento - Elemento a partir do qual buscar
+     * @returns {string|null} - Valor do atributo classe ou null se não encontrado
+     */
+    var _buscarClasseEstruturaGerencia = function (elemento) {
+        try {
+            // Garantir que temos um elemento jQuery
+            var $elemento = angular.element(elemento);
+            
+            // Buscar o elemento pai estrutura-gerencia
+            var $estruturaGerencia = $elemento.closest('estrutura-gerencia');
+            
+            if ($estruturaGerencia.length > 0) {
+                var classe = $estruturaGerencia.attr('classe');
+                return classe || null;
+            }
+            
+            return null;
+        } catch (e) {
+            console.error('Erro ao buscar classe da estrutura-gerencia:', e);
+            return null;
+        }
+    };
+
     return {
         enviaDadosTabela: _enviaDadosTabela,
         executaFuncaoClasse: _executaFuncaoClasse,
@@ -293,5 +318,6 @@ angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).fact
         descriptografa: _descriptografa,
         // abrirModal: _abrirModal,
         fecharModal: _fecharModal,
+        buscarClasseEstruturaGerencia: _buscarClasseEstruturaGerencia,
     };
 });

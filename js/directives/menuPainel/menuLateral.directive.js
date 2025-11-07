@@ -38,7 +38,7 @@
 
     function MenuLateralController($scope, $timeout, APIServ, $location) {
         var ml = this;
-
+      
         // ==================== PROPRIEDADES ====================
         
         ml.menus = [];              // Lista de menus carregados
@@ -153,8 +153,8 @@
             
             // SEMPRE abrir menu por padrão quando há usuário logado
             $timeout(function() {
-                abrirMenu();
-                console.log('🎯 Menu lateral aberto por padrão conforme solicitado');
+              //  abrirMenu();
+              //  console.log('🎯 Menu lateral aberto por padrão conforme solicitado');
             }, 500); // Delay para garantir que o DOM esteja pronto
         }
 
@@ -258,8 +258,8 @@
             
             var botao = document.getElementById('botaoMenu');
             if (botao) {
-                botao.setAttribute('title', aberto ? 'Ocultar Menu' : 'Mostrar Menu');
-                botao.textContent = aberto ? 'Ocultar Menu' : 'Mostrar Menu';
+                //botao.setAttribute('title', aberto ? 'Ocultar Menu' : 'Mostrar Menu');
+                //botao.textContent = aberto ? 'Ocultar Menu' : 'Mostrar Menu';
             }
         }
 

@@ -34,9 +34,15 @@ div.modalPopUp {
     transition: margin-left 0.5s ease;
     margin-left: var(--menu-width);
     padding: 5px;
-    min-height: calc(100vh - 60px);
-    /* margin-top: 60px; */
+    min-height: calc(100vh - 60px);    
 }
+
+@media (max-width: 768px) {
+    .conteudoEstruturaGerencia {
+        margin-top: 40px;
+    }
+}
+
 
 .input-group-addon.btn{
     color: #FFFFFF;

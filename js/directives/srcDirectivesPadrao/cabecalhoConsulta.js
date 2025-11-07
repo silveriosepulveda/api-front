@@ -1,18 +1,28 @@
 app.directive("cabecalhoConsulta", [
+    "$rootScope",
     "$compile",
     "APIServ",
     "EGFuncoes",
     "APIAjuFor",
     "FuncoesConsulta",
-    function ($compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta) {
+    function ($rootScope, $compile, APIServ, EGFuncoes, APIAjuFor, FuncoesConsulta) {
         return {
             restrict: "E",
             replace: true,
             template: "",
-            link: function (scope, elem) {
-                var parametros = scope.estrutura;
-                //let raizModelo = scope.estrutura.raizModelo;
-                let campoChave = scope.estrutura.raizModelo + "." + scope.estrutura.campo_chave;
+            link: function (scope, elem, attr) {
+                const $rS = $rootScope;
+                const classe = attr.classe;
+
+                console.log($rS['estruturas']);
+                
+                // Recuperar o escopo da estrutura do rootScope
+                // Agora escopo é o $scope do Angular armazenado em estruturaGerencia
+                const escopo = $rS['estruturas'] && $rS['estruturas'][classe] ? $rS['estruturas'][classe] : scope;
+                
+                var parametros =  escopo.estrutura;
+                //let raizModelo = escopo.estrutura.raizModelo;
+                let campoChave = escopo.estrutura.raizModelo + "." + escopo.estrutura.campo_chave;
                 const usuario = APIServ.buscaDadosLocais("usuario");
                 const admSistema = usuario["administrador_sistema"] == "S";
 
@@ -36,15 +46,15 @@ app.directive("cabecalhoConsulta", [
                     });
                 }
 
-                var acao = scope.estrutura.acao != undefined ? scope.estrutura.acao : APIServ.parametrosUrl()[1];
+                var acao = escopo.estrutura.acao != undefined ? escopo.estrutura.acao : APIServ.parametrosUrl()[1];
                 $rS[acao] = $rS[acao] == undefined ? ($rS[acao] = {}) : $rS[acao];
                 //console.log($rS[acao]);
                 
                 if ($rS[acao]["acoes"] == undefined) {
                     $rS[acao]["acoes"] = {
-                        Cadastrar: scope.estrutura.acoes != undefined && scope.estrutura.acoes.Cadastrar != undefined ? scope.estrutura.acoes.Cadastrar : false,
-                        Alterar: scope.estrutura.acoes != undefined && scope.estrutura.acoes.Alterar != undefined ? scope.estrutura.acoes.Alterar : false,
-                        Excluir: scope.estrutura.acoes != undefined && scope.estrutura.acoes.Excluir != undefined ? scope.estrutura.acoes.Excluir : false,
+                        Cadastrar: escopo.estrutura.acoes != undefined && escopo.estrutura.acoes.Cadastrar != undefined ? escopo.estrutura.acoes.Cadastrar : false,
+                        Alterar: escopo.estrutura.acoes != undefined && escopo.estrutura.acoes.Alterar != undefined ? escopo.estrutura.acoes.Alterar : false,
+                        Excluir: escopo.estrutura.acoes != undefined && escopo.estrutura.acoes.Excluir != undefined ? escopo.estrutura.acoes.Excluir : false,
                     };
                 }               
 
@@ -67,19 +77,19 @@ app.directive("cabecalhoConsulta", [
                     html += `<button class="col-xs-12 col-md-4 btn btn-success" ng-class="{'top10': !dispositivoMovel}" ng-if="tela != 'cadastro'" ng-click="mudaTela('cadastro')">${parametros.textoNovo}</button>`;
                 }
 
-                if (!scope.popUp) {
+                if (!escopo.popUp) {
                     html += `<button id="botaoIrConsulta" class="col-xs-12 col-md-4 btn btn-primary" ng-class="{'top10': !dispositivoMovel}" ng-if="tela == 'cadastro'" ng-click="mudaTela('consulta')">Ir Para Consulta</button>`;
                 }
 
                 html += `
             </div>`;
 
-                if (scope.estrutura.filtroPersonalzadoDiretiva != undefined) {
+                if (escopo.estrutura.filtroPersonalzadoDiretiva != undefined) {
                     var temp =
                         "<" +
-                        APIAjuFor.variavelParaDiretiva(scope.estrutura.filtroPersonalzadoDiretiva) +
+                        APIAjuFor.variavelParaDiretiva(escopo.estrutura.filtroPersonalzadoDiretiva) +
                         " ng-if=\"tela != 'cadastro'\"></" +
-                        APIAjuFor.variavelParaDiretiva(scope.estrutura.filtroPersonalzadoDiretiva) +
+                        APIAjuFor.variavelParaDiretiva(escopo.estrutura.filtroPersonalzadoDiretiva) +
                         ">";
                     html += temp;
                 } else {
@@ -98,18 +108,19 @@ app.directive("cabecalhoConsulta", [
             <resumo-consulta ng-if="estrutura.tipoListaConsulta == 'lista'"></resumo-consulta>
            `;
 
-                if (scope.estrutura.tipoListaConsulta == "tabela") {
+                if (escopo.estrutura.tipoListaConsulta == "tabela") {
                     html += "<cabecalho-lista-consulta-tabela></cabecalho-lista-consulta-tabela>";
                 }
 
-                // html += scope.estrutura.naoFiltrarAoIniciar == undefined || scope.estrutura.naoFiltrarAoIniciar == false ?
+                // html += escopo.estrutura.naoFiltrarAoIniciar == undefined || escopo.estrutura.naoFiltrarAoIniciar == false ?
                 //     `<div ng-init="filtrar(0)" ng-if="estrutura.tipoEstrutura == 'consultaDireta' && tela != 'cadastro'""></div>` : '';
 
                 // Cabeçalho da tabela movido para diretiva separada cabecalhoListaConsultaTabela
 
                 elem.html(html);
                 elem.addClass("row-fluid cabecalhoConsulta");
-                $compile(elem.contents())(scope);
+                // Usar o escopo da estrutura armazenado no rootScope para compilar
+                $compile(elem.contents())(escopo);
             },
         };
     },
