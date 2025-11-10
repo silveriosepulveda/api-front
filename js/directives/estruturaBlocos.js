@@ -182,7 +182,7 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
             htmlCompleto =
                 `<div class="${classesDiv}" ${atributosBloco.join(' ')}>
                    ${htmlTitulo}
-                   <div class="conteudoBloco">
+                   <div class="conteudoBloco" style="display: block;">
                    ${htmlAbreRepeticao}
                    ${htmlNumeracao}
                    ${htmlPosicao}

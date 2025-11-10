@@ -1421,7 +1421,7 @@ app.directive("estruturaGerencia", [
                     escopo.tela = "cadastro";
                 }
 
-                console.log('classe', classe);
+                //console.log('classe', classe);
                 if($rootScope['estruturas'] == undefined) {
                     $rootScope['estruturas'] = {};
                 }

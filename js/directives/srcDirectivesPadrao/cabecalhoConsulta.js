@@ -12,9 +12,7 @@ app.directive("cabecalhoConsulta", [
             template: "",
             link: function (scope, elem, attr) {
                 const $rS = $rootScope;
-                const classe = attr.classe;
-
-                console.log($rS['estruturas']);
+                const classe = attr.classe;                
                 
                 // Recuperar o escopo da estrutura do rootScope
                 // Agora escopo é o $scope do Angular armazenado em estruturaGerencia
@@ -34,7 +32,7 @@ app.directive("cabecalhoConsulta", [
                 if (parametros.acoesInicioConsulta != undefined) {
                     
                     angular.forEach(parametros.acoesInicioConsulta, function (val, key) {
-                        console.log('Acoes inicio consulta', val, key);
+                        //console.log('Acoes inicio consulta', val, key);
                         mostrarAcoesInicioConsultaSemResultado =
                             val.mostrarSemResultados != undefined && val.mostrarSemResultados ? true : mostrarAcoesInicioConsultaSemResultado;
                         if (val == "diretiva" || (val.tipo != undefined && val.tipo == "diretiva")) {

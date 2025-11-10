@@ -285,7 +285,7 @@ directivesPadrao.directive('montaHtml', ['$rootScope', '$parse', '$compile', 'AP
                         //FIM VERIFICACAO AUTOCOMPLETA
 
                         var label = p.texto != undefined && p.tipo != 'oculto' && tipoEtiqueta == 'normal' ?
-                            `<label for="${campo}">${p.texto} ${spanObrigatorio}</label>` : '';
+                            `<label>${p.texto} ${spanObrigatorio}</label>` : '';
 
                         //Tentando criar a desabilitacao do elemento
                         if (p.habilitadoEdicao != undefined && p.habilitadoEdicao == false && !dadosBloco) {
