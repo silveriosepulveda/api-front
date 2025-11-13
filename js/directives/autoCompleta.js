@@ -91,7 +91,7 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 }
 
                 if (modeloChave) {
-                    setScopeValue(modeloChave, 0);
+                    setScopeValue(modeloChave, -3);
                 }
                 if (modeloValor2) {
                     setScopeValue(modeloValor2, undefined);
@@ -106,35 +106,36 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                 // Comentário: $apply não é necessário aqui pois já está em contexto Angular
             }
 
-            elem.bind('keyup', debounce((event) => {
-                if (!elem.hasClass('valorConsulta')) {
-                    var campoChaveControle = escopo.estrutura.campoChave != undefined ? escopo.estrutura.campoChave : escopo.estrutura.campo_chave;
+            // elem.bind('keyup', debounce((event) => {
+            //     if (!elem.hasClass('valorConsulta')) {
+            //         var campoChaveControle = escopo.estrutura.campoChave != undefined ? escopo.estrutura.campoChave : escopo.estrutura.campo_chave;
 
-                    var elemAC = elem; // Usar elem diretamente é mais seguro
-                    elemAC.val(elemAC.val().toUpperCase());
+            //         var elemAC = elem; // Usar elem diretamente é mais seguro
+            //         elemAC.val(elemAC.val().toUpperCase());
 
-                    var indice = elem.attr('indice');
-                    var temp = elemAC.attr('modelo-chave').split('.');
-                    var campoChave = temp[temp.length - 1];
-                    var modeloChaveAC = elemAC.attr('modelo-chave').replace('$index', indice);
+            //         var indice = elem.attr('indice');
+            //         var temp = elemAC.attr('modelo-chave').split('.');
+            //         var campoChave = temp[temp.length - 1];
+            //         var modeloChaveAC = elemAC.attr('modelo-chave').replace('$index', indice);
 
-                    var oldChave = getScopeValue(modeloChaveAC) != undefined ? getScopeValue(modeloChaveAC) : 0;
+            //         var oldChave = getScopeValue(modeloChaveAC) != undefined ? getScopeValue(modeloChaveAC) : 0;
 
-                    var parametros = {
-                        tabela: dAC.tabela,
-                        //campo: campo,
-                        campo: dAC.campoValor,
-                        valor: elem.val()
-                    }
-                    APIServ.executaFuncaoClasse('classeGeral', 'objetoexistesimples', parametros).then(retorno => {
-                        if (retorno.data.existe) {
-                            setScopeValue(modeloChaveAC, retorno.data.valorinformar);
-                        } else if (campoChaveControle != campoChave) {
-                            setScopeValue(modeloChaveAC, 0);
-                        }
-                    })
-                }
-            }, 250)); // 250ms debounce
+            //         var parametros = {
+            //             tabela: dAC.tabela,
+            //             //campo: campo,
+            //             campo: dAC.campoValor,
+            //             valor: elem.val()
+            //         }
+            //         APIServ.executaFuncaoClasse('classeGeral', 'objetoexistesimples', parametros).then(retorno => {
+            //             console.log(retorno);
+            //             if (retorno.data.existe) {
+            //                 setScopeValue(modeloChaveAC, retorno.data.valorinformar);
+            //             } else if (campoChaveControle != campoChave) {
+            //                 setScopeValue(modeloChaveAC, -2);
+            //             }
+            //         })
+            //     }
+            // }, 250)); // 250ms debounce
 
             elem.bind("change", () => {
                 var campo = elem.attr('auto-completa');
