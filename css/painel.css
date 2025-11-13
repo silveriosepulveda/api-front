@@ -121,11 +121,11 @@ div.conteudoBusca div.row.itemConsulta{
     background-color: yellow;
 }
 
-/* .conteudoBusca {
-    max-height: 800px !important;
+.conteudoBusca {
+    max-height: 700px !important;
     overflow-x: auto;
     height: calc(100%);
-} */
+}
 
 .iconePequeno {
     font-size: 2em !important;

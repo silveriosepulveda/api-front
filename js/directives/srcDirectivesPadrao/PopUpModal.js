@@ -415,6 +415,54 @@ angular.module('app').service('PopUpModal', ['$rootScope', '$compile', '$q', '$t
                 self.fechar(modal.id);
             });
         };
+
+        /**
+         * Identifica o modal que contém o elemento informado e o fecha.
+         * Útil para formulários carregados dentro de modais aninhados.
+         * @param {Element|angular.element|jQuery} elementoReferencia
+         * @returns {boolean} true se encontrou e fechou algum modal
+         */
+        self.identificarEFecharModalAtual = function (elementoReferencia) {
+            if (!elementoReferencia) {
+                return false;
+            }
+
+            var node = elementoReferencia;
+
+            // Tratar angular.element ou jQuery
+            if (node.jquery) {
+                node = node[0];
+            } else if (node[0]) {
+                node = node[0];
+            }
+
+            if (!node) {
+                return false;
+            }
+
+            // Procurar ancestral com classe popup-modal
+            var modalNode = null;
+            var current = node;
+            while (current) {
+                if (current.classList && current.classList.contains('popup-modal')) {
+                    modalNode = current;
+                    break;
+                }
+                current = current.parentNode;
+            }
+
+            if (!modalNode) {
+                return false;
+            }
+
+            var modalId = modalNode.id;
+            if (!modalId) {
+                return false;
+            }
+
+            self.fechar(modalId);
+            return true;
+        };
     }
 ]);
 

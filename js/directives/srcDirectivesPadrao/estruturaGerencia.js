@@ -26,6 +26,8 @@ app.directive("estruturaGerencia", [
             // Detectar contexto modal através do atributo local-exibicao
             const localExibicao = $attrs.localExibicao || "normal";
             const isModal = localExibicao === "modal";
+            escopo.localExibicao = localExibicao;
+            escopo.isModal = isModal;
 
             var classe;
             // Se estiver em modal, priorizar atributo sobre rota atual
@@ -1183,7 +1185,8 @@ app.directive("estruturaGerencia", [
                                                     }
                                                 } else {
                                                     // Comportamento normal fora do modal
-                                                    window.location.reload();
+                                                    //window.location.reload();
+                                                    
                                                 }
                                             } else {
                                                 $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);

@@ -151,10 +151,15 @@
             var estadoGlobal = localStorage.getItem('todos_menus_expandidos');
             ml.todosExpandidos = estadoGlobal ? JSON.parse(estadoGlobal) : false;
             
-            // SEMPRE abrir menu por padrão quando há usuário logado
+            // Abrir automaticamente apenas em telas grandes
             $timeout(function() {
-              //  abrirMenu();
-              //  console.log('🎯 Menu lateral aberto por padrão conforme solicitado');
+                if (window.innerWidth >= 1000) {
+                    abrirMenu();
+                    console.log('🎯 Menu lateral aberto automaticamente em tela grande');
+                } else {
+                    fecharMenu();
+                    console.log('📱 Menu lateral mantido fechado em dispositivo móvel');
+                }
             }, 500); // Delay para garantir que o DOM esteja pronto
         }
 
