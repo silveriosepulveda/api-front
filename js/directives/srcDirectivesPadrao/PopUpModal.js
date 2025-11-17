@@ -10,6 +10,9 @@ angular.module('app').service('PopUpModal', ['$rootScope', '$compile', '$q', '$t
         var self = this;
         var modaisAtivos = [];
         var contadorId = 0;
+        var BASE_MODAL_Z_INDEX = 1200;
+        var MODAL_STACK_STEP = 10;
+        var BACKDROP_OFFSET = 5;
 
         /**
          * Buscar configuração da rota no routes.js
@@ -198,12 +201,14 @@ angular.module('app').service('PopUpModal', ['$rootScope', '$compile', '$q', '$t
                     keyboard: false,
                     show: true
                 });
-                
-                // Ajustar z-index para modais aninhados
-                $('#' + modalId).css('z-index', 1050 + (modaisAtivos.length * 10));
-                
-                if (modaisAtivos.length > 0) {
-                    $('.modal-backdrop').last().css('z-index', 1040 + (modaisAtivos.length * 10) - 5);
+
+                // Ajustar z-index para garantir sobreposição ao menu lateral
+                var modalZIndex = BASE_MODAL_Z_INDEX + (modaisAtivos.length * MODAL_STACK_STEP);
+                $('#' + modalId).css('z-index', modalZIndex);
+
+                var $backdrop = $('.modal-backdrop').last();
+                if ($backdrop && $backdrop.length) {
+                    $backdrop.css('z-index', modalZIndex - BACKDROP_OFFSET);
                 }
             }, 50);
 

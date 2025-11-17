@@ -34,9 +34,9 @@
         };
     }
 
-    MenuLateralController.$inject = ['$scope', '$timeout', 'APIServ', '$location'];
+    MenuLateralController.$inject = ['$scope', '$timeout', 'APIServ', '$location', 'config'];
 
-    function MenuLateralController($scope, $timeout, APIServ, $location) {
+    function MenuLateralController($scope, $timeout, APIServ, $location, config) {
         var ml = this;
       
         // ==================== PROPRIEDADES ====================
@@ -150,15 +150,22 @@
             // Carregar estado de expansão global
             var estadoGlobal = localStorage.getItem('todos_menus_expandidos');
             ml.todosExpandidos = estadoGlobal ? JSON.parse(estadoGlobal) : false;
+
+            var menuForcadoFechado = config && config.usarMenuLateralFechado === true;
             
             // Abrir automaticamente apenas em telas grandes
             $timeout(function() {
-                if (window.innerWidth >= 1000) {
-                    abrirMenu();
-                    console.log('🎯 Menu lateral aberto automaticamente em tela grande');
-                } else {
+                if (menuForcadoFechado) {
                     fecharMenu();
-                    console.log('📱 Menu lateral mantido fechado em dispositivo móvel');
+                    console.log('⚙️ Menu lateral configurado para iniciar fechado');
+                } else {
+                    if (window.innerWidth >= 1000) {
+                        abrirMenu();
+                        console.log('🎯 Menu lateral aberto automaticamente em tela grande');
+                    } else {
+                        fecharMenu();
+                        console.log('📱 Menu lateral mantido fechado em dispositivo móvel');
+                    }
                 }
             }, 500); // Delay para garantir que o DOM esteja pronto
         }

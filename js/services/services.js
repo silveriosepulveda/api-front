@@ -1,4 +1,4 @@
-angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).factory("APIServ", function ($rootScope, $http, config, $base64, $mdDialog, APIAjuFor, DialogoSimplesServ) {
+angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).factory("APIServ", function ($rootScope, $http, config, $base64, $mdDialog, DialogoSimplesServ) {
     
     // Referência ao serviço de diálogo isolado
     var _dialogoSimples = function(titulo, texto, btnConfirmar, btnCancelar, funcaoSim, funcaoNao) {
