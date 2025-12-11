@@ -257,6 +257,9 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                     var indice = escopo.$index;
                 }
 
+                const classe = elem.closest('estrutura-gerencia').attr('classe') ;
+                                
+
                 //Vendo de onde buscar o campo completo                
                 var campoCompleto = buscarCampoCompleto(campo, attr.nomeBloco);
 
@@ -326,12 +329,17 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                         }
                     }
                 } else {
-                    objValor2 = aC.objValor2 != undefined ? e.raizModelo + '_' + aC.objValor2 : '';
-                    objValor3 = aC.objValor3 != undefined ? e.raizModelo + '_' + aC.objValor3 : '';
-                    objValor4 = aC.objValor4 != undefined ? e.raizModelo + '_' + aC.objValor4 : '';
+                    console.log(aC);
+                    
+                    objValor2 = aC.objValor2 != undefined ? 'estruturas_' + classe + '_' + e.raizModelo + '_' + aC.objValor2 : '';
+                    objValor3 = aC.objValor3 != undefined ? 'estruturas_' + classe + '_' + e.raizModelo + '_' + aC.objValor3 : '';
+                    objValor4 = aC.objValor4 != undefined ? 'estruturas_' + classe + '_' + e.raizModelo + '_' + aC.objValor4 : '';
 
                     if (objValor2 != '') {
-                        elem.attr('modelo-valor2', $('#' + objValor2).attr('ng-model'));
+                        const modeloValor2 = $('#' + objValor2).attr('ng-model');
+                        console.log(modeloValor2);
+                        
+                        elem.attr('modelo-valor2', modeloValor2);
 
                     }
                     if (objValor3 != '') {
@@ -594,13 +602,15 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
                                     }
                                 } else {
                                     modeloChaveAC = temRaizModelo ? modeloChaveACtemp : raizModelo + '.' + modeloChaveACtemp;
-                                }
+                                }                              
 
 
                                 //modeloChaveAC = e.raizModelo + '.' + EGFuncoes.indexPorNumero(event, elemAC.attr('modelo-chave'));
                                 modeloValor2 = elemAC.attr('modelo-valor2');
                                 modeloValor3 = elemAC.attr('modelo-valor3');
                                 modeloValor4 = elemAC.attr('modelo-valor4');
+
+                                console.log(modeloValor2, modeloValor3, modeloValor4);
 
                                 $parse(modeloChaveAC).assign(escopoAtual, ui.item.id);
 
