@@ -296,6 +296,74 @@ angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).fact
         }
     };
 
+    /**
+     * Converte Enter em Tab - move o foco para o próximo elemento focável
+     * @param {Event} event - Evento de teclado (keydown/keyup)
+     * @param {HTMLElement|jQuery} elementoAtual - Elemento atual que recebeu o Enter
+     * @returns {boolean} - true se o evento foi processado, false caso contrário
+     */
+    var _converterEnterComoTab = function (event, elementoAtual) {
+        // Verificar se Enter foi pressionado
+        if (event.keyCode !== 13 && event.which !== 13) {
+            return false;
+        }
+
+        var $elementoAtual = angular.element(elementoAtual || event.target);
+        var tagName = $elementoAtual[0].tagName.toLowerCase();
+        var tipoInput = $elementoAtual.attr('type') ? $elementoAtual.attr('type').toLowerCase() : '';
+        
+        // Elementos onde Enter deve funcionar normalmente
+        var elementosPermitidos = ['textarea', 'button', 'a', 'select'];
+        var tiposPermitidos = ['submit', 'button', 'reset'];
+        
+        // Verificar se o elemento permite Enter
+        var permiteEnter = elementosPermitidos.indexOf(tagName) !== -1 || 
+                          tiposPermitidos.indexOf(tipoInput) !== -1 ||
+                          $elementoAtual.hasClass('manter-enter') ||
+                          $elementoAtual.closest('.manter-enter').length > 0;
+        
+        // Se for um elemento permitido, não converter
+        if (permiteEnter) {
+            return false;
+        }
+        
+        // Prevenir comportamento padrão
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Obter todos os elementos focáveis na página
+        var elementosFocaveis = angular.element('input:visible, select:visible, textarea:visible, button:visible, a:visible, [tabindex]:visible')
+            .filter(function() {
+                return !angular.element(this).is(':disabled') && angular.element(this).css('display') !== 'none';
+            });
+        
+        // Encontrar o índice do elemento atual
+        var indiceAtual = elementosFocaveis.index($elementoAtual[0]);
+        
+        // Se encontrou o elemento atual e não é o último
+        if (indiceAtual !== -1 && indiceAtual < elementosFocaveis.length - 1) {
+            // Focar no próximo elemento
+            var proximoElemento = elementosFocaveis.eq(indiceAtual + 1);
+            proximoElemento.focus();
+            
+            // Se for um input/select, selecionar o texto se possível
+            if (proximoElemento.is('input') && proximoElemento.attr('type') !== 'checkbox' && proximoElemento.attr('type') !== 'radio') {
+                try {
+                    proximoElemento[0].select();
+                } catch(e) {
+                    // Ignorar erro se não for possível selecionar
+                }
+            }
+        } else {
+            // Se for o último elemento, focar no primeiro (ciclo)
+            if (elementosFocaveis.length > 0) {
+                elementosFocaveis.first().focus();
+            }
+        }
+        
+        return true;
+    };
+
     return {
         enviaDadosTabela: _enviaDadosTabela,
         executaFuncaoClasse: _executaFuncaoClasse,
@@ -319,5 +387,6 @@ angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).fact
         // abrirModal: _abrirModal,
         fecharModal: _fecharModal,
         buscarClasseEstruturaGerencia: _buscarClasseEstruturaGerencia,
+        converterEnterComoTab: _converterEnterComoTab,
     };
 });

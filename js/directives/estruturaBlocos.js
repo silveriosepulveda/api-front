@@ -144,7 +144,7 @@ directivesPadrao.directive('montaBlocoHtml', ['$parse', '$compile', 'APIServ', '
                             baixarBotao = '';
                         }
 
-                        htmlRepeticao += `<monta-html campo="${campo}" nome-bloco="${elem.attr('nome-bloco')}" indice="{{$index}}"></monta-html> `
+                        htmlRepeticao += `<monta-html campo="${campo}" nome-bloco="${elem.attr('nome-bloco')}" ng-attr-indice="{{$index}}"></monta-html> `
                     }
                 });
 

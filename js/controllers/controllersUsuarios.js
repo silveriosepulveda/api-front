@@ -296,6 +296,7 @@ angular
                 APIServ.mensagemSimples("Solicitação", "Defina o Usuário");
             } else {
                 var fd = new FormData();
+                console.log($scope.menus);
                 fd.append("menus", angular.toJson($scope.menus));
                 fd.append("chave_usuario", $scope.usuarios[$scope.keyUsuarioIndex]["chave_usuario"]);
                 fd.append("chave_perfil_padrao", $scope.chave_perfil_padrao);

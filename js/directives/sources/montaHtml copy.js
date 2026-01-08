@@ -1,29 +1,32 @@
-directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFuncoes', function ($parse, $compile, APIServ, EGFuncoes) {
+directivesPadrao.directive('montaHtml', ['$rootScope', '$parse', '$compile', 'APIServ', 'EGFuncoes', function ($rootScope, $parse, $compile, APIServ, EGFuncoes) {
     return {
         restrict: 'E',
         replace: false,
         template: '',
-        link: function (scope, elem, attr) {
+        link: function (escopo, elem, attr) {
             var campo = elem.attr('campo');
+            const classe = elem.closest('estrutura-gerencia').attr('classe') ;
+            var escopo = $rootScope['estruturas'][classe];   
+            console.log('Indice: ' , attr.indice);
 
-            var e = angular.fromJson(scope.estrutura);
+            var e = angular.fromJson(escopo.estrutura);
 
-            var tela = attr.tela != undefined ? attr.tela : scope.tela;
+            var tela = attr.tela != undefined ? attr.tela : escopo.tela;
 
             var nomeBloco = elem.attr('nome-bloco');
             //Faco essa comparaca, pois o campo dentro do bloco, pode ter o mesmo nome de outro campa em outro bloco ou fora de blocos
             var dadosBloco = nomeBloco != undefined ? APIServ.buscarValorVariavel(e.campos, nomeBloco) : false;
 
-            var campoLista = scope.estrutura.listaConsulta != undefined ? Object.assign({}, scope.estrutura.listaConsulta) : {};
+            var campoLista = escopo.estrutura.listaConsulta != undefined ? Object.assign({}, escopo.estrutura.listaConsulta) : {};
 
             var raizModelo = attr.raizModelo != undefined ? attr.raizModelo : tela == 'consulta' && e.tipoEstrutura != 'personalizado' ? 'item' : e.raizModelo;
 
-            if (tela == 'consulta' && scope.estrutura.camposFiltroPersonalizado != undefined) {
-                var camposPerso = Object.assign({}, scope.estrutura.camposFiltroPersonalizado);
-                var campos = angular.merge(campoLista, scope.estrutura.campos, camposPerso);
+            if (tela == 'consulta' && escopo.estrutura.camposFiltroPersonalizado != undefined) {
+                var camposPerso = Object.assign({}, escopo.estrutura.camposFiltroPersonalizado);
+                var campos = angular.merge(campoLista, escopo.estrutura.campos, camposPerso);
             } else {
-                //var campos = angular.merge({}, scope.estrutura.campos, campoLista);
-                var campos = Object.assign({}, scope.estrutura.campos);
+                //var campos = angular.merge({}, escopo.estrutura.campos, campoLista);
+                var campos = Object.assign({}, escopo.estrutura.campos);
             }
 
 
@@ -37,14 +40,14 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
             if (p == 'linhaDivisoria') {
                 var html = '<linha-divisoria></linha-divisoria>';
                 elem.html(html);
-                $compile(elem.contents())(scope);
+                $compile(elem.contents())(escopo);
                 return false;
             }
 
             if (p == 'quebraLinha') {
                 var html = '<quebra-linha></quebra-linha>';
                 elem.html(html);
-                $compile(elem.contents())(scope);
+                $compile(elem.contents())(escopo);
                 return false;
             }
 
@@ -60,21 +63,21 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
             //Esta linha era como esta acima, mudei para ficar com o final(nome do campo) igual aos blocos
             //p.modelo = p.modelo != undefined ? p.modelo : e.raizModelo + "['" + campo + "']";
             if (tela == 'consulta') {
-                p.modelo = raizModelo + "[$index]" + "['" + campo + "']";
+                p.modelo = raizModelo + "[{{$index}}]" + "['" + campo + "']";
             } else {
                 var raizModeloBloco = dadosBloco.raizModeloBloco != undefined ? dadosBloco.raizModeloBloco : raizModelo;
-                p.modelo = p.modelo != undefined ? p.modelo : raizModeloBloco + "['" + campo + "']";
+                p.modelo = p.modelo != undefined ? p.modelo : "estruturas['" + classe + "']['" + raizModeloBloco + "']['" + campo + "']";
             }
 
-            var acao = scope.acao != undefined ? scope.acao : APIServ.parametrosUrl()[1];
+            var acao = escopo.acao != undefined ? escopo.acao : APIServ.parametrosUrl()[1];
 
             var verificarPerfil = p.verificarPerfil != undefined && p.verificarPerfil;
 
-            var temAcao = $rS[acao] != undefined && $rS[acao]['campos'] != undefined && $rS[acao]['campos'][campo] != undefined;
+            var temAcao = true;// $rS[acao] != undefined && $rS[acao]['campos'] != undefined && $rS[acao]['campos'][campo] != undefined;
 
             if (!verificarPerfil || (verificarPerfil && temAcao)) {
                 var dadosUsuario = APIServ.buscarValorVariavel(APIServ.buscaDadosLocais('usuario'), campo);
-                var temDadosUsuario = dadosUsuario != undefined && dadosUsuario != '' && APIServ.valorExisteEmVariavel(scope.estrutura.camposBuscarNoUsuario, campo);
+                var temDadosUsuario = dadosUsuario != undefined && dadosUsuario != '' && APIServ.valorExisteEmVariavel(escopo.estrutura.camposBuscarNoUsuario, campo);
 
                 var spanObrigatorio = '';
                 var info = '';
@@ -103,6 +106,7 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
 
 
                     nomeElemento = EGFuncoes.modeloParaId(p.modelo); // e.raizModelo + '.' + campo;
+                    console.log('Nome Elemento: ' , nomeElemento, p.modelo);
                     //idElemento = nomeElemento.split('.').join('_') + '_' + campo;
                     idElemento = nomeElemento; // nomeElemento.split('.').join('_');
 
@@ -141,6 +145,8 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                         atributos.push(`campo="${campo}"`);
 
                         var typeElemento = 'text';
+
+                        atributos.push(`classe="${classe}"`);
 
                         if (p.tipo == 'data') {
                             atributos.push('ui-data');
@@ -203,7 +209,7 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                                 });
                             });
                             var idOpcoes = 'opcoes' + idElemento;
-                            scope[idOpcoes] = opcoesSelect;
+                            escopo[idOpcoes] = opcoesSelect;
                             atributos.push(`ng-options="sp.key as sp.value for sp in ${idOpcoes}"`);
                         } else if ((p.campoMaiusculo == undefined || p.campoMaiusculo == true) && (e.todosCamposMaiusculo != undefined && e.todosCamposMaiusculo) || (p.campoMaiusculo != undefined && p.campoMaiusculo)) {
                             atributos.push('ui-maiusculo');
@@ -281,7 +287,7 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                         //FIM VERIFICACAO AUTOCOMPLETA
 
                         var label = p.texto != undefined && p.tipo != 'oculto' && tipoEtiqueta == 'normal' ?
-                            `<label for="${campo}">${p.texto} ${spanObrigatorio}</label>` : '';
+                            `<label>${p.texto} ${spanObrigatorio}</label>` : '';
 
                         //Tentando criar a desabilitacao do elemento
                         if (p.habilitadoEdicao != undefined && p.habilitadoEdicao == false && !dadosBloco) {
@@ -306,15 +312,17 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
                                 var input = `<textarea name="${nomeElemento}" ng-model="${p.modelo}" id="${idElemento}" ${atributos.join(' ')} rows="${linhas}" ${tituloInput} class="${classes.join(' ')}"></textarea>`
                             } else {
                                 if (p.tipo == 'imagem' && p.tipoImagem != undefined && p.tipoImagem == 'exibicao') {
-                                    var input = `<img ng-src="" placeholder="${placeHolder}" indice="{{$index}}" indice-superior="{{$parent.$index}}" name="${nomeElemento}" ng-model="${p.modelo}"
+                                    var input = `<img ng-src="" placeholder="${placeHolder}" ng-attr-indice="{{$index}}" ng-attr-indice-superior="{{$parent.$index}}" name="${nomeElemento}" ng-model="${p.modelo}"
                                 id="${idElemento}" ${atributos.join(' ')} ${tituloInput} class="img-responsive">`;
                                 } else {
+                                    console.log('Modelo Input: ' , p.modelo);
 
-                                    var modeloChaveAC = campoChaveAC != undefined ? `modelo-chave="${campoChaveAC.join('.')}"` : '';
+                                    var modeloChaveAC = campoChaveAC != undefined ? `modelo-chave="${raizModelo +'.'+ campoChaveAC.join('.')}"` : '';
 
 
-                                    var input = `<input type="${typeElemento}" placeholder="${placeHolder}" indice="{{$index}}" indice-superior="{{$parent.$index}}" name="${nomeElemento}" ng-model="${p.modelo}" ${modeloChaveAC}
-                                id="${idElemento}" ${atributos.join(' ')} ${tituloInput} class="${classes.join(' ')} ${tamanhoInput}">`;
+                                    var input = `<input type="${typeElemento}" placeholder="${placeHolder}" ng-attr-indice="{{$index}}" ng-attr-indice-superior="{{$parent.$index}}" 
+                                                    name="${nomeElemento}" ng-model="${p.modelo}" ${modeloChaveAC}
+                                                    id="${idElemento}" ${atributos.join(' ')} ${tituloInput} class="${classes.join(' ')} ${tamanhoInput}">`;
                                 }
                             }
                         } else if (temSelect) {
@@ -451,13 +459,13 @@ directivesPadrao.directive('montaHtml', ['$parse', '$compile', 'APIServ', 'EGFun
 
 
                     elem.html(html);
-                    $compile(elem.contents())(scope);
+                    $compile(elem.contents())(escopo);
 
-                    //  var e = $compile(html)(scope);
+                    //  var e = $compile(html)(escopo);
                     //  elem.replaceWith(e);
-                    //  $compile(e)(scope);
+                    //  $compile(e)(escopo);
                 } else if (temDadosUsuario) {
-                    $parse(p.modelo).assign(scope, dadosUsuario);
+                    $parse(p.modelo).assign(escopo, dadosUsuario);
                 }
             }
         }

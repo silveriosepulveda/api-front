@@ -237,6 +237,8 @@ app.directive("estruturaGerencia", [
                     var filtrosPersonalizados = escopo.estrutura.camposFiltroPesquisa != undefined ? escopo.estrutura.camposFiltroPesquisa : {};
 
                     angular.forEach(campos, function (val, campo) {
+                        console.log('Campo', campo, val);
+                        
                         var temCampoFiltro = escopo.estrutura.camposFiltroPesquisa != undefined && escopo.estrutura.camposFiltroPesquisa[campo] != undefined;
 
                         if (EGFuncoes.eBloco(campo) && val.nome == undefined) {

@@ -102,6 +102,8 @@ directivesPadrao.factory('EGFuncoes', function ($rootScope, $parse, $http, confi
 
     var _indexPorNumero = (event, modelo) => {
         var indice = $(event.target).attr('indice');
+     //   console.log(indice);
+        
         var indiceSuperior = $(event.target).attr('indice-superior');
         var retorno = '';
         //return modelo.replace('[$index]', `[${indice}]`).replace('[$parent.$index]', `[${indiceSuperior}]`);
