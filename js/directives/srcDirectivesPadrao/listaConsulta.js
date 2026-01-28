@@ -60,6 +60,7 @@ directivesPadrao
                         var tamanho = EGFuncoes.montarTamanhos(val);
 
                         var atributosDivCampoConsulta = val.atributos_div != undefined ? EGFuncoes.montarAtributos(val.atributos_div) : [];
+                        atributosDivCampoConsulta = val.atributosDiv != undefined ? EGFuncoes.montarAtributos(val.atributosDiv) : atributosDivCampoConsulta;
 
                         if (val.tipo != "oculto") {
                             if (val.tipo == "caixaSelecao") {

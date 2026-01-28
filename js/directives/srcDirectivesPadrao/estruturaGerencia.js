@@ -1301,7 +1301,7 @@ app.directive("estruturaGerencia", [
                             var fd = new FormData();
                             fd.append("filtros", JSON.stringify(filtros));                            
                             
-                            APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", filtros)
+                            APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", fd, 'post')
                                 .success(function (data) {
                                     
                                     $rS.carregando = false;
