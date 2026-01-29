@@ -40,9 +40,9 @@ app.directive("estruturaGerencia", [
             } else if ($attrs.classe != undefined) {
                 classe = $attrs.classe;
                 //console.log('🔍 [estruturaGerencia] Usando classe do atributo:', classe);
-            }            
+            }
 
-            $element.attr('classe', classe);
+            $element.attr("classe", classe);
 
             // Se estiver em contexto modal, aplicar CSS para ocultar elementos
             if (isModal) {
@@ -138,17 +138,17 @@ app.directive("estruturaGerencia", [
 
             var montarEstrutura = function (estrutura) {
                 var retorno = estrutura;
-                const elementoEstrutura = $element[0];                
-               
+                const elementoEstrutura = $element[0];
+
                 // Recuperar e processar o atributo parametros se existir
                 var parametrosRecebidos = null;
                 if ($attrs.parametros) {
                     try {
                         // Tentar fazer parse do JSON se for string
                         var parametrosStr = $attrs.parametros;
-                        if (typeof parametrosStr === 'string' && parametrosStr.trim().startsWith('{')) {
+                        if (typeof parametrosStr === "string" && parametrosStr.trim().startsWith("{")) {
                             parametrosRecebidos = JSON.parse(parametrosStr);
-                        } else if (typeof parametrosStr === 'string' && parametrosStr.trim().startsWith('[')) {
+                        } else if (typeof parametrosStr === "string" && parametrosStr.trim().startsWith("[")) {
                             parametrosRecebidos = JSON.parse(parametrosStr);
                         } else {
                             // Se não for JSON, tentar usar diretamente ou avaliar como expressão Angular
@@ -164,11 +164,11 @@ app.directive("estruturaGerencia", [
                         // Se não conseguir fazer parse, usar como string
                         parametrosRecebidos = $attrs.parametros;
                     }
-                    
+
                     // Disponibilizar no scope para uso posterior
                     escopo.parametrosRecebidos = parametrosRecebidos;
                 }
-                                                
+
                 //Fazendo a validacao dos poderes do usuario
                 var menuPainel = APIServ.buscaDadosLocais("menuPainel");
 
@@ -197,7 +197,7 @@ app.directive("estruturaGerencia", [
                     acao = $attrs.subacao || "";
                     subacao = $attrs.subacao || "";
                     // Usar os parâmetros processados se disponíveis, senão usar atributo direto
-                    parametrosAcao = escopo.parametrosRecebidos != null ? escopo.parametrosRecebidos : ($attrs.parametros || "");
+                    parametrosAcao = escopo.parametrosRecebidos != null ? escopo.parametrosRecebidos : $attrs.parametros || "";
                 } else {
                     pagina = parametrosUrl[0] != undefined ? parametrosUrl[0] : parametrosLocal["pagina"];
                     acao = parametrosUrl[1] != undefined ? parametrosUrl[1] : parametrosLocal["acao"];
@@ -205,13 +205,13 @@ app.directive("estruturaGerencia", [
                         parametrosUrl[2] != undefined
                             ? parametrosUrl[2]
                             : parametrosLocal != undefined && parametrosLocal["subAcao"] != undefined
-                            ? parametrosLocal["subAcao"]
-                            : "";
+                              ? parametrosLocal["subAcao"]
+                              : "";
                 }
 
                 escopo.pagina = pagina;
                 escopo.acao = acao;
-                escopo.subacao = subacao;              
+                escopo.subacao = subacao;
 
                 $rS["acao"] = acao;
                 if ($rS[acao] == undefined) {
@@ -219,6 +219,10 @@ app.directive("estruturaGerencia", [
                     $rS[acao]["acoes"] = menuPainel.acoes != undefined && menuPainel.acoes[acao] != undefined ? menuPainel.acoes[acao] : [];
                     $rS[acao]["campos"] = menuPainel.campos != undefined && menuPainel.campos[acao] != undefined ? menuPainel.campos[acao] : [];
                 }
+
+                let nomeFiltroTemp = "filtroTemp_" + acao;
+                let filtroTemp = APIServ.buscaDadosLocais(nomeFiltroTemp);
+                console.log(nomeFiltroTemp, filtroTemp);
 
                 escopo.parametrosUrl = parametrosUrl;
 
@@ -237,8 +241,6 @@ app.directive("estruturaGerencia", [
                     var filtrosPersonalizados = escopo.estrutura.camposFiltroPesquisa != undefined ? escopo.estrutura.camposFiltroPesquisa : {};
 
                     angular.forEach(campos, function (val, campo) {
-                        console.log('Campo', campo, val);
-                        
                         var temCampoFiltro = escopo.estrutura.camposFiltroPesquisa != undefined && escopo.estrutura.camposFiltroPesquisa[campo] != undefined;
 
                         if (EGFuncoes.eBloco(campo) && val.nome == undefined) {
@@ -259,7 +261,7 @@ app.directive("estruturaGerencia", [
                                 if (temCampoFiltro) {
                                     campoEmCampos = Object.assign(
                                         APIServ.buscarValorVariavel(escopo.estrutura.campos, campo),
-                                        escopo.estrutura.camposFiltroPesquisa[campo]
+                                        escopo.estrutura.camposFiltroPesquisa[campo],
                                     );
                                 } else campoEmCampos = APIServ.buscarValorVariavel(escopo.estrutura.campos, campo);
 
@@ -399,7 +401,7 @@ app.directive("estruturaGerencia", [
 
                 escopo.limparCampoConsulta = function (event) {
                     console.log(event);
-                    
+
                     var input = $(event.target).closest("monta-html").find(":input");
                     var campo = input.attr("campo");
                     var modelo = input.attr("ng-model");
@@ -511,7 +513,7 @@ app.directive("estruturaGerencia", [
                     }
                 };
 
-                if (EGFuncoes.temConsulta(retorno)) {                                        
+                if (EGFuncoes.temConsulta(retorno)) {
                     escopo.adicionarFiltro = function () {
                         escopo.filtros.push({
                             texto: "",
@@ -543,6 +545,7 @@ app.directive("estruturaGerencia", [
 
                     escopo.limparFiltros = function () {
                         escopo.manipularFiltroLocal(escopo.acao, "limpar");
+                        APIServ.apagaDadosLocais(nomeFiltroTemp);
 
                         escopo.filtros = [];
                         escopo.adicionarFiltro();
@@ -585,14 +588,16 @@ app.directive("estruturaGerencia", [
                         }
                     };
 
-
-                    
                     const filtrosLocal = escopo.manipularFiltroLocal(escopo.acao, "buscar");
-                    
 
-                    if (filtrosLocal.length > 0) {
+                    if (filtroTemp != null) {
+                        for (let i = 0; i < filtroTemp.length; i++) {
+                            escopo.filtros.push(filtroTemp[i]);
+                        }
+                    } else if (filtrosLocal.length > 0) {
                         escopo.filtros = filtrosLocal;
-                    } else
+                    }
+
                     if (estrutura.filtrosPadrao) {
                         //escopo.filtros = [];
                         var tirarPrimeiroFiltro = false;
@@ -630,6 +635,8 @@ app.directive("estruturaGerencia", [
                             escopo.filtros.splice(0, 1);
                         }
                     }
+
+                    console.log(escopo.filtros);
 
                     escopo.converterFiltroParaEnvio = function () {
                         var retorno = [];
@@ -699,9 +706,8 @@ app.directive("estruturaGerencia", [
                     if (escopo.estrutura.funcaoFiltrar != undefined) {
                         escopo.filtrar = eval("escopo." + escopo.estrutura.funcaoFiltrar);
                     }
-                    
-                    if (escopo.filtrar == undefined) {
 
+                    if (escopo.filtrar == undefined) {
                         escopo.filtrar = function (pagina = 1, origem = "filtro") {
                             //Testando por limite no filtro inicial, para buscar apenas os últimos 500 registros
                             var limite = 0; // pagina == 0 ? 500 : 0;
@@ -776,15 +782,15 @@ app.directive("estruturaGerencia", [
                                 ordemCampoTela != undefined && ordemCampoTela != "" > 0
                                     ? angular.element("#ordemFiltro").val().split(":")[1]
                                     : escopo.ordemFiltro != ""
-                                    ? escopo.ordemFiltro
-                                    : "";
+                                      ? escopo.ordemFiltro
+                                      : "";
 
                             var sentidoFiltro =
                                 angular.element("#sentidoFiltro").length > 0
                                     ? angular.element("#sentidoFiltro").val()
                                     : escopo.sentidoFiltro != ""
-                                    ? escopo.sentidoFiltro
-                                    : "";
+                                      ? escopo.sentidoFiltro
+                                      : "";
 
                             if (usarDataAlteracaoAoFiltrar && escopo.dataUltimaConsulta != undefined && origem == "timer") {
                                 var data_alteracao = APIAjuFor.dateParaTimestamp(escopo.dataUltimaConsulta);
@@ -952,8 +958,7 @@ app.directive("estruturaGerencia", [
                                 });
                             //*/
                         };
-                    }else{
-
+                    } else {
                     }
 
                     if ((escopo.estrutura.filtrarAoIniciar == undefined || escopo.estrutura.filtrarAoIniciar == true) && escopo.tela == "consulta") {
@@ -1018,7 +1023,7 @@ app.directive("estruturaGerencia", [
 
                             //Vendo se o detalhe do item ja foi carregado
                             if (item["detalhes"] == undefined) {
-                                APIServ.executaFuncaoClasse("classeGeral", "detalhar", filtros).success(function (data) {                                    
+                                APIServ.executaFuncaoClasse("classeGeral", "detalhar", filtros).success(function (data) {
                                     item["arquivosAnexados"] = data.arquivosAnexados;
                                     item["exibirDetalhes"] = true;
                                     item["detalhes"] = {};
@@ -1040,8 +1045,7 @@ app.directive("estruturaGerencia", [
                     }
 
                     if (escopo.salvar == undefined) {
-                        escopo.salvar = function (dadosTela, nomeForm) {                            
-                            
+                        escopo.salvar = function (dadosTela, nomeForm) {
                             $invalidos = document.getElementsByClassName("erro").length > 0;
                             if (escopo.formularioInvalido || $invalidos) {
                                 return true;
@@ -1133,7 +1137,7 @@ app.directive("estruturaGerencia", [
                             // })
                             APIServ.executaFuncaoClasse("classeGeral", "manipula", parametrosEnviar, escopo.tipoSalvar)
                                 .success(function (retorno) {
-                                     //console.log(retorno); escopo.desabilitarSalvar = false; $rootScope.carregando = false; /*
+                                    //console.log(retorno); escopo.desabilitarSalvar = false; $rootScope.carregando = false; /*
                                     if (escopo.tipoSalvar == "get") {
                                         //console.log(retorno);
                                         return false;
@@ -1177,7 +1181,7 @@ app.directive("estruturaGerencia", [
                                                     console.log("🎭 [estruturaGerencia] Contexto modal detectado - evitando window.location.reload()");
 
                                                     // Fechar apenas o modal que contém este formulário
-                                                    if (PopUpModal && typeof PopUpModal.identificarEFecharModalAtual === 'function') {
+                                                    if (PopUpModal && typeof PopUpModal.identificarEFecharModalAtual === "function") {
                                                         PopUpModal.identificarEFecharModalAtual($element[0]);
                                                     }
 
@@ -1188,7 +1192,6 @@ app.directive("estruturaGerencia", [
                                                 } else {
                                                     // Comportamento normal fora do modal
                                                     //window.location.reload();
-                                                    
                                                 }
                                             } else {
                                                 $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
@@ -1205,16 +1208,16 @@ app.directive("estruturaGerencia", [
 
                                         if (escopo.aoSalvar != undefined) {
                                             escopo.aoSalvar(retorno);
-                                        } else if (escopo.estrutura.tipoEstrutura == "cadastroUnico" || escopo.estrutura.tipoEstrutura == 'cadastroDireto') {
+                                        } else if (escopo.estrutura.tipoEstrutura == "cadastroUnico" || escopo.estrutura.tipoEstrutura == "cadastroDireto") {
                                             var funcaoCadUnico = () => {
                                                 // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
                                                 if (escopo.isModal || (escopo.localExibicao && escopo.localExibicao === "modal")) {
                                                     console.log(
-                                                        "🎭 [estruturaGerencia] CadastroUnico - contexto modal detectado - evitando window.location.reload()"
+                                                        "🎭 [estruturaGerencia] CadastroUnico - contexto modal detectado - evitando window.location.reload()",
                                                     );
 
                                                     // Fechar apenas o modal que contém este formulário
-                                                    if (PopUpModal && typeof PopUpModal.identificarEFecharModalAtual === 'function') {
+                                                    if (PopUpModal && typeof PopUpModal.identificarEFecharModalAtual === "function") {
                                                         PopUpModal.identificarEFecharModalAtual($element[0]);
                                                     }
 
@@ -1299,11 +1302,10 @@ app.directive("estruturaGerencia", [
                             }
 
                             var fd = new FormData();
-                            fd.append("filtros", JSON.stringify(filtros));                            
-                            
-                            APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", fd, 'post')
+                            fd.append("filtros", JSON.stringify(filtros));
+
+                            APIServ.executaFuncaoClasse("classeGeral", "buscarParaAlterar", fd, "post")
                                 .success(function (data) {
-                                    
                                     $rS.carregando = false;
                                     if (usarTimerConsulta) {
                                         $rootScope.iniciarTimer();
@@ -1360,20 +1362,20 @@ app.directive("estruturaGerencia", [
 
                         let novaLista = [];
 
-                        const novaConsulta = function(){
-                            $parse('listaConsulta').assign($scope, novaLista);
-                            $parse('listaConsultaVisivel').assign($scope, novaLista);
+                        const novaConsulta = function () {
+                            $parse("listaConsulta").assign($scope, novaLista);
+                            $parse("listaConsultaVisivel").assign($scope, novaLista);
                             escopo.$apply();
-                        }      
+                        };
 
                         var funcao = function () {
-                            $rootScope.carregando = true;                            
-                            
+                            $rootScope.carregando = true;
+
                             APIServ.executaFuncaoClasse("classeGeral", "excluir", parametros).success(function (retorno) {
                                 console.log(retorno);
                                 if (retorno.erro != undefined) {
                                     APIServ.mensagemSimples(retorno.erro);
-                                } else if (retorno.chave >= 0) {       
+                                } else if (retorno.chave >= 0) {
                                     novaLista = retorno.novaConsulta.lista;
                                     APIServ.mensagemSimples("Confirmação", escopo.estrutura.nomeUsual + " Excluído!", novaConsulta);
                                 } else if (retorno.chave > 0) {
@@ -1405,7 +1407,7 @@ app.directive("estruturaGerencia", [
                     html += `<cabecalho-consulta class="cabecalhoConsulta" classe="${classe}"></cabecalho-consulta>`; //montaCabecalhoConsulta(retorno, $scope);
                     if (estrutura.tipoListaConsulta != undefined && estrutura.tipoListaConsulta == "tabela") {
                         escopo.tipoListaConsulta = "tabela";
-                            html += '<lista-consulta-tabela class="listaConsulta"></lista-consulta-tabela>'; //  montaListaConsulta(estrutura);
+                        html += '<lista-consulta-tabela class="listaConsulta"></lista-consulta-tabela>'; //  montaListaConsulta(estrutura);
                     } else {
                         escopo.tipoListaConsulta = "lista";
                         html += '<lista-consulta class="listaConsulta"></lista-consulta>'; //  montaListaConsulta(estrutura);
@@ -1427,15 +1429,14 @@ app.directive("estruturaGerencia", [
                 }
 
                 //console.log('classe', classe);
-                if($rootScope['estruturas'] == undefined) {
-                    $rootScope['estruturas'] = {};
+                if ($rootScope["estruturas"] == undefined) {
+                    $rootScope["estruturas"] = {};
                 }
-                $rootScope['estruturas'][classe] = escopo;
-                
+                $rootScope["estruturas"][classe] = escopo;
 
                 if (retorno.tipoEstrutura != "personalizado") {
                     $element.html(html);
-                    $compile($element.contents())($rootScope['estruturas'][classe]);
+                    $compile($element.contents())($rootScope["estruturas"][classe]);
                 }
 
                 if (escopo.aoCarregar != undefined) {
@@ -1445,14 +1446,16 @@ app.directive("estruturaGerencia", [
                 //Fiz esta rotina para ver se poe as mascaras nos campos de pesquisa, quando sao padrao
                 if (escopo.tela == "consulta" && estrutura.filtrosPadrao) {
                     setTimeout(function () {
-                        angular.forEach(escopo.filtros, function (item, key) {                           
+                        angular.forEach(escopo.filtros, function (item, key) {
                             if (item.campo !== null && item.campo != undefined && item.campo != "" && estrutura.filtrosPadrao[item["campo"]] != undefined) {
                                 angular.element(`#filtros_${key}_campo`).trigger("change");
-                                
-                                const campoF = item['campo'];
-                                const valorFiltroPadrao = estrutura.filtrosPadrao[campoF] != undefined && estrutura.filtrosPadrao[campoF]["valor"] != undefined ? 
-                                    estrutura.filtrosPadrao[campoF]["valor"] : "";
-                                escopo.filtros[key]["valor"] =valorFiltroPadrao;
+
+                                const campoF = item["campo"];
+                                const valorFiltroPadrao =
+                                    estrutura.filtrosPadrao[campoF] != undefined && estrutura.filtrosPadrao[campoF]["valor"] != undefined
+                                        ? estrutura.filtrosPadrao[campoF]["valor"]
+                                        : "";
+                                escopo.filtros[key]["valor"] = valorFiltroPadrao;
                             }
                         });
 
@@ -1467,13 +1470,11 @@ app.directive("estruturaGerencia", [
                         document.querySelector("#filtro_resultado").focus();
                     }, 200);
                 }
-                
-                
             };
 
             var rotaAtual = $route.current;
             var parametrosRota = $routeParams;
-    
+
             if (escopo.estrutura != undefined) {
                 montarEstrutura(escopo.estrutura);
             } else if ($element.attr("variavelEstrutura") != undefined) {
@@ -1509,7 +1510,7 @@ app.directive("estruturaGerencia", [
                 }
 
                 APIServ.executaFuncaoClasse("classeGeral", "buscarEstrutura", parametrosBuscaEstrutura).success((retorno) => {
-                     //console.log(retorno);
+                    //console.log(retorno);
                     montarEstrutura(retorno);
                 });
             }

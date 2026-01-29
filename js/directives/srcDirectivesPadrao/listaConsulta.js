@@ -132,22 +132,33 @@ directivesPadrao
                                 ? "btn-modern btn-outline-primary"
                                 : parametros.classesBotaoAlterar;
                         var ocultarAlterar = parametros.ocultarAlterar != undefined ? `ng-if="${parametros.ocultarAlterar == 'true'}"` : "";
+
+                        var desabilitarAlterar = '';
+                        if(parametros.desabilitarAlterar != undefined)
+                            desabilitarAlterar = "ng-disabled='" + parametros.desabilitarAlterar + "'";
+
+                        
+
                         htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)"
-                            ${ocultarAlterar}>${textoBotaoAlterar}</button>`;
-                        //htmlBotoes += `<button type="button" class="btn ${classesBotaoAlterar} ${iconeBotaoAlterar}" title="Alterar ${parametros.nomeUsual}" ng-click="${funcaoAlt}(item)">${textoBotaoAlterar}</button>`;
-                    //}
-                    // if (
-                    //     admSistema ||
-                    //     ((parametros.funcaoExcluir == undefined || parametros.funcaoExcluir != "desativada") &&
-                    //         $rS[acao] != undefined &&
-                    //         $rS[acao]["acoes"]["Excluir"])
-                    // ) {
+                            ${ocultarAlterar}
+                            ${desabilitarAlterar}>
+                            ${textoBotaoAlterar}
+                        </button>`;
+                  
+                  
                         var funcaoExc = parametros.funcaoExcluir != undefined ? parametros.funcaoExcluir : "excluir";
                         var ocultarExcluir = parametros.ocultarExcluir != undefined ? `ng-if="${parametros.ocultarExcluir == 'true'}"` : "";
-                        htmlBotoes += `<button type="button" class="btn btn-modern btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"
-                            ${ocultarExcluir }></button>`;
-                        //htmlBotoes += `<button type="button" class="btn btn-default glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" ng-click="${funcaoExc}(item)"></button>`;
-                    //}
+
+                        var desabilitarExcluir = '';
+                        if(parametros.desabilitarExcluir != undefined)
+                            desabilitarExcluir = "ng-disabled='" + parametros.desabilitarExcluir + "'";
+
+                        htmlBotoes += `<button type="button" class="btn btn-modern btn-outline-danger glyphicon glyphicon-trash" title="Excluir ${parametros.nomeUsual}" 
+                            ng-click="${funcaoExc}(item)"
+                            ${ocultarExcluir }
+                            ${desabilitarExcluir}
+                            ></button>`;
+                  
 
                     if (habilitarSalvar) {
                         htmlBotoes += `

@@ -1228,7 +1228,7 @@ var directivesPadrao = angular
                         }
 
                         if (atributos.se != undefined) {
-                            ngIf += ngIf != "" ? ` && ${atributos["se"]}` : `${atributos["se"]}`;
+                            ngIf += ngIf != "" ? ` && ${atributos["se"]}` : `${atributos["se"]}`;                            
                         }
 
                         if (p.classes != undefined) {
