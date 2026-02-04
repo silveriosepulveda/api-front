@@ -1,0 +1,392 @@
+/**
+ * Tema Claro (Light Theme) - PlayerOn
+ * Tema padrão do sistema
+ * 
+ * Este tema é aplicado em :root por padrão.
+ * Quando outro tema é ativado, ele sobrescreve estas variáveis.
+ */
+
+:root {
+  /* ============================================
+     CORES PRIMÁRIAS (Brand Colors)
+     ============================================ */
+  
+  /* Cor principal da marca - dourado PlayerOn */
+  --color-primary: #dcb826;
+  --color-primary-rgba: rgba(220, 184, 38, 0.91);
+  
+  /* Variações da cor primária */
+  --color-primary-dark: #b89a1f;
+  --color-primary-light: #e8c94a;
+  --color-primary-hover: rgba(200, 184, 38, 0.91);
+  
+  /* Cor primária em diferentes estados */
+  --color-primary-solid: rgb(220, 184, 38);
+  --color-primary-alpha-50: rgba(220, 184, 38, 0.5);
+  --color-primary-alpha-20: rgba(220, 184, 38, 0.2);
+  
+
+  /* ============================================
+     CORES SEMÂNTICAS (Status/Ações)
+     Paleta harmonizada com tons suaves
+     ============================================ */
+  
+  /* Sucesso - ações bem-sucedidas, abatimentos (verde suave harmonioso) */
+  --color-success: #6b8a5a;
+  --color-success-light: #8ba678;
+  --color-success-dark: #556b48;
+  --color-success-alpha: rgba(107, 138, 90, 0.15);
+  
+  /* Erro - erros, destaques críticos, transações (vermelho suave) */
+  --color-error: #c85a4a;
+  --color-error-light: #d87a6a;
+  --color-error-dark: #b84a3a;
+  --color-error-alpha: rgba(200, 90, 74, 0.15);
+  
+  /* Aviso - alertas, warnings (laranja/dourado suave harmonioso) */
+  --color-warning: #d4a853;
+  --color-warning-light: #e4b863;
+  --color-warning-dark: #c49843;
+  --color-warning-alpha: rgba(212, 168, 83, 0.15);
+  
+  /* Informação - mensagens informativas (azul suave harmonioso) */
+  --color-info: #6b8aa8;
+  --color-info-light: #8ba8c8;
+  --color-info-dark: #556a88;
+  --color-info-alpha: rgba(107, 138, 168, 0.15);
+  
+  /* Pagamento - ações de pagamento (rosa/coral suave) */
+  --color-payment: #d88a8a;
+  --color-payment-light: #e8aa9a;
+  --color-payment-dark: #c86a7a;
+  --color-payment-alpha: rgba(216, 138, 138, 0.15);
+  
+
+  /* ============================================
+     CORES NEUTRAS
+     ============================================ */
+  
+  /* Backgrounds harmonizados (tons creme/bege suaves) */
+  --color-background: #ffffff;
+  --color-background-alt: #faf8f3;
+  --color-surface: #f5f2eb;
+  --color-surface-light: #faf8f3;
+  --color-surface-elevated: #ffffff;
+  
+  /* Texto harmonizado */
+  --color-text: #3d3528;
+  --color-text-secondary: #6b5d4a;
+  --color-text-tertiary: #9a8d7a;
+  --color-text-disabled: #c4b8a8;
+  --color-text-inverse: #ffffff;
+  
+  /* Bordas e separadores harmonizados */
+  --color-border: #e0d8d0;
+  --color-border-light: #e8e0d8;
+  --color-border-dark: #d0c8c0;
+  --color-divider: #e8e0d8;
+  
+  /* Cores especiais harmonizadas */
+  --color-aliceblue: #f5f2eb;  /* Background de itens de dados - harmonizado */
+  --color-black: #2d2518;
+  --color-black-alpha-80: rgba(45, 37, 24, 0.8);
+  --color-black-alpha-10: rgba(45, 37, 24, 0.1);
+  
+
+  /* ============================================
+     CORES DE GRÁFICOS E VISUALIZAÇÕES
+     ============================================ */
+  
+  /* Gráfico - Cores harmonizadas com a paleta */
+  --color-chart-primary: rgb(220, 184, 38);  /* Dourado primário */
+  --color-chart-primary-alpha: rgba(220, 184, 38, 0.2);
+  
+  --color-chart-secondary: rgb(107, 138, 90);  /* Verde suave */
+  --color-chart-secondary-alpha: rgba(107, 138, 90, 0.2);
+  
+  /* Gráfico - Cores adicionais harmonizadas */
+  --color-chart-tertiary: rgb(212, 168, 83);  /* Laranja/dourado */
+  --color-chart-tertiary-alpha: rgba(212, 168, 83, 0.2);
+  
+  --color-chart-quaternary: rgb(107, 138, 168);  /* Azul suave */
+  --color-chart-quaternary-alpha: rgba(107, 138, 168, 0.2);
+  
+
+  /* ============================================
+     SOMBRAS E EFEITOS
+     ============================================ */
+  
+  /* Sombras suaves harmonizadas */
+  --shadow-sm: 0 2px 4px rgba(45, 37, 24, 0.08);
+  --shadow-md: 0 4px 8px rgba(45, 37, 24, 0.12);
+  --shadow-lg: 0 8px 16px rgba(45, 37, 24, 0.15);
+  --shadow-xl: 0 12px 24px rgba(45, 37, 24, 0.18);
+  
+  /* Sombras coloridas para elementos primários (tons dourados suaves) */
+  --shadow-primary: 0 4px 8px rgba(220, 184, 38, 0.25);
+  --shadow-primary-hover: 0 6px 12px rgba(220, 184, 38, 0.3);
+  
+
+  /* ============================================
+     VARIÁVEIS ESPECÍFICAS DO MENU LATERAL
+     Paleta harmonizada com tons suaves baseados na cor primária dourada
+     ============================================ */
+  
+  /* Menu - Cores de accent harmonizadas (tons dourados suaves) */
+  --menu-accent: var(--color-primary);
+  --menu-accent-hover: var(--color-primary-dark);
+  --menu-accent-alpha-15: var(--color-primary-alpha-20);
+  --menu-accent-alpha-10: rgba(220, 184, 38, 0.1);
+  --menu-accent-alpha-30: var(--color-primary-alpha-50);
+  --menu-accent-alpha-40: rgba(220, 184, 38, 0.4);
+  --menu-accent-alpha-20: var(--color-primary-alpha-20);
+  
+  /* Menu - Backgrounds harmonizados (tons creme e bege suaves) */
+  --menu-bg: #faf8f3;
+  --menu-bg-hover: #f5f2eb;
+  --menu-bg-gradient-start: #faf8f3;
+  --menu-bg-gradient-end: #f5f2eb;
+  --menu-bg-gradient-mobile-start: #fbf9f4;
+  --menu-bg-gradient-mobile-end: #f7f4ed;
+  --menu-bg-gradient-items-start: #fbf9f4;
+  --menu-bg-gradient-items-end: #f7f4ed;
+  --menu-bg-gradient-header-start: #fffefb;
+  --menu-bg-gradient-header-end: #faf8f3;
+  --menu-bg-gradient-header-hover-start: #f5f2eb;
+  --menu-bg-gradient-header-hover-end: #f0ede5;
+  --menu-bg-gradient-item-start: #ffffff;
+  --menu-bg-gradient-item-end: #faf8f3;
+  --menu-bg-gradient-item-hover-start: #f5f2eb;
+  --menu-bg-gradient-item-hover-end: #f0ede5;
+  --menu-bg-gradient-item-mobile-start: #ffffff;
+  --menu-bg-gradient-item-mobile-end: #fbf9f4;
+  --menu-bg-gradient-items-mobile-start: #fdfbf6;
+  --menu-bg-gradient-items-mobile-end: #f9f6f0;
+  
+  /* Menu - Textos harmonizados */
+  --menu-texto: #3d3528;
+  --menu-texto-muted: #6b5d4a;
+  --menu-texto-hover: #2d2518;
+  --menu-texto-titulo: #4a3f2f;
+  --menu-texto-favorito-inativo: #c4b8a8;
+  
+  /* Menu - Bordas harmonizadas (tons bege suaves) */
+  --menu-borda: #e8e0d4;
+  --menu-borda-light: #f0e8dc;
+  
+  /* Menu - Favoritos harmonizados (tons dourados/laranja suaves) */
+  --menu-favorito-cor: #d4a853;
+  --menu-favorito-bg: #faf6ed;
+  --menu-favorito-hover: #f5f0e3;
+  --menu-favorito-bg-gradient-start: #faf6ed;
+  --menu-favorito-bg-gradient-end: #f5f0e3;
+  --menu-favorito-bg-gradient-item-start: #fdf9f1;
+  --menu-favorito-bg-gradient-item-end: #faf6ed;
+  --menu-favorito-bg-gradient-item-hover-start: #f5f0e3;
+  --menu-favorito-bg-gradient-item-hover-end: #f0ead9;
+  --menu-favorito-bg-gradient-item-hover-end-alt: #f0ead9;
+  --menu-favorito-bg-gradient-item-mobile-start: #fdf9f1;
+  --menu-favorito-bg-gradient-item-mobile-end: #faf6ed;
+  --menu-favorito-alpha-30: rgba(212, 168, 83, 0.3);
+  --menu-favorito-alpha-50: rgba(212, 168, 83, 0.5);
+  --menu-favorito-alpha-06: rgba(212, 168, 83, 0.06);
+  --menu-favorito-alpha-03: rgba(212, 168, 83, 0.03);
+  --menu-favorito-alpha-10: rgba(212, 168, 83, 0.10);
+  --menu-favorito-alpha-05: rgba(212, 168, 83, 0.05);
+  --menu-favorito-alpha-12: rgba(212, 168, 83, 0.12);
+  --menu-favorito-alpha-08: rgba(212, 168, 83, 0.08);
+  --menu-favorito-alpha-40: rgba(212, 168, 83, 0.4);
+  --menu-favorito-alpha-shadow: rgba(212, 168, 83, 0.3);
+  
+  /* Menu - Overlay */
+  --menu-overlay: rgba(0, 0, 0, 0.4);
+  
+  /* Menu - Sombras harmonizadas (tons dourados suaves) */
+  --menu-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --menu-shadow-accent: 4px 0 24px var(--color-primary-alpha-20);
+  --menu-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --menu-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --menu-shadow-header: 0 4px 12px var(--color-primary-alpha-20);
+  --menu-shadow-btn: var(--shadow-primary);
+  --menu-shadow-btn-hover: var(--shadow-primary-hover);
+  --menu-shadow-btn-active: 0 2px 4px var(--color-primary-alpha-20);
+  --menu-shadow-secao: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --menu-shadow-item: 0 2px 6px var(--color-primary-alpha-20);
+  --menu-shadow-favorito: 0 2px 8px rgba(212, 168, 83, 0.12);
+  --menu-shadow-favorito-item: 0 1px 3px rgba(212, 168, 83, 0.08);
+  --menu-shadow-favorito-item-hover: 0 2px 6px rgba(212, 168, 83, 0.15);
+  
+  /* Menu - Transições */
+  --menu-transicao: 0.3s ease;
+  
+  /* Menu - Largura */
+  --menu-largura: 350px;
+  
+
+  /* ============================================
+     VARIÁVEIS ESPECÍFICAS DO PAINEL.CSS
+     Paleta harmonizada com tons suaves
+     ============================================ */
+  
+  /* Painel - Cores de erro e alerta harmonizadas */
+  --painel-error-bg: #f5e8e8;
+  --painel-error-text: #c85a4a;
+  --painel-error-border: var(--color-error);
+  --painel-focus-bg: #fff9c4;  /* Amarelo suave para focus */
+  
+  /* Painel - Backgrounds de itens harmonizados (tons creme/bege) */
+  --painel-item-consulta-bg: #f5f2eb;
+  --painel-detalhe-bg: #f0ede5;
+  
+  /* Painel - Cores de linhas alternadas harmonizadas */
+  --painel-linha-impar: #faf8f3;
+  --painel-linha-par: #f5f2eb;
+  
+  /* Painel - Cores de divs harmonizadas (tons suaves da paleta) */
+  --painel-div1: #f5f3f0;
+  --painel-div2: #f0ede8;
+  --painel-div3: #f5f2eb;
+  --painel-div4: #f0f5ed;
+  --painel-div5: #f5f0ed;
+  --painel-div6: #f5f5eb;
+  
+  /* Painel - Cores de itens harmonizadas */
+  --painel-divit1: #faf6ed;
+  --painel-divit2: #f0f5ed;
+  
+  /* Painel - Cores de fundo semânticas harmonizadas */
+  --painel-fundo-azul: #a8b8c8;
+  --painel-fundo-vermelho: #e8a8a8;
+  --painel-fundo-verde: #b8d8a8;
+  --painel-fundo-cinza: #d0d0c8;
+  --painel-fundo-amarelo: #f5e8a8;
+  
+  /* Painel - Cores de texto harmonizadas */
+  --painel-text-preto: var(--color-text);
+  --painel-text-vermelho: #c85a4a;
+  --painel-text-verde: #6b8a5a;
+  --painel-text-cinza-claro: #9a8d7a;
+  --painel-text-cinza: #8a7d6a;
+  --painel-text-laranja: #d4a853;
+  --painel-text-azul: #6b8aa8;
+  
+  /* Painel - Bordas harmonizadas */
+  --painel-borda-cinza: #c8c0b8;
+  --painel-borda-cinza-claro: #d8d0c8;
+  --painel-borda-cinza-muito-claro: #e8e0d8;
+  --painel-borda-cabecalho: #e0d8d0;
+  
+  /* Painel - Cabeçalho harmonizado */
+  --painel-cabecalho-bg: var(--color-primary);
+  
+  /* Painel - Select editável harmonizado */
+  --painel-select-bg-hover: #f5f2eb;
+  --painel-select-border-focus: var(--color-primary);
+  --painel-select-shadow-focus: var(--color-primary-alpha-20);
+  
+  /* Painel - Sombras harmonizadas */
+  --painel-shadow-sm: var(--shadow-sm);
+  --painel-shadow-md: var(--shadow-md);
+  --painel-shadow-focus: 0px 0px 10px 10px var(--color-primary-alpha-20);
+  
+
+  /* ============================================
+     VARIÁVEIS PARA BOTÕES BOOTSTRAP
+     Permite que os botões acompanhem os temas
+     ============================================ */
+  
+  /* Botão Primary */
+  --btn-primary-bg: var(--color-primary);
+  --btn-primary-border: var(--color-primary);
+  --btn-primary-color: var(--color-text-inverse);
+  --btn-primary-hover-bg: var(--color-primary-dark);
+  --btn-primary-hover-border: var(--color-primary-dark);
+  --btn-primary-hover-color: var(--color-text-inverse);
+  --btn-primary-active-bg: var(--color-primary-dark);
+  --btn-primary-active-border: var(--color-primary-dark);
+  --btn-primary-active-color: var(--color-text-inverse);
+  --btn-primary-focus-shadow: 0 0 0 0.2rem var(--color-primary-alpha-20);
+  --btn-primary-disabled-bg: var(--color-primary-alpha-50);
+  --btn-primary-disabled-border: var(--color-primary-alpha-50);
+  --btn-primary-disabled-color: var(--color-text-inverse);
+  
+  /* Botão Success */
+  --btn-success-bg: var(--color-success);
+  --btn-success-border: var(--color-success);
+  --btn-success-color: var(--color-text-inverse);
+  --btn-success-hover-bg: var(--color-success-dark);
+  --btn-success-hover-border: var(--color-success-dark);
+  --btn-success-hover-color: var(--color-text-inverse);
+  --btn-success-active-bg: var(--color-success-dark);
+  --btn-success-active-border: var(--color-success-dark);
+  --btn-success-active-color: var(--color-text-inverse);
+  --btn-success-focus-shadow: 0 0 0 0.2rem var(--color-success-alpha);
+  --btn-success-disabled-bg: rgba(107, 138, 90, 0.5);
+  --btn-success-disabled-border: rgba(107, 138, 90, 0.5);
+  --btn-success-disabled-color: var(--color-text-inverse);
+  
+  /* Botão Danger */
+  --btn-danger-bg: var(--color-error);
+  --btn-danger-border: var(--color-error);
+  --btn-danger-color: var(--color-text-inverse);
+  --btn-danger-hover-bg: var(--color-error-dark);
+  --btn-danger-hover-border: var(--color-error-dark);
+  --btn-danger-hover-color: var(--color-text-inverse);
+  --btn-danger-active-bg: var(--color-error-dark);
+  --btn-danger-active-border: var(--color-error-dark);
+  --btn-danger-active-color: var(--color-text-inverse);
+  --btn-danger-focus-shadow: 0 0 0 0.2rem var(--color-error-alpha);
+  --btn-danger-disabled-bg: rgba(200, 90, 74, 0.5);
+  --btn-danger-disabled-border: rgba(200, 90, 74, 0.5);
+  --btn-danger-disabled-color: var(--color-text-inverse);
+  
+  /* Botão Warning */
+  --btn-warning-bg: var(--color-warning);
+  --btn-warning-border: var(--color-warning);
+  --btn-warning-color: var(--color-text);
+  --btn-warning-hover-bg: var(--color-warning-dark);
+  --btn-warning-hover-border: var(--color-warning-dark);
+  --btn-warning-hover-color: var(--color-text-inverse);
+  --btn-warning-active-bg: var(--color-warning-dark);
+  --btn-warning-active-border: var(--color-warning-dark);
+  --btn-warning-active-color: var(--color-text-inverse);
+  --btn-warning-focus-shadow: 0 0 0 0.2rem var(--color-warning-alpha);
+  --btn-warning-disabled-bg: rgba(212, 168, 83, 0.5);
+  --btn-warning-disabled-border: rgba(212, 168, 83, 0.5);
+  --btn-warning-disabled-color: var(--color-text);
+  
+  /* Botão Info */
+  --btn-info-bg: var(--color-info);
+  --btn-info-border: var(--color-info);
+  --btn-info-color: var(--color-text-inverse);
+  --btn-info-hover-bg: var(--color-info-dark);
+  --btn-info-hover-border: var(--color-info-dark);
+  --btn-info-hover-color: var(--color-text-inverse);
+  --btn-info-active-bg: var(--color-info-dark);
+  --btn-info-active-border: var(--color-info-dark);
+  --btn-info-active-color: var(--color-text-inverse);
+  --btn-info-focus-shadow: 0 0 0 0.2rem var(--color-info-alpha);
+  --btn-info-disabled-bg: rgba(107, 138, 168, 0.5);
+  --btn-info-disabled-border: rgba(107, 138, 168, 0.5);
+  --btn-info-disabled-color: var(--color-text-inverse);
+  
+  /* Botão Default/Secondary */
+  --btn-default-bg: var(--color-surface);
+  --btn-default-border: var(--color-border);
+  --btn-default-color: var(--color-text);
+  --btn-default-hover-bg: var(--color-border-light);
+  --btn-default-hover-border: var(--color-border-dark);
+  --btn-default-hover-color: var(--color-text);
+  --btn-default-active-bg: var(--color-border);
+  --btn-default-active-border: var(--color-border-dark);
+  --btn-default-active-color: var(--color-text);
+  --btn-default-focus-shadow: 0 0 0 0.2rem var(--color-black-alpha-10);
+  --btn-default-disabled-bg: var(--color-surface);
+  --btn-default-disabled-border: var(--color-border-light);
+  --btn-default-disabled-color: var(--color-text-disabled);
+  
+  /* Botão Link */
+  --btn-link-color: var(--color-primary);
+  --btn-link-hover-color: var(--color-primary-dark);
+  --btn-link-disabled-color: var(--color-text-disabled);
+}

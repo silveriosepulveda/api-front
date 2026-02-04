@@ -1,0 +1,393 @@
+/**
+ * Bootstrap Buttons Theme - PlayerOn
+ * 
+ * Sobrescreve os estilos padrão dos botões Bootstrap usando variáveis CSS do tema.
+ * Isso permite que os botões acompanhem automaticamente quando o tema for alterado.
+ * 
+ * Este arquivo deve ser carregado APÓS o bootstrap.min.css
+ */
+
+/* Reset de background-image do Bootstrap que pode causar conflitos */
+.btn-primary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info,
+.btn-default,
+.btn-secondary {
+    background-image: none !important;
+}
+
+/* ============================================
+   BOTÃO PRIMARY
+   ============================================ */
+.btn-primary {
+    background-color: var(--btn-primary-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-primary-border) !important;
+    color: var(--btn-primary-color) !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--btn-primary-hover-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-primary-hover-border) !important;
+    color: var(--btn-primary-hover-color) !important;
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.btn-primary.active:focus,
+.btn-primary.active:hover {
+    background-color: var(--btn-primary-active-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-primary-active-border) !important;
+    color: var(--btn-primary-active-color) !important;
+}
+
+.btn-primary:focus {
+    box-shadow: var(--btn-primary-focus-shadow) !important;
+}
+
+.btn-primary:disabled,
+.btn-primary.disabled {
+    background-color: var(--btn-primary-disabled-bg) !important;
+    border-color: var(--btn-primary-disabled-border) !important;
+    color: var(--btn-primary-disabled-color) !important;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+/* ============================================
+   BOTÃO SUCCESS
+   ============================================ */
+.btn-success {
+    background-color: var(--btn-success-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-success-border) !important;
+    color: var(--btn-success-color) !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+    background-color: var(--btn-success-hover-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-success-hover-border) !important;
+    color: var(--btn-success-hover-color) !important;
+}
+
+.btn-success:active,
+.btn-success.active,
+.btn-success.active:focus,
+.btn-success.active:hover {
+    background-color: var(--btn-success-active-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-success-active-border) !important;
+    color: var(--btn-success-active-color) !important;
+}
+
+.btn-success:focus {
+    box-shadow: var(--btn-success-focus-shadow) !important;
+}
+
+.btn-success:disabled,
+.btn-success.disabled {
+    background-color: var(--btn-success-disabled-bg) !important;
+    border-color: var(--btn-success-disabled-border) !important;
+    color: var(--btn-success-disabled-color) !important;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+/* ============================================
+   BOTÃO DANGER
+   ============================================ */
+.btn-danger {
+    background-color: var(--btn-danger-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-danger-border) !important;
+    color: var(--btn-danger-color) !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+    background-color: var(--btn-danger-hover-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-danger-hover-border) !important;
+    color: var(--btn-danger-hover-color) !important;
+}
+
+.btn-danger:active,
+.btn-danger.active,
+.btn-danger.active:focus,
+.btn-danger.active:hover {
+    background-color: var(--btn-danger-active-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-danger-active-border) !important;
+    color: var(--btn-danger-active-color) !important;
+}
+
+.btn-danger:focus {
+    box-shadow: var(--btn-danger-focus-shadow) !important;
+}
+
+.btn-danger:disabled,
+.btn-danger.disabled {
+    background-color: var(--btn-danger-disabled-bg) !important;
+    border-color: var(--btn-danger-disabled-border) !important;
+    color: var(--btn-danger-disabled-color) !important;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+/* ============================================
+   BOTÃO WARNING
+   ============================================ */
+.btn-warning {
+    background-color: var(--btn-warning-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-warning-border) !important;
+    color: var(--btn-warning-color) !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-warning:hover,
+.btn-warning:focus {
+    background-color: var(--btn-warning-hover-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-warning-hover-border) !important;
+    color: var(--btn-warning-hover-color) !important;
+}
+
+.btn-warning:active,
+.btn-warning.active,
+.btn-warning.active:focus,
+.btn-warning.active:hover {
+    background-color: var(--btn-warning-active-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-warning-active-border) !important;
+    color: var(--btn-warning-active-color) !important;
+}
+
+.btn-warning:focus {
+    box-shadow: var(--btn-warning-focus-shadow) !important;
+}
+
+.btn-warning:disabled,
+.btn-warning.disabled {
+    background-color: var(--btn-warning-disabled-bg) !important;
+    border-color: var(--btn-warning-disabled-border) !important;
+    color: var(--btn-warning-disabled-color) !important;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+/* ============================================
+   BOTÃO INFO
+   ============================================ */
+.btn-info {
+    background-color: var(--btn-info-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-info-border) !important;
+    color: var(--btn-info-color) !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-info:hover,
+.btn-info:focus {
+    background-color: var(--btn-info-hover-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-info-hover-border) !important;
+    color: var(--btn-info-hover-color) !important;
+}
+
+.btn-info:active,
+.btn-info.active,
+.btn-info.active:focus,
+.btn-info.active:hover {
+    background-color: var(--btn-info-active-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-info-active-border) !important;
+    color: var(--btn-info-active-color) !important;
+}
+
+.btn-info:focus {
+    box-shadow: var(--btn-info-focus-shadow) !important;
+}
+
+.btn-info:disabled,
+.btn-info.disabled {
+    background-color: var(--btn-info-disabled-bg) !important;
+    border-color: var(--btn-info-disabled-border) !important;
+    color: var(--btn-info-disabled-color) !important;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+/* ============================================
+   BOTÃO DEFAULT/SECONDARY
+   ============================================ */
+.btn-default,
+.btn-secondary {
+    background-color: var(--btn-default-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-default-border) !important;
+    color: var(--btn-default-color) !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-default:hover,
+.btn-default:focus,
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: var(--btn-default-hover-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-default-hover-border) !important;
+    color: var(--btn-default-hover-color) !important;
+}
+
+.btn-default:active,
+.btn-default.active,
+.btn-default.active:focus,
+.btn-default.active:hover,
+.btn-secondary:active,
+.btn-secondary.active,
+.btn-secondary.active:focus,
+.btn-secondary.active:hover {
+    background-color: var(--btn-default-active-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-default-active-border) !important;
+    color: var(--btn-default-active-color) !important;
+}
+
+.btn-default:focus,
+.btn-secondary:focus {
+    box-shadow: var(--btn-default-focus-shadow) !important;
+}
+
+.btn-default:disabled,
+.btn-default.disabled,
+.btn-secondary:disabled,
+.btn-secondary.disabled {
+    background-color: var(--btn-default-disabled-bg) !important;
+    border-color: var(--btn-default-disabled-border) !important;
+    color: var(--btn-default-disabled-color) !important;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+/* ============================================
+   BOTÃO LINK
+   ============================================ */
+.btn-link {
+    color: var(--btn-link-color) !important;
+    text-decoration: none;
+}
+
+.btn-link:hover,
+.btn-link:focus {
+    color: var(--btn-link-hover-color) !important;
+    text-decoration: underline;
+}
+
+.btn-link:disabled,
+.btn-link.disabled {
+    color: var(--btn-link-disabled-color) !important;
+    opacity: 0.65;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+
+/* ============================================
+   BOTÕES OUTLINE (Bootstrap 4+ compatibilidade)
+   ============================================ */
+.btn-outline-primary {
+    color: var(--btn-primary-bg) !important;
+    border-color: var(--btn-primary-border) !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background-color: var(--btn-primary-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-primary-border) !important;
+    color: var(--btn-primary-color) !important;
+}
+
+.btn-outline-success {
+    color: var(--btn-success-bg) !important;
+    border-color: var(--btn-success-border) !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-outline-success:hover,
+.btn-outline-success:focus {
+    background-color: var(--btn-success-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-success-border) !important;
+    color: var(--btn-success-color) !important;
+}
+
+.btn-outline-danger {
+    color: var(--btn-danger-bg) !important;
+    border-color: var(--btn-danger-border) !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+    background-color: var(--btn-danger-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-danger-border) !important;
+    color: var(--btn-danger-color) !important;
+}
+
+.btn-outline-warning {
+    color: var(--btn-warning-bg) !important;
+    border-color: var(--btn-warning-border) !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-outline-warning:hover,
+.btn-outline-warning:focus {
+    background-color: var(--btn-warning-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-warning-border) !important;
+    color: var(--btn-warning-color) !important;
+}
+
+.btn-outline-info {
+    color: var(--btn-info-bg) !important;
+    border-color: var(--btn-info-border) !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.btn-outline-info:hover,
+.btn-outline-info:focus {
+    background-color: var(--btn-info-bg) !important;
+    background-image: none !important;
+    border-color: var(--btn-info-border) !important;
+    color: var(--btn-info-color) !important;
+}

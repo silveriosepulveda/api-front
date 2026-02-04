@@ -1,0 +1,41 @@
+/**
+ * Sistema de Temas - PlayerOn
+ * Arquivo Base - Define a estrutura de variáveis CSS
+ * 
+ * Este arquivo define apenas a estrutura das variáveis.
+ * Os valores são definidos nos arquivos de tema específicos.
+ */
+
+:root {
+  /* ============================================
+     ESTRUTURA DE VARIÁVEIS DO TEMA
+     ============================================ */
+  
+  /* Todas as variáveis são definidas nos arquivos de tema específicos */
+  /* Este arquivo serve apenas como documentação da estrutura */
+  
+  /* 
+   * CATEGORIAS DE VARIÁVEIS:
+   * 
+   * 1. CORES PRIMÁRIAS (Brand Colors)
+   *    --color-primary, --color-primary-dark, --color-primary-light, etc.
+   * 
+   * 2. CORES SEMÂNTICAS (Status/Ações)
+   *    --color-success, --color-error, --color-warning, --color-info, --color-payment
+   * 
+   * 3. CORES NEUTRAS
+   *    --color-background, --color-surface, --color-text, --color-border, etc.
+   * 
+   * 4. CORES DE GRÁFICOS
+   *    --color-chart-primary, --color-chart-secondary, etc.
+   * 
+   * 5. SOMBRAS E EFEITOS
+   *    --shadow-sm, --shadow-md, --shadow-lg, etc.
+   * 
+   * 6. VARIÁVEIS ESPECÍFICAS DO MENU LATERAL
+   *    --menu-accent, --menu-bg, --menu-texto, etc.
+   * 
+   * 7. VARIÁVEIS ESPECÍFICAS DO PAINEL
+   *    --painel-error-bg, --painel-fundo-azul, etc.
+   */
+}

@@ -1,0 +1,315 @@
+/**
+ * Sistema de Variáveis de Cores - PlayerOn
+ * 
+ * Este arquivo define todas as cores do sistema usando CSS Custom Properties.
+ * Para usar uma cor, utilize: var(--nome-da-variavel)
+ * 
+ * Exemplo:
+ *   background-color: var(--color-primary);
+ *   color: var(--color-text);
+ */
+
+:root {
+  /* ============================================
+     CORES PRIMÁRIAS (Brand Colors)
+     ============================================ */
+  
+  /* Cor principal da marca - dourado PlayerOn */
+  --color-primary: #dcb826;
+  --color-primary-rgba: rgba(220, 184, 38, 0.91);
+  
+  /* Variações da cor primária */
+  --color-primary-dark: #b89a1f;
+  --color-primary-light: #e8c94a;
+  --color-primary-hover: rgba(200, 184, 38, 0.91);
+  
+  /* Cor primária em diferentes estados */
+  --color-primary-solid: rgb(220, 184, 38);
+  --color-primary-alpha-50: rgba(220, 184, 38, 0.5);
+  --color-primary-alpha-20: rgba(220, 184, 38, 0.2);
+  
+
+  /* ============================================
+     CORES SEMÂNTICAS (Status/Ações)
+     ============================================ */
+  
+  /* Sucesso - ações bem-sucedidas, abatimentos */
+  --color-success: #7cb342;
+  --color-success-light: #a5d075;
+  --color-success-dark: #558b2f;
+  --color-success-alpha: rgba(124, 179, 66, 0.2);
+  
+  /* Erro - erros, destaques críticos, transações */
+  --color-error: #e53935;
+  --color-error-light: #ef5350;
+  --color-error-dark: #c62828;
+  --color-error-alpha: rgba(229, 57, 53, 0.2);
+  
+  /* Aviso - alertas, warnings */
+  --color-warning: #ffb300;
+  --color-warning-light: #ffc107;
+  --color-warning-dark: #ff8f00;
+  --color-warning-alpha: rgba(255, 179, 0, 0.2);
+  
+  /* Informação - mensagens informativas */
+  --color-info: #1e88e5;
+  --color-info-light: #42a5f5;
+  --color-info-dark: #1565c0;
+  --color-info-alpha: rgba(30, 136, 229, 0.2);
+  
+  /* Pagamento - ações de pagamento */
+  --color-payment: #f08080;
+  --color-payment-light: #f5a5a5;
+  --color-payment-dark: #e57373;
+  --color-payment-alpha: rgba(240, 128, 128, 0.2);
+  
+
+  /* ============================================
+     CORES NEUTRAS
+     ============================================ */
+  
+  /* Backgrounds */
+  --color-background: #ffffff;
+  --color-background-alt: #fafafa;
+  --color-surface: #f9f9f9;
+  --color-surface-light: #fcfcfc;
+  --color-surface-elevated: #ffffff;
+  
+  /* Texto */
+  --color-text: #333333;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --color-text-disabled: #cccccc;
+  --color-text-inverse: #ffffff;
+  
+  /* Bordas e separadores */
+  --color-border: #dddddd;
+  --color-border-light: #eeeeee;
+  --color-border-dark: #bbbbbb;
+  --color-divider: #eeeeee;
+  
+  /* Cores especiais encontradas no projeto */
+  --color-aliceblue: #f0f8ff;  /* Background de itens de dados */
+  --color-black: #000000;
+  --color-black-alpha-80: rgba(0, 0, 0, 0.8);
+  --color-black-alpha-10: rgba(0, 0, 0, 0.1);
+  
+
+  /* ============================================
+     CORES DE GRÁFICOS E VISUALIZAÇÕES
+     ============================================ */
+  
+  /* Gráfico - Linha primária */
+  --color-chart-primary: rgb(75, 192, 192);
+  --color-chart-primary-alpha: rgba(75, 192, 192, 0.2);
+  
+  /* Gráfico - Linha secundária */
+  --color-chart-secondary: rgb(255, 99, 132);
+  --color-chart-secondary-alpha: rgba(255, 99, 132, 0.2);
+  
+  /* Gráfico - Cores adicionais para múltiplas séries */
+  --color-chart-tertiary: rgb(255, 206, 86);
+  --color-chart-tertiary-alpha: rgba(255, 206, 86, 0.2);
+  
+  --color-chart-quaternary: rgb(54, 162, 235);
+  --color-chart-quaternary-alpha: rgba(54, 162, 235, 0.2);
+  
+
+  /* ============================================
+     SOMBRAS E EFEITOS
+     ============================================ */
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.25);
+  
+  /* Sombras coloridas para elementos primários */
+  --shadow-primary: 0 4px 8px rgba(220, 184, 38, 0.3);
+  --shadow-primary-hover: 0 6px 12px rgba(220, 184, 38, 0.4);
+  
+
+  /* ============================================
+     VARIÁVEIS ESPECÍFICAS DO MENU LATERAL
+     Mantendo todas as cores originais do menu
+     ============================================ */
+  
+  /* Menu - Cores de accent e interação (cores originais azuis) */
+  --menu-accent: #4f8ef7;
+  --menu-accent-hover: #3b82f6;
+  --menu-accent-alpha-15: rgba(79, 142, 247, 0.15);
+  --menu-accent-alpha-10: rgba(79, 142, 247, 0.1);
+  --menu-accent-alpha-30: rgba(79, 142, 247, 0.3);
+  --menu-accent-alpha-40: rgba(79, 142, 247, 0.4);
+  --menu-accent-alpha-20: rgba(79, 142, 247, 0.2);
+  
+  /* Menu - Backgrounds (cores originais) */
+  --menu-bg: #f8f9fc;
+  --menu-bg-hover: #f0f4ff;
+  --menu-bg-gradient-start: #f8f9fc;
+  --menu-bg-gradient-end: #eef2f7;
+  --menu-bg-gradient-mobile-start: #fafbfd;
+  --menu-bg-gradient-mobile-end: #f5f8fc;
+  --menu-bg-gradient-items-start: #fafbfd;
+  --menu-bg-gradient-items-end: #f5f7fb;
+  --menu-bg-gradient-header-start: #fefeff;
+  --menu-bg-gradient-header-end: #f8fbff;
+  --menu-bg-gradient-header-hover-start: #f5f9ff;
+  --menu-bg-gradient-header-hover-end: #ebf4ff;
+  --menu-bg-gradient-item-start: #ffffff;
+  --menu-bg-gradient-item-end: #fbfcfe;
+  --menu-bg-gradient-item-hover-start: #f5f9ff;
+  --menu-bg-gradient-item-hover-end: #ebf4ff;
+  --menu-bg-gradient-item-mobile-start: #ffffff;
+  --menu-bg-gradient-item-mobile-end: #fafcfe;
+  --menu-bg-gradient-items-mobile-start: #fcfdfe;
+  --menu-bg-gradient-items-mobile-end: #f8fafe;
+  
+  /* Menu - Textos (cores originais) */
+  --menu-texto: #1f2937;
+  --menu-texto-muted: #374151;
+  --menu-texto-hover: #1a202c;
+  --menu-texto-titulo: #2c3e50;
+  --menu-texto-favorito-inativo: #d1d5db;
+  
+  /* Menu - Bordas (cores originais) */
+  --menu-borda: #d4d9e3;
+  --menu-borda-light: #e5e7eb;
+  
+  /* Menu - Favoritos (cores originais) */
+  --menu-favorito-cor: #ff9500;
+  --menu-favorito-bg: #fffaf0;
+  --menu-favorito-hover: #fff5e6;
+  --menu-favorito-bg-gradient-start: #fffcf7;
+  --menu-favorito-bg-gradient-end: #fffaf5;
+  --menu-favorito-bg-gradient-item-start: #fffefb;
+  --menu-favorito-bg-gradient-item-end: #fffcf7;
+  --menu-favorito-bg-gradient-item-hover-start: #fff9f5;
+  --menu-favorito-bg-gradient-item-hover-end: #fff5eb;
+  --menu-favorito-bg-gradient-item-hover-end-alt: #fff5eb;
+  --menu-favorito-bg-gradient-item-mobile-start: #fffefb;
+  --menu-favorito-bg-gradient-item-mobile-end: #fffcf8;
+  --menu-favorito-alpha-30: rgba(255, 149, 0, 0.3);
+  --menu-favorito-alpha-50: rgba(255, 149, 0, 0.5);
+  --menu-favorito-alpha-06: rgba(255, 149, 0, 0.06);
+  --menu-favorito-alpha-03: rgba(255, 149, 0, 0.03);
+  --menu-favorito-alpha-10: rgba(255, 149, 0, 0.10);
+  --menu-favorito-alpha-05: rgba(255, 149, 0, 0.05);
+  --menu-favorito-alpha-12: rgba(255, 149, 0, 0.12);
+  --menu-favorito-alpha-08: rgba(255, 149, 0, 0.08);
+  --menu-favorito-alpha-40: rgba(255, 149, 0, 0.4);
+  --menu-favorito-alpha-shadow: rgba(255, 149, 0, 0.3);
+  
+  /* Menu - Overlay */
+  --menu-overlay: rgba(0, 0, 0, 0.4);
+  
+  /* Menu - Sombras (cores originais) */
+  --menu-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --menu-shadow-accent: 4px 0 24px rgba(79, 142, 247, 0.15);
+  --menu-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --menu-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --menu-shadow-header: 0 4px 12px rgba(79, 142, 247, 0.1);
+  --menu-shadow-btn: 0 2px 6px rgba(79, 142, 247, 0.3);
+  --menu-shadow-btn-hover: 0 4px 12px rgba(79, 142, 247, 0.4);
+  --menu-shadow-btn-active: 0 2px 4px rgba(79, 142, 247, 0.2);
+  --menu-shadow-secao: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --menu-shadow-item: 0 2px 6px rgba(79, 142, 247, 0.10);
+  --menu-shadow-favorito: 0 2px 8px rgba(255, 149, 0, 0.08);
+  --menu-shadow-favorito-item: 0 1px 3px rgba(255, 149, 0, 0.06);
+  --menu-shadow-favorito-item-hover: 0 2px 6px rgba(255, 149, 0, 0.12);
+  
+  /* Menu - Transições */
+  --menu-transicao: 0.3s ease;
+  
+  /* Menu - Largura */
+  --menu-largura: 350px;
+  
+
+  /* ============================================
+     VARIÁVEIS ESPECÍFICAS DO PAINEL.CSS
+     ============================================ */
+  
+  /* Painel - Cores de erro e alerta */
+  --painel-error-bg: #f2dede;
+  --painel-error-text: #FC6D49;
+  --painel-error-border: var(--color-error);
+  --painel-focus-bg: yellow;  /* Mantendo yellow para focus visual */
+  
+  /* Painel - Backgrounds de itens */
+  --painel-item-consulta-bg: rgb(234, 240, 241);
+  --painel-detalhe-bg: #ECECEC;
+  
+  /* Painel - Cores de linhas alternadas */
+  --painel-linha-impar: #f3ebe3;
+  --painel-linha-par: #ecd5e0;
+  
+  /* Painel - Cores de divs (div1-div6) */
+  --painel-div1: rgb(229, 231, 243);
+  --painel-div2: rgb(230, 230, 238);
+  --painel-div3: #E3E1FB;
+  --painel-div4: rgba(234, 241, 235, 0.993);
+  --painel-div5: rgb(243, 235, 236);
+  --painel-div6: rgb(240, 241, 220);
+  
+  /* Painel - Cores de itens (divit1-divit2) */
+  --painel-divit1: #FAF3A9;
+  --painel-divit2: #E8F4B5;
+  
+  /* Painel - Cores de fundo semânticas */
+  --painel-fundo-azul: #879cc3;
+  --painel-fundo-vermelho: #FF7979;
+  --painel-fundo-verde: #97FF97;
+  --painel-fundo-cinza: #D0D0D0;
+  --painel-fundo-amarelo: #FAF3A9;
+  
+  /* Painel - Cores de texto */
+  --painel-text-preto: #000;
+  --painel-text-vermelho: #F00;
+  --painel-text-verde: #0EB112;
+  --painel-text-cinza-claro: #91868d;
+  --painel-text-cinza: #909090;
+  --painel-text-laranja: #f58634;
+  --painel-text-azul: #606DEE;
+  
+  /* Painel - Bordas */
+  --painel-borda-cinza: #aaa;
+  --painel-borda-cinza-claro: #ccc;
+  --painel-borda-cinza-muito-claro: #eee;
+  --painel-borda-cabecalho: #e9ecef;
+  
+  /* Painel - Cabeçalho */
+  --painel-cabecalho-bg: #337ab7;
+  
+  /* Painel - Select editável */
+  --painel-select-bg-hover: #e8f4f8;
+  --painel-select-border-focus: #66afe9;
+  --painel-select-shadow-focus: rgba(102, 175, 233, 0.6);
+  
+  /* Painel - Sombras */
+  --painel-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --painel-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --painel-shadow-focus: 0px 0px 10px 10px rgba(0, 0, 255, 0.4);
+  
+
+  /* ============================================
+     MAPEAMENTO DE CORES ANTIGAS (Para referência)
+     ============================================ */
+  
+  /* 
+   * Cores antigas encontradas no projeto:
+   * 
+   * rgba(220, 184, 38, 0.91) → var(--color-primary-rgba)
+   * rgba(200, 184, 38, 0.91) → var(--color-primary-hover)
+   * rgba(0,0,0, 0.8) → var(--color-black-alpha-80)
+   * #fcfcfc → var(--color-surface-light)
+   * #ffffff / white → var(--color-background)
+   * #f9f9f9 → var(--color-surface)
+   * #333 → var(--color-text)
+   * #ddd → var(--color-border)
+   * #eee → var(--color-border-light)
+   * red → var(--color-error)
+   * lightcoral → var(--color-payment)
+   * lawngreen → var(--color-success)
+   * aliceblue → var(--color-aliceblue)
+   */
+}

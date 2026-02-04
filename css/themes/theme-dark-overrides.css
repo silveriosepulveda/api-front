@@ -1,0 +1,694 @@
+/**
+ * Theme Dark Overrides - PlayerOn
+ * 
+ * Ajustes específicos para elementos básicos do HTML e componentes
+ * que precisam de estilos adicionais no tema escuro.
+ * 
+ * Este arquivo deve ser carregado após theme-dark.css
+ */
+
+[data-theme="dark"] {
+  /* ============================================
+     ELEMENTOS BÁSICOS DO HTML
+     ============================================ */
+  
+  /* Body e containers principais */
+  body {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important; /* Cor dourada aplicada */
+  }
+  
+  .container,
+  .container-fluid {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important; /* Cor dourada aplicada */
+  }
+  
+  .row,
+  .row-fluid {
+    color: var(--color-text) !important; /* Cor dourada aplicada */
+  }
+  
+  /* ============================================
+     FORMULÁRIOS E INPUTS
+     ============================================ */
+  
+  /* Inputs e controles de formulário */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select,
+  .form-control {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input[type="date"]:focus,
+  input[type="time"]:focus,
+  input[type="datetime-local"]:focus,
+  input[type="search"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  textarea:focus,
+  select:focus,
+  .form-control:focus {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 184, 38, 0.25) !important;
+  }
+  
+  /* Placeholders */
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-text-tertiary) !important;
+  }
+  
+  /* Inputs desabilitados */
+  input:disabled,
+  textarea:disabled,
+  select:disabled,
+  .form-control:disabled {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text-disabled) !important;
+    opacity: 0.6;
+  }
+  
+  /* Input groups */
+  .input-group-addon {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  /* ============================================
+     TABELAS
+     ============================================ */
+  
+  table {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+  }
+  
+  thead,
+  tfoot {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+  }
+  
+  tbody {
+    background-color: var(--color-background) !important;
+  }
+  
+  th,
+  td {
+    border-color: var(--color-border) !important;
+    color: var(--color-text) !important;
+  }
+  
+  th {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+  }
+  
+  tr:hover {
+    background-color: var(--color-surface-light) !important;
+  }
+  
+  /* Tabelas Bootstrap */
+  .table {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--painel-linha-impar) !important;
+  }
+  
+  .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--painel-linha-par) !important;
+  }
+  
+  .table-hover > tbody > tr:hover {
+    background-color: var(--color-surface-light) !important;
+  }
+  
+  /* ============================================
+     LINKS E TEXTOS
+     ============================================ */
+  
+  a {
+    color: var(--color-primary-light) !important;
+  }
+  
+  a:hover,
+  a:focus {
+    color: var(--color-primary) !important;
+  }
+  
+  a:visited {
+    color: var(--color-primary-dark) !important;
+  }
+  
+  /* Links no cabeçalho */
+  .cabecalhoSistema a,
+  .cabecalhoSistema a.branco {
+    color: var(--color-text-inverse) !important;
+  }
+  
+  /* Classe branco - deve manter texto claro no tema escuro quando usado em backgrounds escuros */
+  .branco {
+    color: var(--color-text-inverse) !important;
+  }
+  
+  /* Quando branco é usado em elementos com background claro, usar texto escuro */
+  [data-theme="dark"] .branco:not(.cabecalhoSistema .branco) {
+    color: var(--color-text) !important;
+  }
+  
+  /* Usuário logado no cabeçalho - manter cor preta padrão */
+  #usuarioLogado,
+  #usuarioLogado h3,
+  #usuarioLogado h3.fl,
+  #usuarioLogado .fl,
+  #usuarioLogado span,
+  #usuarioLogado div {
+    color: #000000 !important; /* Preto padrão, mesmo no tema escuro */
+  }
+  
+  /* ============================================
+     LABELS E TEXTOS
+     ============================================ */
+  
+  label {
+    color: var(--color-text) !important;
+  }
+  
+  span,
+  p,
+  div {
+    color: var(--color-text) !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text) !important;
+  }
+  
+  /* ============================================
+     COMPONENTES BOOTSTRAP
+     ============================================ */
+  
+  /* Panels/Cards */
+  .panel {
+    background-color: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .panel-heading {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  .panel-body {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .panel-footer {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  /* Wells */
+  .well {
+    background-color: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* Modals */
+  .modal-content {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .modal-header {
+    background-color: var(--color-surface-light) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  .modal-body {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .modal-footer {
+    background-color: var(--color-surface-light) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  /* Dropdowns */
+  .dropdown-menu {
+    background-color: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  .dropdown-menu > li > a {
+    color: var(--color-text) !important;
+  }
+  
+  .dropdown-menu > li > a:hover,
+  .dropdown-menu > li > a:focus {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* ============================================
+     COMPONENTES ESPECÍFICOS DO SISTEMA
+     ============================================ */
+  
+  /* Cabeçalho de consulta */
+  .cabecalhoConsulta {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* Corpo principal */
+  .corpo {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* Conteúdo de estrutura gerencial */
+  .conteudoEstruturaGerencia,
+  #conteudoEstruturaGerencia {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* Item de dados do player */
+  .itemDadosPlayer {
+    color: var(--color-text) !important;
+  }
+  
+  /* Campo detalhe consulta */
+  .campoDetalheConsulta {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* Bloco detalhe consulta */
+  .blocoDetalheConsulta {
+    border-color: var(--color-border) !important;
+    background-color: var(--color-surface) !important;
+  }
+  
+  /* Item relacionado */
+  .itemRelacionado {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* Campo item consulta */
+  .campoItemConsulta {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* Div item consulta */
+  .divitemconsulta {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* Arquivo anexo */
+  .arquivoAnexo {
+    background-color: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  .arquivoAnexo label {
+    color: var(--color-text) !important;
+  }
+  
+  /* Quadro colar imagem */
+  .quadroColarImagem {
+    background-color: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  /* Conteúdo quadro copiar colar */
+  .conteudoQuadroCopiarColar {
+    background-color: var(--color-surface-light) !important;
+  }
+  
+  /* ============================================
+     FORMULÁRIO DE CADASTRO
+     ============================================ */
+  
+  /* Diretiva formulario-cadastro */
+  formulario-cadastro {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+  }
+  
+  formulario-cadastro .form-group {
+    background-color: transparent !important;
+    color: var(--color-text) !important;
+  }
+  
+  formulario-cadastro .form-group label {
+    color: var(--color-text) !important;
+  }
+  
+  formulario-cadastro .form-group input,
+  formulario-cadastro .form-group select,
+  formulario-cadastro .form-group textarea {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  formulario-cadastro .form-group input:focus,
+  formulario-cadastro .form-group select:focus,
+  formulario-cadastro .form-group textarea:focus {
+    background-color: var(--color-surface-light) !important;
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 184, 38, 0.25) !important;
+  }
+  
+  /* Div Item Cadastro */
+  .divItemCadastro {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  .divItemCadastro > label {
+    color: var(--color-text) !important;
+    background-color: transparent !important;
+  }
+  
+  .divItemCadastro .form-group {
+    background-color: transparent !important;
+  }
+  
+  .divItemCadastro .form-group label {
+    color: var(--color-text) !important;
+  }
+  
+  .divItemCadastro input,
+  .divItemCadastro select,
+  .divItemCadastro textarea,
+  .divItemCadastro .form-control {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  .divItemCadastro input:focus,
+  .divItemCadastro select:focus,
+  .divItemCadastro textarea:focus,
+  .divItemCadastro .form-control:focus {
+    background-color: var(--color-surface-elevated) !important;
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 184, 38, 0.25) !important;
+  }
+  
+  /* Item relacionado dentro de formulário */
+  .itemRelacionado .divItemCadastro {
+    background-color: var(--color-surface) !important;
+  }
+  
+  /* Form group geral dentro de formulários */
+  .form-group {
+    color: var(--color-text) !important;
+  }
+  
+  .form-group label {
+    color: var(--color-text) !important;
+  }
+  
+  .form-group .help-block,
+  .form-group .help-text {
+    color: var(--color-text-secondary) !important;
+  }
+  
+  /* Checkbox e radio dentro de formulários */
+  formulario-cadastro input[type="checkbox"],
+  formulario-cadastro input[type="radio"],
+  .divItemCadastro input[type="checkbox"],
+  .divItemCadastro input[type="radio"] {
+    filter: brightness(0.8) contrast(1.2);
+  }
+  
+  /* Input groups dentro de formulários */
+  formulario-cadastro .input-group,
+  .divItemCadastro .input-group {
+    background-color: transparent !important;
+  }
+  
+  formulario-cadastro .input-group-addon,
+  .divItemCadastro .input-group-addon {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  /* Botões dentro de formulários */
+  formulario-cadastro .btn,
+  .divItemCadastro .btn {
+    /* Botões já estão cobertos pelo bootstrap-buttons-theme.css */
+  }
+  
+  /* Mensagens de erro/validação dentro de formulários */
+  formulario-cadastro .text-danger,
+  formulario-cadastro .has-error,
+  .divItemCadastro .text-danger,
+  .divItemCadastro .has-error {
+    color: var(--color-error) !important;
+  }
+  
+  formulario-cadastro .text-success,
+  formulario-cadastro .has-success,
+  .divItemCadastro .text-success,
+  .divItemCadastro .has-success {
+    color: var(--color-success) !important;
+  }
+  
+  formulario-cadastro .text-warning,
+  formulario-cadastro .has-warning,
+  .divItemCadastro .text-warning,
+  .divItemCadastro .has-warning {
+    color: var(--color-warning) !important;
+  }
+  
+  /* Campos obrigatórios (asteriscos) */
+  formulario-cadastro label.required::after,
+  .divItemCadastro label.required::after,
+  formulario-cadastro .required::after,
+  .divItemCadastro .required::after {
+    color: var(--color-error) !important;
+  }
+  
+  /* Selects editáveis dentro de formulários */
+  formulario-cadastro .select-editavel,
+  .divItemCadastro .select-editavel {
+    background-color: transparent !important;
+  }
+  
+  formulario-cadastro .select-editavel .form-control,
+  .divItemCadastro .select-editavel .form-control {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  formulario-cadastro .select-editavel .form-control:focus,
+  .divItemCadastro .select-editavel .form-control:focus {
+    background-color: var(--color-surface-light) !important;
+    border-color: var(--painel-select-border-focus) !important;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px var(--painel-select-shadow-focus) !important;
+  }
+  
+  /* Alertas e mensagens dentro de formulários */
+  formulario-cadastro .alert,
+  .divItemCadastro .alert {
+    background-color: var(--color-surface-light) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text) !important;
+  }
+  
+  formulario-cadastro .alert-success,
+  .divItemCadastro .alert-success {
+    background-color: var(--color-success-alpha) !important;
+    border-color: var(--color-success) !important;
+    color: var(--color-success-light) !important;
+  }
+  
+  formulario-cadastro .alert-danger,
+  .divItemCadastro .alert-danger {
+    background-color: var(--color-error-alpha) !important;
+    border-color: var(--color-error) !important;
+    color: var(--color-error-light) !important;
+  }
+  
+  formulario-cadastro .alert-warning,
+  .divItemCadastro .alert-warning {
+    background-color: var(--color-warning-alpha) !important;
+    border-color: var(--color-warning) !important;
+    color: var(--color-warning-light) !important;
+  }
+  
+  formulario-cadastro .alert-info,
+  .divItemCadastro .alert-info {
+    background-color: var(--color-info-alpha) !important;
+    border-color: var(--color-info) !important;
+    color: var(--color-info-light) !important;
+  }
+  
+  /* Backgrounds do Bootstrap dentro de formulários */
+  formulario-cadastro .bg-success,
+  .divItemCadastro .bg-success {
+    background-color: var(--color-success-alpha) !important;
+    color: var(--color-success-light) !important;
+  }
+  
+  formulario-cadastro .bg-danger,
+  .divItemCadastro .bg-danger {
+    background-color: var(--color-error-alpha) !important;
+    color: var(--color-error-light) !important;
+  }
+  
+  formulario-cadastro .bg-warning,
+  .divItemCadastro .bg-warning {
+    background-color: var(--color-warning-alpha) !important;
+    color: var(--color-warning-light) !important;
+  }
+  
+  formulario-cadastro .bg-info,
+  .divItemCadastro .bg-info {
+    background-color: var(--color-info-alpha) !important;
+    color: var(--color-info-light) !important;
+  }
+  
+  /* Listas dentro de formulários */
+  formulario-cadastro ul,
+  formulario-cadastro ol,
+  .divItemCadastro ul,
+  .divItemCadastro ol {
+    color: var(--color-text) !important;
+  }
+  
+  formulario-cadastro li,
+  .divItemCadastro li {
+    color: var(--color-text) !important;
+  }
+  
+  /* Campos de data/time dentro de formulários */
+  formulario-cadastro input[type="date"]::-webkit-calendar-picker-indicator,
+  formulario-cadastro input[type="time"]::-webkit-calendar-picker-indicator,
+  .divItemCadastro input[type="date"]::-webkit-calendar-picker-indicator,
+  .divItemCadastro input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+  }
+  
+  /* Placeholders dentro de formulários */
+  formulario-cadastro input::placeholder,
+  formulario-cadastro textarea::placeholder,
+  .divItemCadastro input::placeholder,
+  .divItemCadastro textarea::placeholder {
+    color: var(--color-text-tertiary) !important;
+  }
+  
+  /* Autocomplete */
+  .ui-autocomplete {
+    background-color: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .ui-autocomplete .ui-menu-item {
+    background-color: var(--color-surface) !important;
+  }
+  
+  .ui-autocomplete .ui-menu-item:hover,
+  .ui-autocomplete .ui-menu-item.ui-state-active {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+  }
+  
+  /* ============================================
+     BORDAS E DIVISORES
+     ============================================ */
+  
+  hr {
+    border-color: var(--color-border) !important;
+  }
+  
+  .bordadecima {
+    border-top-color: var(--color-border) !important;
+  }
+  
+  .bordadebaixo {
+    border-bottom-color: var(--color-border) !important;
+  }
+  
+  .bordaD {
+    border-right-color: var(--color-border) !important;
+  }
+  
+  .bordaE {
+    border-left-color: var(--color-border) !important;
+  }
+  
+  .borda {
+    border-color: var(--color-border) !important;
+  }
+  
+  /* ============================================
+     CHECKBOXES E RADIOS
+     ============================================ */
+  
+  input[type="checkbox"],
+  input[type="radio"] {
+    filter: brightness(0.8) contrast(1.2);
+  }
+  
+  /* ============================================
+     SCROLLBARS (Webkit)
+     ============================================ */
+  
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-dark);
+    border-radius: 6px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-border);
+  }
+}

@@ -37,7 +37,7 @@ angular.module("servicos", ["ngMaterial", "ngMessages", "dialogoServices"]).fact
             
             var parametrosEnviar = angular.isObject(temp) ? angular.toJson(temp) : temp;            
             
-            console.log(config.baseUrl + classe + '/' + funcaoExecutar + '/' + parametrosEnviar);            
+          //  console.log(config.baseUrl + classe + '/' + funcaoExecutar + '/' + parametrosEnviar);            
             
             return $http.get(config.baseUrl + classe + '/' + funcaoExecutar + '/' + parametrosEnviar, { headers: headers });
         } else if (tipo == 'post') {

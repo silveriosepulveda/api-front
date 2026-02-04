@@ -23,7 +23,7 @@ div.modalPopUp {
     position: absolute;
     left: 0;
     top: 0;
-    background-color: red;
+    background-color: var(--color-error);
 }
 
 
@@ -45,7 +45,7 @@ div.modalPopUp {
 
 
 .input-group-addon.btn{
-    color: #FFFFFF;
+    color: var(--color-text-inverse);
 }
 
 .ui-autocomplete {
@@ -69,10 +69,10 @@ div.conteudoBusca div.row.itemConsulta{
         top: 60px;
         left: 0;
         z-index: 998;
-        background-color: #ffffff !important;
-        background: #ffffff !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border-bottom: 1px solid #e9ecef;
+        background-color: var(--color-background) !important;
+        background: var(--color-background) !important;
+        box-shadow: var(--painel-shadow-sm);
+        border-bottom: 1px solid var(--painel-borda-cabecalho);
         padding: 10px 0;
         margin: 0;        
         float: left;
@@ -118,7 +118,7 @@ div.conteudoBusca div.row.itemConsulta{
 }
 
 .form-control:focus, select:focus {
-    background-color: yellow;
+    background-color: var(--painel-focus-bg);
 }
 
 .conteudoBusca {
@@ -194,9 +194,9 @@ input[type='checkbox'], input[type='radio'] {
 }
 
 .erro {
-    background-color: #f2dede !important;
+    background-color: var(--painel-error-bg) !important;
     border-radius: 10px;
-    color: #FC6D49;
+    color: var(--painel-error-text);
 }
 
 .baixarbotao, .baixarBotao {
@@ -263,7 +263,7 @@ input[type='checkbox'], input[type='radio'] {
     -webkit-border-radius: 15px;
     border-radius: 15px;
     margin-bottom: 5px;
-    background-color: rgb(234, 240, 241) !important;
+    background-color: var(--painel-item-consulta-bg) !important;
 }
 
 .form-group {
@@ -340,11 +340,11 @@ formulario-cadastro .form-group label {
     -webkit-border-radius: 5px;
     border-radius: 20px;
     margin-bottom: 1px;
-    background-color: #ffffff
+    background-color: var(--color-background)
 }
 
 .fundoDetalheConsulta {
-    background: #ECECEC;
+    background: var(--painel-detalhe-bg);
     padding: 5px;
 }
 
@@ -355,7 +355,7 @@ formulario-cadastro .form-group label {
     border-radius: 10px;
     margin-bottom: 1px;
     margin-top: 1px;
-    background: #ffffff;
+    background: var(--color-background);
 }
 
 .arquivoAnexo {
@@ -401,48 +401,48 @@ formulario-cadastro .form-group label {
 }
 
 .linhaImpar {
-    background: #f3ebe3;
+    background: var(--painel-linha-impar);
 }
 
 .linhaPar {
-    background: #ecd5e0;
+    background: var(--painel-linha-par);
 }
 
 .div1 {
-    background: rgb(229, 231, 243)
+    background: var(--painel-div1)
 }
 
 .div2 {
-    background: rgb(230, 230, 238)
+    background: var(--painel-div2)
 }
 
 .div3 {
-    background: #E3E1FB;
+    background: var(--painel-div3);
 }
 
 .div4 {
-    background: rgba(234, 241, 235, 0.993);
+    background: var(--painel-div4);
 }
 
 .div5 {
-    background: rgb(243, 235, 236);
+    background: var(--painel-div5);
 }
 
 .div6 {
-    background: rgb(240, 241, 220);
+    background: var(--painel-div6);
 }
 
 .divit1 {
-    background: #FAF3A9;
+    background: var(--painel-divit1);
 }
 
 .divit2 {
-    background: #E8F4B5;
+    background: var(--painel-divit2);
 }
 
 .error {
-    border: 1px solid red;
-    color: red;
+    border: 1px solid var(--painel-error-border);
+    color: var(--color-error);
 }
 
 .borda {
@@ -456,7 +456,7 @@ formulario-cadastro .form-group label {
 /***************** REFERENTE AO ANEXAR POR COPIAR E COLAR ********************/
 
 .quadroColarImagem {
-    border: solid 1px #aaa;
+    border: solid 1px var(--painel-borda-cinza);
     min-height: 200px !important;
     width: 30%;
     margin-top: 1em;
@@ -475,7 +475,7 @@ formulario-cadastro .form-group label {
 }
 
 .quadroCopiarColarAtivo {
-    box-shadow: 0px 0px 10px 10px rgba(0, 0, 255, .4);
+    box-shadow: var(--painel-shadow-focus);
 }
 
 .quadroColarImagem select{   
@@ -653,35 +653,35 @@ formulario-cadastro .form-group label {
 /******************* CORES DE FUNDO *****************/
 
 .fundobranco, .fundoBranco {
-    background-color: #fff !important;
+    background-color: var(--color-background) !important;
 }
 
 .fundoAzul {
-    background: #879cc3;
+    background: var(--painel-fundo-azul);
 }
 
 .fundoazul {
-    background: #879cc3;
+    background: var(--painel-fundo-azul);
 }
 
 .fundoVermelho {
-    background: #FF7979 !important;
+    background: var(--painel-fundo-vermelho) !important;
 }
 
 .fundovermelho>label {
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .fundoVerde {
-    background: #97FF97 !important;
+    background: var(--painel-fundo-verde) !important;
 }
 
 .fundoCinza {
-    background: #D0D0D0;
+    background: var(--painel-fundo-cinza);
 }
 
 .fundoAmarelo {
-    background: #FAF3A9 !important;
+    background: var(--painel-fundo-amarelo) !important;
 }
 
 /********************* FONTS ***********************/
@@ -739,19 +739,19 @@ formulario-cadastro .form-group label {
 }
 
 .preto {
-    color: #000;
+    color: var(--painel-text-preto);
 }
 
 .vermelho {
-    color: #F00;
+    color: var(--painel-text-vermelho);
 }
 
 .verde {
-    color: #0EB112;
+    color: var(--painel-text-verde);
 }
 
 .branco {
-    color: #fff;
+    color: var(--color-text-inverse);
 }
 
 .georgia {
@@ -761,27 +761,27 @@ formulario-cadastro .form-group label {
 /******************CORES DE FONTE **************/
 
 .fontbranco {
-    color: #fff;
+    color: var(--color-text-inverse);
 }
 
 .fontcinzaclaro {
-    color: #91868d;
+    color: var(--painel-text-cinza-claro);
 }
 
 .fontcinza {
-    color: #909090;
+    color: var(--painel-text-cinza);
 }
 
 .fontlaranja {
-    color: #f58634
+    color: var(--painel-text-laranja)
 }
 
 .fonteazul {
-    color: #606DEE;
+    color: var(--painel-text-azul);
 }
 
 .fontevermelho {
-    color: red;
+    color: var(--color-error);
 }
 
 /**************** ALINHAMENTOS **********/
@@ -1231,7 +1231,7 @@ formulario-cadastro .form-group label {
 
 .barraProgressoTimer {
     height: 3px;
-    background-color: black;
+    background-color: var(--color-black);
     width: 100%;
     margin-top: 3px;
     margin-bottom: 1px;
@@ -1280,9 +1280,9 @@ formulario-cadastro .form-group label {
     right: 0;
     z-index: 1000;
     height: 60px;
-    background-color: #337ab7;
+    background-color: var(--painel-cabecalho-bg);
     padding: 10px 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: var(--painel-shadow-sm);
 }
 
 .cabecalhoSistema h3 {
@@ -1310,28 +1310,28 @@ body {
     top: 100%;
     left: 0;
     right: 0;
-    background: white;
-    border: 1px solid #ccc;
+    background: var(--color-background);
+    border: 1px solid var(--painel-borda-cinza-claro);
     border-top: none;
     max-height: 200px;
     overflow-y: auto;
     z-index: 9999;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    box-shadow: var(--painel-shadow-md);
     border-radius: 0 0 4px 4px;
 }
 
 .item-usuario {
     padding: 10px 12px;
     cursor: pointer;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--painel-borda-cinza-muito-claro);
     transition: background-color 0.2s;
-    color: #333;
+    color: var(--color-text);
     font-size: 14px;
 }
 
 .item-usuario:hover {
-    background-color: #e8f4f8;
-    color: #000;
+    background-color: var(--painel-select-bg-hover);
+    color: var(--painel-text-preto);
 }
 
 .item-usuario:last-child {
@@ -1347,8 +1347,8 @@ body {
 }
 
 .select-editavel .form-control:focus {
-    border-color: #66afe9;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(102,175,233,0.6);
+    border-color: var(--painel-select-border-focus);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px var(--painel-select-shadow-focus);
 }
 
 /* Z-index hierarchy for modal system compatibility */

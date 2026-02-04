@@ -1,0 +1,25 @@
+/**
+ * Sistema de Temas - PlayerOn
+ * Arquivo principal que carrega o tema ativo
+ * 
+ * Este arquivo importa o tema padrão (light) e temas alternativos.
+ * O tema claro é aplicado em :root por padrão.
+ * Para adicionar novos temas, importe-os aqui e use o ThemeManager para alternar.
+ */
+
+/* Importar tema claro (padrão) - aplicado em :root */
+@import url('themes/theme-light.css');
+
+/* Importar tema escuro (opcional) - aplicado quando data-theme="dark" */
+@import url('themes/theme-dark.css');
+
+/* Overrides específicos para tema escuro (elementos básicos HTML, forms, tables, etc.) */
+@import url('themes/theme-dark-overrides.css');
+
+/* 
+ * Para adicionar novos temas:
+ * 1. Crie um arquivo theme-[nome].css em themes/
+ * 2. Use o seletor [data-theme="nome"]
+ * 3. Importe aqui: @import url('themes/theme-[nome].css');
+ * 4. Use ThemeManager.setTheme('nome') para ativar
+ */
