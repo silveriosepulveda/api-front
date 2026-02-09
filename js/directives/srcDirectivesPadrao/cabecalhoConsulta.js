@@ -128,9 +128,9 @@ app.directive("cabecalhoConsulta", [
         restrict: "E",
         replace: true,
         template: `
-        <div class="col-xs-12" ng-if="tela == 'consulta' && tipoListaConsulta == 'lista'">
+        <div class="col-xs-12 div4" ng-if="tela == 'consulta' && tipoListaConsulta == 'lista'">
                 <div class="row">
-                    <div class="col-xs-12 col-md-6 div4 bordaQuadrada">
+                    <div class="col-xs-12 col-md-6 ">
                         <div class="row">
                             <div class="col-xs-1">
                                 <input type="checkbox" ng-if="opcaoSelecionarTodosItensConsulta" name="todosItensSelecionados" id="todosItensSelecionados"
@@ -158,7 +158,7 @@ app.directive("cabecalhoConsulta", [
                     <div ng-if="estrutura.camposFiltroPersonalizado == undefined">
                         <div class="col-xs-8 col-sm-4 form-group superFiltro">
                             <div class="input-group">
-                                <input type="text" ng-change="alterarFiltroResultado(filtroResultado)" ng-model="filtroResultado" class="form-control top05"
+                                <input type="text" ng-change="alterarFiltroResultado(filtroResultado)" ng-model="filtroResultado" class="form-control"
                                     placeholder="Buscar nos Ítens da Tela" id="filtro_resultado">
                                 <span class="input-group-btn glyphicon glyphicon-erase btn btn-default" ng-click="limparFiltroResultado(filtroResultado)"></span>
                             </div>

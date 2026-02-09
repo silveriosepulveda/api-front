@@ -406,9 +406,13 @@ directivesPadrao.directive('autoCompleta', ['$rootScope', '$parse', 'APIServ', '
 
                         var idChaveObjeto = EGFuncoes.indexPorNumero(event, aC.objChave3);
                         
+                        try {
                         var chave3Objeto = eval('scope' + '.' + idChaveObjeto) != undefined ? eval('scope' + '.' + idChaveObjeto) :
-                            eval('$rootScope' + '.' + idChaveObjeto) != undefined ? eval('$rootScope' + '.' + idChaveObjeto) : 
-                            eval('scope.' + e.raizModelo + '.' + idChaveObjeto) != undefined ? eval('scope.' + e.raizModelo + '.' + idChaveObjeto) : undefined;
+                              eval('$rootScope' + '.' + idChaveObjeto) != undefined ? eval('$rootScope' + '.' + idChaveObjeto) : 
+                              eval('scope.' + e.raizModelo + '.' + idChaveObjeto) != undefined ? eval('scope.' + e.raizModelo + '.' + idChaveObjeto) : undefined;
+                        } catch (e) {
+                            //console.log(e);
+                        }
 
                         //console.log( eval('scope.' + e.raizModelo), idChaveObjeto, chave3Objeto);
 

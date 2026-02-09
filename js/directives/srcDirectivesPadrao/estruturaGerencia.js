@@ -222,7 +222,6 @@ app.directive("estruturaGerencia", [
 
                 let nomeFiltroTemp = "filtroTemp_" + acao;
                 let filtroTemp = APIServ.buscaDadosLocais(nomeFiltroTemp);
-                console.log(nomeFiltroTemp, filtroTemp);
 
                 escopo.parametrosUrl = parametrosUrl;
 
@@ -635,8 +634,6 @@ app.directive("estruturaGerencia", [
                             escopo.filtros.splice(0, 1);
                         }
                     }
-
-                    console.log(escopo.filtros);
 
                     escopo.converterFiltroParaEnvio = function () {
                         var retorno = [];

@@ -3,6 +3,7 @@
 [lazy-load-container] {
     max-height: 70vh;
     overflow-y: auto;
+    overflow-x: hidden; /* Remove scroll horizontal */
     position: relative;
 }
 
@@ -23,16 +24,7 @@
     50% { opacity: 1; }
 }
 
-/* Melhoria no visual dos itens da consulta */
-.itemConsulta {
-    border-bottom: 1px solid #eee;
-    padding: 10px 0;
-    transition: background-color 0.2s ease;
-}
-
-.itemConsulta:hover {
-    background-color: #f8f9fa;
-}
+/* Estilos de hover para itemConsulta são definidos em painel.css para maior especificidade */
 
 /* Botão carregar mais */
 .btn-carregar-mais {

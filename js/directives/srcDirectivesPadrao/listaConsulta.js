@@ -285,7 +285,9 @@ directivesPadrao
                     elem.html(html);
                     $(elem).css("margin-top", "400px !important");
 
-                    // Implementação do Lazy Loading
+                    // ========== IMPLEMENTAÇÃO DO LAZY LOADING OTIMIZADA ==========
+                    
+                    // Variáveis de estado
                     scope.listaConsultaVisivel = [];
                     scope.carregandoMaisItens = false;
                     scope.temMaisItens = true;
@@ -315,19 +317,36 @@ directivesPadrao
                                 novaLista.length > scope.listaConsultaCompleta.length;
 
                             if (mudancaExterna) {
-                                // Salvar como lista completa apenas se for mudança externa
-                                scope.listaConsultaCompleta = angular.copy(novaLista);
+                                // Verificar se é lazy load (lista aumentou mas não é primeira vez)
+                                var isLazyLoad = scope.listaConsultaCompleta.length > 0 && 
+                                                novaLista.length > scope.listaConsultaCompleta.length &&
+                                                !scope.filtroResultadoAtivo;
+                                
+                                if (isLazyLoad) {
+                                    // É lazy load: atualizar lista completa e carregar novos itens
+                                    scope.listaConsultaCompleta = angular.copy(novaLista);
+                                    scope.carregandoMaisItens = false;
+                                    scope.carregarDaListaAtual();
+                                } else {
+                                    // É primeira carga ou reset: inicializar do zero
+                                    scope.listaConsultaCompleta = angular.copy(novaLista);
+                                    scope.carregandoMaisItens = false;
 
-                                // Se não há filtro ativo, inicializar carregamento
-                                if (!scope.filtroResultadoAtivo) {
-                                    scope.listaConsultaVisivel = [];
-                                    scope.ultimaPaginaCarregada = 0;
-                                    scope.temMaisItens = true;
-                                    setTimeout(function () {
-                                        scope.carregarMaisItens();
-                                    }, 100);
+                                    // Se não há filtro ativo, inicializar carregamento
+                                    if (!scope.filtroResultadoAtivo) {
+                                        scope.listaConsultaVisivel = [];
+                                        scope.ultimaPaginaCarregada = 0;
+                                        scope.temMaisItens = true;
+                                        setTimeout(function () {
+                                            scope.carregarMaisItens();
+                                        }, 100);
+                                    }
                                 }
                             }
+                        } else if (novaLista && novaLista.length === 0) {
+                            // Se lista ficou vazia, resetar flag
+                            scope.carregandoMaisItens = false;
+                            scope.temMaisItens = false;
                         }
                     });
 
@@ -338,9 +357,9 @@ directivesPadrao
                             // Evitar trigger do watch durante atualização interna
                             watchingUpdate = true;
                             scope.listaConsulta = [];
-                            setTimeout(function () {
+                            scope.$evalAsync(function() {
                                 watchingUpdate = false;
-                            }, 0);
+                            });
                             return;
                         }
 
@@ -358,9 +377,9 @@ directivesPadrao
                         // Atualizar listaConsulta com o resultado filtrado (evitar trigger do watch)
                         watchingUpdate = true;
                         scope.listaConsulta = angular.copy(scope.listaConsultaFiltrada);
-                        setTimeout(function () {
+                        scope.$evalAsync(function() {
                             watchingUpdate = false;
-                        }, 0);
+                        });
 
                         // Resetar lista visível para mostrar itens filtrados
                         scope.listaConsultaVisivel = [];
@@ -464,7 +483,9 @@ directivesPadrao
                         }
                     });
 
-                    // Função para carregar mais itens
+                    // ========== FUNÇÕES DE CARREGAMENTO OTIMIZADAS ==========
+
+                    // Função para carregar mais itens - REMOVIDO DELAY DE 300ms
                     scope.carregarMaisItens = function () {
                         if (scope.carregandoMaisItens || !scope.temMaisItens) {
                             return;
@@ -473,24 +494,14 @@ directivesPadrao
                         scope.carregandoMaisItens = true;
                         scope.ultimaPaginaCarregada++;
 
-                        // Simular delay de carregamento (pode ser removido em produção)
-                        setTimeout(function () {
-                            // Solicitar novos dados do backend
-                            scope.carregarDadosLazyLoad();
-                        }, 300);
+                        // Removido setTimeout de 300ms - carregar IMEDIATAMENTE
+                        scope.carregarDadosLazyLoad();
                     };
 
                     // Função para carregar dados do backend
                     scope.carregarDadosLazyLoad = function () {
                         if (scope.$parent && scope.$parent.filtrar) {
-                            // Usar a função filtrar existente mas com parâmetros de lazy loading
-                            var parametrosLazyLoad = {
-                                pagina: scope.ultimaPaginaCarregada,
-                                itensPagina: scope.itensPorCarregamento,
-                                lazyLoad: true, // Flag para indicar que é carregamento lazy
-                            };
-
-                            // Chamar função filtrar do escopo pai
+                            // Chamar função filtrar do escopo pai IMEDIATAMENTE
                             scope.$parent.filtrar(scope.ultimaPaginaCarregada, "lazyLoad");
                         } else {
                             // Fallback: carregar da lista atual
@@ -532,13 +543,18 @@ directivesPadrao
                         }
                     };
 
-                    // Configurar scroll infinito
+                    // Configurar scroll infinito - MANTENDO ESTRUTURA ORIGINAL MAS OTIMIZADA
                     setTimeout(function () {
                         var container = elem.find("[lazy-load-container]");
                         if (container.length > 0) {
                             container.on("scroll", function () {
                                 var element = this;
-                                if (element.scrollTop + element.clientHeight >= element.scrollHeight - 100) {
+                                // Verificar se já está carregando para evitar múltiplas chamadas
+                                if (scope.carregandoMaisItens || !scope.temMaisItens) {
+                                    return;
+                                }
+                                // Aumentar distância de 100 para 200 para começar a carregar antes
+                                if (element.scrollTop + element.clientHeight >= element.scrollHeight - 200) {
                                     scope.$apply(function () {
                                         scope.carregarMaisItens();
                                     });
@@ -548,10 +564,26 @@ directivesPadrao
 
                         // Fallback: usar scroll da window
                         $(window).on("scroll", function () {
-                            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
+                            // Verificar se já está carregando para evitar múltiplas chamadas
+                            if (scope.carregandoMaisItens || !scope.temMaisItens) {
+                                return;
+                            }
+                            // Aumentar distância de 200 para 300 para começar a carregar antes
+                            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 300) {
                                 scope.$apply(function () {
                                     scope.carregarMaisItens();
                                 });
+                            }
+                        });
+                        
+                        // Limpar listeners no destroy
+                        scope.$on('$destroy', function() {
+                            if (container.length > 0) {
+                                container.off("scroll");
+                            }
+                            $(window).off("scroll");
+                            if (filtroTimeout) {
+                                clearTimeout(filtroTimeout);
                             }
                         });
                     }, 500);

@@ -123,7 +123,8 @@ div.conteudoBusca div.row.itemConsulta{
 
 .conteudoBusca {
     max-height: 700px !important;
-    overflow-x: auto;
+    overflow-x: hidden; /* Removido scroll horizontal */
+    overflow-y: auto; /* Mantém scroll vertical */
     height: calc(100%);
 }
 
@@ -258,12 +259,34 @@ input[type='checkbox'], input[type='radio'] {
 
 .itemConsulta {
     padding: 5px;
+    padding-right: 8px; /* Espaço reservado para compensar o deslocamento no hover */
     /* border-bottom: 0 !important; */
     -moz-border-radius: 15px;
     -webkit-border-radius: 15px;
     border-radius: 15px;
     margin-bottom: 5px;
     background-color: var(--painel-item-consulta-bg) !important;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    box-sizing: border-box; /* Garante que padding e border não aumentem o tamanho total */
+}
+
+/* Hover melhorado para identificação visual */
+.itemConsulta:hover {
+    background-color: var(--color-primary-alpha-20, rgba(220, 184, 38, 0.15)) !important;
+    border-left-color: var(--color-primary, #dcb826) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(3px);
+    padding-left: 8px;
+    padding-right: 5px; /* Reduz padding-right proporcionalmente ao deslocamento */
+}
+
+/* Ajuste para tema escuro */
+[data-theme="dark"] .itemConsulta:hover {
+    background-color: rgba(220, 184, 38, 0.2) !important;
+    border-left-color: var(--color-text, #dcb826) !important;
+    box-shadow: 0 2px 8px rgba(220, 184, 38, 0.3);
 }
 
 .form-group {
@@ -340,7 +363,23 @@ formulario-cadastro .form-group label {
     -webkit-border-radius: 5px;
     border-radius: 20px;
     margin-bottom: 1px;
-    background-color: var(--color-background)
+    background-color: var(--color-background);
+    transition: all 0.2s ease;
+}
+
+/* Efeito nos campos quando itemConsulta está em hover */
+.itemConsulta:hover .campoItemConsulta {
+    background-color: var(--color-primary-alpha-20, rgba(220, 184, 38, 0.1));
+    color: var(--color-text, #333);
+    transform: scale(1.01);
+    box-shadow: 0 1px 4px rgba(220, 184, 38, 0.15);
+}
+
+/* Ajuste para tema escuro */
+[data-theme="dark"] .itemConsulta:hover .campoItemConsulta {
+    background-color: rgba(220, 184, 38, 0.12);
+    color: var(--color-text, #dcb826);
+    box-shadow: 0 1px 4px rgba(220, 184, 38, 0.25);
 }
 
 .fundoDetalheConsulta {
@@ -674,6 +713,21 @@ formulario-cadastro .form-group label {
 
 .fundoVerde {
     background: var(--painel-fundo-verde) !important;
+}
+
+/* Bordas usando as mesmas cores dos fundos */
+.bordaVerde,
+.bordaverde {
+    border: 1px solid var(--painel-fundo-verde) !important;
+    padding-right: 1px !important;
+    padding-left: 1px !important;
+}
+
+.bordaVermelha,
+.bordavermelha {
+    border: 1px solid var(--painel-fundo-vermelho) !important;
+    padding-right: 1px !important;
+    padding-left: 1px !important;
 }
 
 .fundoCinza {
@@ -1229,11 +1283,12 @@ formulario-cadastro .form-group label {
     margin-top: -30px;
 }
 
+/* Barra de progresso do timer - Estilos base */
 .barraProgressoTimer {
     height: 3px;
     background-color: var(--color-black);
     width: 100%;
-    margin-top: 3px;
+    margin-top: 10px;
     margin-bottom: 1px;
 }
 

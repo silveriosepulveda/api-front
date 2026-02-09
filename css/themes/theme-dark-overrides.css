@@ -670,6 +670,17 @@
     color: var(--color-text-inverse) !important;
   }
   
+  /* Bordas usando as mesmas cores dos fundos - Tema Escuro */
+  /* .bordaVerde,
+  .bordaverde {
+    border: 2px solid var(--painel-fundo-verde) !important;
+  }
+  
+  .bordaVermelha,
+  .bordavermelha {
+    border: 2px solid var(--painel-fundo-vermelho) !important;
+  } */
+  
   /* Fundo Azul */
   .fundoAzul,
   .fundoazul {
@@ -793,5 +804,31 @@
   
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-border);
+  }
+  
+  /* ============================================
+     BARRA DE PROGRESSO DO TIMER
+     ============================================ */
+  
+  .barraProgressoTimer {
+    margin-top: 10px !important;
+    height: 3px;
+    background-color: rgba(220, 184, 38, 0.2) !important; /* Fundo dourado suave */
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Barra de progresso animada com cor primária dourada */
+  .barraProgressoTimer.animate {
+    background-color: var(--color-primary, #dcb826) !important;
+    background: linear-gradient(90deg, 
+      var(--color-primary, #dcb826) 0%, 
+      var(--color-primary-light, #e8c94a) 50%, 
+      var(--color-primary, #dcb826) 100%) !important;
+  }
+  
+  .barraProgressoTimer.pause {
+    animation-play-state: paused;
   }
 }
