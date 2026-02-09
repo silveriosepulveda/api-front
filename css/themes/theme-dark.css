@@ -326,17 +326,17 @@
   /* Botão Warning - Laranja ajustado para tema escuro */
   --btn-warning-bg: var(--color-warning);
   --btn-warning-border: var(--color-warning);
-  --btn-warning-color: var(--color-text);
+  --btn-warning-color: #000000; /* Preto para melhor contraste no fundo laranja/amarelo */
   --btn-warning-hover-bg: var(--color-warning-light);
   --btn-warning-hover-border: var(--color-warning-light);
-  --btn-warning-hover-color: var(--color-text);
+  --btn-warning-hover-color: #000000; /* Preto no hover também */
   --btn-warning-active-bg: var(--color-warning-light);
   --btn-warning-active-border: var(--color-warning-light);
-  --btn-warning-active-color: var(--color-text);
+  --btn-warning-active-color: #000000; /* Preto no active também */
   --btn-warning-focus-shadow: 0 0 0 0.2rem rgba(255, 183, 77, 0.4);
   --btn-warning-disabled-bg: rgba(255, 183, 77, 0.4);
   --btn-warning-disabled-border: rgba(255, 183, 77, 0.4);
-  --btn-warning-disabled-color: var(--color-text);
+  --btn-warning-disabled-color: #333333; /* Cinza escuro para disabled */
   
   /* Botão Info - Azul ajustado para tema escuro */
   --btn-info-bg: var(--color-info);

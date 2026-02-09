@@ -634,6 +634,109 @@
   }
   
   /* ============================================
+     CLASSES DE FUNDO COLORIDO - TEMA ESCURO
+     Garantir que funcionem mesmo no tema escuro
+     ============================================ */
+  
+  /* Fundo Vermelho */
+  .fundoVermelho,
+  .fundovermelho {
+    background: var(--painel-fundo-vermelho) !important;
+    color: var(--color-text-inverse) !important;
+  }
+  
+  .fundoVermelho label,
+  .fundovermelho label,
+  .fundoVermelho span,
+  .fundovermelho span,
+  .fundoVermelho .branco,
+  .fundovermelho .branco {
+    color: var(--color-text-inverse) !important;
+  }
+  
+  /* Fundo Verde */
+  .fundoVerde,
+  .fundoverde {
+    background: var(--painel-fundo-verde) !important;
+    color: var(--color-text-inverse) !important;
+  }
+  
+  .fundoVerde label,
+  .fundoverde label,
+  .fundoVerde span,
+  .fundoverde span,
+  .fundoVerde .branco,
+  .fundoverde .branco {
+    color: var(--color-text-inverse) !important;
+  }
+  
+  /* Fundo Azul */
+  .fundoAzul,
+  .fundoazul {
+    background: var(--painel-fundo-azul) !important;
+    color: var(--color-text-inverse) !important;
+  }
+  
+  .fundoAzul label,
+  .fundoazul label,
+  .fundoAzul span,
+  .fundoazul span,
+  .fundoAzul .branco,
+  .fundoazul .branco {
+    color: var(--color-text-inverse) !important;
+  }
+  
+  /* Fundo Amarelo */
+  .fundoAmarelo,
+  .fundoamarelo {
+    background: var(--painel-fundo-amarelo) !important;
+    color: var(--color-text) !important; /* Texto escuro no amarelo */
+  }
+  
+  .fundoAmarelo label,
+  .fundoamarelo label,
+  .fundoAmarelo span,
+  .fundoamarelo span {
+    color: var(--color-text) !important;
+  }
+  
+  /* Fundo Amarelo com classe branco - usar texto claro */
+  .fundoAmarelo.branco,
+  .fundoamarelo.branco,
+  .fundoAmarelo .branco,
+  .fundoamarelo .branco {
+    color: var(--color-text-inverse) !important;
+  }
+  
+  /* Fundo Cinza */
+  .fundoCinza,
+  .fundocinza {
+    background: var(--painel-fundo-cinza) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .fundoCinza label,
+  .fundocinza label,
+  .fundoCinza span,
+  .fundocinza span {
+    color: var(--color-text) !important;
+  }
+  
+  /* Campo Item Consulta com fundo colorido */
+  .campoItemConsulta.fundoVermelho,
+  .campoItemConsulta.fundovermelho,
+  .campoItemConsulta.fundoVerde,
+  .campoItemConsulta.fundoverde,
+  .campoItemConsulta.fundoAzul,
+  .campoItemConsulta.fundoazul,
+  .campoItemConsulta.fundoAmarelo,
+  .campoItemConsulta.fundoamarelo,
+  .campoItemConsulta.fundoCinza,
+  .campoItemConsulta.fundocinza {
+    /* Manter as cores de fundo definidas acima */
+  }
+  
+  /* ============================================
      BORDAS E DIVISORES
      ============================================ */
   
