@@ -1157,49 +1157,68 @@ app.directive("estruturaGerencia", [
 
                                         var cadastroDiretoUrl = parametrosUrl[2] != undefined && parametrosUrl[2] == "cadastro" ? true : false;
                                         var funcao = function () {
-                                            if (EGFuncoes.temConsulta(escopo.estrutura) && !cadastroDiretoUrl) {
-                                                escopo.tela = "consulta";
-
-                                                setTimeout(function () {
-                                                    //angular.element('#filtrar').trigger('click');
-                                                    if (escopo.estrutura.filtrarAoIniciar != undefined && escopo.estrutura.filtrarAoIniciar) {
-                                                        escopo.filtrar();
-                                                    }
-                                                }, 100);
+                                            // Envolver alterações do escopo com $apply para garantir propagação
+                                            if (!$scope.$$phase && !$rootScope.$$phase) {
+                                                $scope.$apply(function() {
+                                                    executarFuncaoInterna();
+                                                });
+                                            } else {
+                                                // Se já está em digest cycle, executar diretamente
+                                                executarFuncaoInterna();
                                             }
+                                            
+                                            function executarFuncaoInterna() {
+                                                if (EGFuncoes.temConsulta(escopo.estrutura) && !cadastroDiretoUrl) {
+                                                    escopo.tela = "consulta";
 
-                                            // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
-                                            if (
-                                                (escopo.estrutura.recarregarAposSalvar != undefined && escopo.estrutura.recarregarAposSalvar) ||
-                                                cadastroDiretoUrl
-                                            ) {
-                                                // Se estiver em modal, não recarregar a página - apenas fechar o modal
-                                                if (escopo.isModal || (escopo.localExibicao && escopo.localExibicao === "modal")) {
-                                                    console.log("🎭 [estruturaGerencia] Contexto modal detectado - evitando window.location.reload()");
+                                                    setTimeout(function () {
+                                                        //angular.element('#filtrar').trigger('click');
+                                                        if (escopo.estrutura.filtrarAoIniciar != undefined && escopo.estrutura.filtrarAoIniciar) {
+                                                            // Garantir que filtrar também seja executado dentro do digest cycle
+                                                            if (!$scope.$$phase && !$rootScope.$$phase) {
+                                                                $scope.$apply(function() {
+                                                                    escopo.filtrar();
+                                                                });
+                                                            } else {
+                                                                escopo.filtrar();
+                                                            }
+                                                        }
+                                                    }, 100);
+                                                }
 
-                                                    // Fechar apenas o modal que contém este formulário
-                                                    if (PopUpModal && typeof PopUpModal.identificarEFecharModalAtual === "function") {
-                                                        PopUpModal.identificarEFecharModalAtual($element[0]);
-                                                    }
+                                                // CORREÇÃO: Verificar se estamos em contexto modal antes de recarregar
+                                                if (
+                                                    (escopo.estrutura.recarregarAposSalvar != undefined && escopo.estrutura.recarregarAposSalvar) ||
+                                                    cadastroDiretoUrl
+                                                ) {
+                                                    // Se estiver em modal, não recarregar a página - apenas fechar o modal
+                                                    if (escopo.isModal || (escopo.localExibicao && escopo.localExibicao === "modal")) {
+                                                        console.log("🎭 [estruturaGerencia] Contexto modal detectado - evitando window.location.reload()");
 
-                                                    // Resetar modelo se necessário
-                                                    if (escopo.estrutura.raizModelo) {
-                                                        $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
+                                                        // Fechar apenas o modal que contém este formulário
+                                                        if (PopUpModal && typeof PopUpModal.identificarEFecharModalAtual === "function") {
+                                                            PopUpModal.identificarEFecharModalAtual($element[0]);
+                                                        }
+
+                                                        // Resetar modelo se necessário
+                                                        if (escopo.estrutura.raizModelo) {
+                                                            $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
+                                                        }
+                                                    } else {
+                                                        // Comportamento normal fora do modal
+                                                        //window.location.reload();
                                                     }
                                                 } else {
-                                                    // Comportamento normal fora do modal
-                                                    //window.location.reload();
+                                                    $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
                                                 }
-                                            } else {
-                                                $scope[escopo.estrutura.raizModelo] = EGFuncoes.novaVariavelRaizModelo(escopo.estrutura);
-                                            }
-                                            if (angular.element("#popUp").val() == "true") {
-                                                window.close();
-                                            }
-                                            if (escopo.estrutura.executarAposSalvar != undefined) {
-                                                $scope[escopo.estrutura.executarAposSalvar.funcao](retorno);
-                                            } else if (escopo.executarAposSalvar != undefined) {
-                                                escopo.executarAposSalvar();
+                                                if (angular.element("#popUp").val() == "true") {
+                                                    window.close();
+                                                }
+                                                if (escopo.estrutura.executarAposSalvar != undefined) {
+                                                    $scope[escopo.estrutura.executarAposSalvar.funcao](retorno);
+                                                } else if (escopo.executarAposSalvar != undefined) {
+                                                    escopo.executarAposSalvar();
+                                                }
                                             }
                                         };
 

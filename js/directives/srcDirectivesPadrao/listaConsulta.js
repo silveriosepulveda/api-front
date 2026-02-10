@@ -250,8 +250,25 @@ directivesPadrao
                     var diretivaDetalhes = parametros.diretivaDetalhesConsulta != undefined ? parametros.diretivaDetalhesConsulta : "detalhes-item-consulta";
                     html += `<${diretivaDetalhes}></${diretivaDetalhes}>`;
 
+                    console.log(parametros);
                     if (parametros.anexos != undefined) {
-                        html += `<arquivos-anexos tela="detalhes" chave-array="key"></arquivos-anexos>`;
+                        console.log('anexos');
+                        
+                        // Criar função helper para encontrar o índice do item em listaConsulta
+                        scope.encontrarIndiceItem = function(item) {
+                            if (!scope.listaConsulta || !item || !parametros.campo_chave) {
+                                return -1;
+                            }
+                            var campoChave = parametros.campo_chave;
+                            for (var i = 0; i < scope.listaConsulta.length; i++) {
+                                if (scope.listaConsulta[i] && scope.listaConsulta[i][campoChave] === item[campoChave]) {
+                                    return i;
+                                }
+                            }
+                            return -1;
+                        };
+                        
+                        html += `<arquivos-anexos tela="detalhes" chave-array="{{encontrarIndiceItem(item)}}"></arquivos-anexos>`;
                     }
 
                     html += `

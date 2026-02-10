@@ -422,6 +422,75 @@
     border-color: var(--color-border) !important;
   }
   
+  /* Fundo Detalhe Consulta - Ajustes para tema escuro */
+  .fundoDetalheConsulta {
+    background: var(--painel-detalhe-bg) !important;
+    color: var(--color-text) !important;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid var(--color-border) !important;
+  }
+  
+  .fundoDetalheConsulta h4,
+  .fundoDetalheConsulta h3,
+  .fundoDetalheConsulta h2,
+  .fundoDetalheConsulta h1,
+  .fundoDetalheConsulta .campoItemConsulta,
+  .fundoDetalheConsulta .fundobranco {
+    color: var(--color-text) !important;
+  }
+  
+  .fundoDetalheConsulta .campoDetalheConsulta {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .fundoDetalheConsulta label,
+  .fundoDetalheConsulta span,
+  .fundoDetalheConsulta div,
+  .fundoDetalheConsulta p {
+    color: var(--color-text) !important;
+  }
+  
+  .fundoDetalheConsulta .row {
+    color: var(--color-text) !important;
+  }
+  
+  /* Tabelas dentro de fundoDetalheConsulta */
+  .fundoDetalheConsulta table {
+    color: var(--color-text) !important;
+  }
+  
+  .fundoDetalheConsulta table td,
+  .fundoDetalheConsulta table th {
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  .fundoDetalheConsulta table thead th {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+  }
+  
+  .fundoDetalheConsulta table tbody tr {
+    background-color: var(--color-background) !important;
+  }
+  
+  .fundoDetalheConsulta table tbody tr:nth-child(even) {
+    background-color: var(--color-surface) !important;
+  }
+  
+  /* Inputs e controles dentro de fundoDetalheConsulta */
+  .fundoDetalheConsulta input,
+  .fundoDetalheConsulta select,
+  .fundoDetalheConsulta textarea,
+  .fundoDetalheConsulta .form-control {
+    background-color: var(--color-surface-light) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
   .divItemCadastro input:focus,
   .divItemCadastro select:focus,
   .divItemCadastro textarea:focus,
