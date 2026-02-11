@@ -149,7 +149,7 @@ app.directive("cabecalhoConsulta", [
                                             ng-click="alterarExibicaoConsulta()"></button>
                                     </div>
                                     <div class="col-xs-6 refreshConsulta" ng-if="!exibirConsulta">
-                                        <button class="btn btn-primary glyphicon glyphicon-refresh"></button>
+                                        <button id="botaoRefreshConsulta" class="btn btn-primary glyphicon glyphicon-refresh"></button>
                                     </div>
                                 </div>
                             </div>

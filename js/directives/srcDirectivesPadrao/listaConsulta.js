@@ -369,15 +369,21 @@ directivesPadrao
 
                     // Função para filtrar itens da lista baseado no filtroResultado
                     scope.aplicarFiltroResultado = function () {
+                        // Se listaConsultaCompleta ainda não foi inicializada, usar listaConsulta como fallback
                         if (!scope.listaConsultaCompleta || scope.listaConsultaCompleta.length === 0) {
-                            scope.listaConsultaFiltrada = [];
-                            // Evitar trigger do watch durante atualização interna
-                            watchingUpdate = true;
-                            scope.listaConsulta = [];
-                            scope.$evalAsync(function() {
-                                watchingUpdate = false;
-                            });
-                            return;
+                            // Se listaConsulta tem dados, usar ela como base e atualizar listaConsultaCompleta
+                            if (scope.listaConsulta && scope.listaConsulta.length > 0) {
+                                scope.listaConsultaCompleta = angular.copy(scope.listaConsulta);
+                            } else {
+                                // Se ambas estão vazias, limpar tudo
+                                scope.listaConsultaFiltrada = [];
+                                watchingUpdate = true;
+                                scope.listaConsulta = [];
+                                scope.$evalAsync(function() {
+                                    watchingUpdate = false;
+                                });
+                                return;
+                            }
                         }
 
                         var filtro = scope.filtroResultadoAtivo;

@@ -699,6 +699,7 @@ app.directive("estruturaGerencia", [
                         }
                     };
 
+
                     //Vendo se a funcao de filtrar e personalizada e tem outro nome
                     if (escopo.estrutura.funcaoFiltrar != undefined) {
                         escopo.filtrar = eval("escopo." + escopo.estrutura.funcaoFiltrar);
@@ -889,7 +890,18 @@ app.directive("estruturaGerencia", [
                                                         novaListaDefinitiva.push(listaAtual[x]);
                                                     }
                                                 }
+                                                
+                                                // Atribuir lista completa - a diretiva listaConsulta aplicará o filtro se necessário
                                                 $parse("listaConsulta").assign($scope, novaListaDefinitiva);
+                                                
+                                                // Se há filtroResultado, aplicar após um delay maior para garantir que a diretiva atualizou listaConsultaCompleta
+                                                if (escopo.filtroResultado && escopo.filtroResultado.trim() !== "") {
+                                                    setTimeout(function() {
+                                                        if (escopo.aplicarFiltroResultado && typeof escopo.aplicarFiltroResultado === "function") {
+                                                            escopo.aplicarFiltroResultado();
+                                                        }
+                                                    }, 300);
+                                                }
                                             }
                                         } else {
                                             // Implementação do Lazy Loading
@@ -904,7 +916,17 @@ app.directive("estruturaGerencia", [
                                                     var itensExistentes = escopo.listaConsulta.map((item) => item[estrutura.campo_chave]);
                                                     var novosItens = data.lista.filter((item) => !itensExistentes.includes(item[estrutura.campo_chave]));
 
+                                                    // Adicionar novos itens à lista completa
                                                     escopo.listaConsulta = escopo.listaConsulta.concat(novosItens);
+                                                    
+                                                    // Se há filtroResultado, aplicar após um delay para garantir que a diretiva atualizou listaConsultaCompleta
+                                                    if (escopo.filtroResultado && escopo.filtroResultado.trim() !== "") {
+                                                        setTimeout(function() {
+                                                            if (escopo.aplicarFiltroResultado && typeof escopo.aplicarFiltroResultado === "function") {
+                                                                escopo.aplicarFiltroResultado();
+                                                            }
+                                                        }, 300);
+                                                    }
 
                                                     // Atualizar lista visível no lazy loading
                                                     if (escopo.listaConsultaVisivel === undefined) {
@@ -919,7 +941,19 @@ app.directive("estruturaGerencia", [
                                                 }
                                             } else {
                                                 // Carregamento normal - substituir lista completa
+                                                // Atribuir lista completa primeiro
                                                 $parse("listaConsulta").assign($scope, data.lista);
+
+                                                // Se há filtroResultado, aplicar após garantir que a diretiva processou
+                                                // A função aplicarFiltroResultado agora usa listaConsulta como fallback se listaConsultaCompleta estiver vazia
+                                                if (escopo.filtroResultado && escopo.filtroResultado.trim() !== "") {
+                                                    // Aguardar um ciclo para garantir que o $watch da diretiva executou
+                                                    setTimeout(function() {
+                                                        if (escopo.aplicarFiltroResultado && typeof escopo.aplicarFiltroResultado === "function") {
+                                                            escopo.aplicarFiltroResultado();
+                                                        }
+                                                    }, 200);
+                                                }
 
                                                 // Inicializar variáveis de lazy loading para filtro normal
                                                 escopo.listaConsultaVisivel = undefined; // Será inicializada pela diretiva
@@ -1289,7 +1323,7 @@ app.directive("estruturaGerencia", [
                     }
 
                     if (escopo.alterar == undefined) {
-                        escopo.alterar = function (valor) {
+                        escopo.alterar = function (valor, origemChamado = null) {
                             //console.log(valor);
                             //console.log('alterando');
                             if (usarTimerConsulta) {
@@ -1302,6 +1336,8 @@ app.directive("estruturaGerencia", [
                                 tabelaConsulta: escopo.estrutura.tabelaConsulta,
                                 campo_chave: escopo.estrutura.campo_chave,
                                 chave: valor[escopo.estrutura.campo_chave],
+                                //Fazendo essa origem para ver se a funcao e chamada de um botao, e caso sim ver se previsa ver perfil
+                                origemChamado: origemChamado,
                             };
 
                             if (escopo.estrutura.tabelasRelacionadas != undefined) {

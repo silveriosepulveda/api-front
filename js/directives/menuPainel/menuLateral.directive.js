@@ -331,7 +331,17 @@
             if (acao) url += '/' + acao;
             if (subacao) url += '/' + subacao;
             
-            $location.path(url);
+            // Forçar ciclo de digest para garantir que a navegação funcione mesmo após período de inatividade
+            if (!$scope.$$phase && !$scope.$root.$$phase) {
+                $scope.$apply(function() {
+                    $location.path(url);
+                });
+            } else {
+                // Se já está em digest cycle, usar $timeout para garantir execução
+                $timeout(function() {
+                    $location.path(url);
+                }, 0);
+            }
             
             // Fechar menu em mobile após navegação
             if (window.innerWidth < 1000) {

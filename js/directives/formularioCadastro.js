@@ -26,7 +26,7 @@ directivesPadrao.directive("formularioCadastro", [
                 varVerSub = varVerSub != undefined ? ` && ${varVerSub} != undefined && ${varVerSub} ` : "";
 
                 var html = `<form name="${nomeForm}" id="${nomeForm}" ng-submit="${nomeForm}.$valid ${varVerSub} && ${funcaoSalvar}(${parametros.raizModelo}, ${nomeForm})" 
-                        ng-if="tela == 'cadastro'" valida-Formulario novalidate enctype="multipart/form-data" autocomplete="off">
+                        ng-if="tela == 'cadastro'" valida-Formulario novalidate enctype="multipart/form-data" autocomplete="off">                        
                         <input type="search" autocomplete="off" name="hidden" type="text" style="display:none;">                        
                     <div class="col-xs-12 well" id="formCadastro">                    
                         <!--h1 class="text-center" ng-if="${parametros.raizModelo}.${parametros.campo_chave} == 0">${parametros.textoFormCadastro}</h1>
@@ -37,7 +37,7 @@ directivesPadrao.directive("formularioCadastro", [
                             <input type="submit" value="${textoSalvar}" class="btn   ${classesSalvar} " ng-disabled="desabilitarSalvar" >
                             <input type="button" value="Cancelar" class="cancelaCadastro btn btn-danger col-xs-12 col-md-3 col-md-offset-1" ng-click="mudaTela('consulta')"
                                 ng-if="estrutura.tipoEstrutura != 'cadastroDireto' && estrutura.tipoEstrutura != 'somenteCadastro'">
-                        </div>`;
+                        </div> `;
                 }
 
                 html += `   <div class="row bg-danger" ng-if="${nomeForm}.$submitted && ${nomeForm}.$invalid">
