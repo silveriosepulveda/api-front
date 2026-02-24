@@ -39,12 +39,18 @@
     function MenuLateralController($scope, $timeout, APIServ, $location, config) {
         var ml = this;
       
+        // ==================== CONFIGURAÇÕES ====================
+        
+        // Distância da borda esquerda para ativar preview do menu (em pixels)
+        var DISTANCIA_PREVIEW_MENU = -10;
+      
         // ==================== PROPRIEDADES ====================
         
         ml.menus = [];              // Lista de menus carregados
         ml.favoritos = [];          // Lista de favoritos
         ml.buscaTexto = '';         // Texto de busca
         ml.menuAberto = false;      // Estado do menu lateral
+        ml.menuPreviewAtivo = false; // Estado de preview temporário (não salva)
         ml.todosExpandidos = false; // Estado global de expansão
         ml.favoritosExpandido = true; // Favoritos expandidos por padrão
 
@@ -151,23 +157,57 @@
             var estadoGlobal = localStorage.getItem('todos_menus_expandidos');
             ml.todosExpandidos = estadoGlobal ? JSON.parse(estadoGlobal) : false;
 
+            // Carregar estado do menu salvo no localStorage
+            var estadoMenuSalvo = localStorage.getItem('menuLateralEstado');
+            var menuAbertoSalvo = estadoMenuSalvo ? JSON.parse(estadoMenuSalvo) : null;
+
             var menuForcadoFechado = config && config.usarMenuLateralFechado === true;
             
             // Abrir automaticamente apenas em telas grandes
             $timeout(function() {
                 if (menuForcadoFechado) {
                     fecharMenu();
+                    salvarEstadoMenu(false);
                     console.log('⚙️ Menu lateral configurado para iniciar fechado');
                 } else {
-                    if (window.innerWidth >= 1000) {
-                        abrirMenu();
-                        console.log('🎯 Menu lateral aberto automaticamente em tela grande');
+                    // Se há estado salvo, usar ele (prioridade)
+                    if (menuAbertoSalvo !== null) {
+                        if (menuAbertoSalvo) {
+                            abrirMenu();
+                        } else {
+                            fecharMenu();
+                        }
+                        console.log('💾 Menu lateral restaurado do estado salvo:', menuAbertoSalvo ? 'aberto' : 'fechado');
                     } else {
-                        fecharMenu();
-                        console.log('📱 Menu lateral mantido fechado em dispositivo móvel');
+                        // Se não há estado salvo, usar comportamento padrão
+                        if (window.innerWidth >= 1000) {
+                            abrirMenu();
+                            salvarEstadoMenu(true);
+                            console.log('🎯 Menu lateral aberto automaticamente em tela grande');
+                        } else {
+                            fecharMenu();
+                            salvarEstadoMenu(false);
+                            console.log('📱 Menu lateral mantido fechado em dispositivo móvel');
+                        }
                     }
+                    
+                    // Garantir que o texto do botão seja atualizado após carregar estado
+                    $timeout(function() {
+                        atualizarTextoBotao(ml.menuAberto);
+                    }, 100);
                 }
             }, 500); // Delay para garantir que o DOM esteja pronto
+        }
+
+        /**
+         * Salva o estado do menu no localStorage
+         */
+        function salvarEstadoMenu(aberto) {
+            try {
+                localStorage.setItem('menuLateralEstado', JSON.stringify(aberto));
+            } catch (erro) {
+                console.error('Erro ao salvar estado do menu:', erro);
+            }
         }
 
         /**
@@ -200,10 +240,89 @@
                 }
             });
 
+            // Listener para preview do menu ao aproximar mouse da borda esquerda
+            var previewTimeout = null;
+            var menuElement = null;
+            
+            // Obter referência ao elemento do menu após renderização
+            $timeout(function() {
+                menuElement = document.getElementById('menuLateral');
+                
+                // Listener adicional quando mouse entra no menu para manter preview
+                if (menuElement) {
+                    angular.element(menuElement).on('mouseenter', function() {
+                        if (previewTimeout) {
+                            clearTimeout(previewTimeout);
+                            previewTimeout = null;
+                        }
+                        if (!ml.menuAberto && window.innerWidth >= 1000) {
+                            mostrarMenuPreview();
+                        }
+                    });
+                    
+                    angular.element(menuElement).on('mouseleave', function(e) {
+                        // Só esconder se mouse não está na área configurada da borda
+                        if (!ml.menuAberto && window.innerWidth >= 1000) {
+                            var distanciaBordaEsquerda = e.clientX;
+                            if (distanciaBordaEsquerda > DISTANCIA_PREVIEW_MENU) {
+                                previewTimeout = setTimeout(function() {
+                                    //esconderMenuPreview();
+                                }, 300);
+                            }
+                        }
+                    });
+                }
+            }, 600);
+            
+            angular.element(document).on('mousemove', function(e) {
+                // Só funciona em desktop (telas >= 1000px)
+                if (window.innerWidth < 1000) return;
+                
+                // Se o menu já está aberto, não fazer nada
+                if (ml.menuAberto) return;
+                
+                var distanciaBordaEsquerda = e.clientX;
+                
+                // Verificar se o mouse está sobre o menu
+                var mouseSobreMenu = false;
+                if (menuElement) {
+                    var menuRect = menuElement.getBoundingClientRect();
+                    mouseSobreMenu = e.clientX >= menuRect.left && 
+                                    e.clientX <= menuRect.right &&
+                                    e.clientY >= menuRect.top && 
+                                    e.clientY <= menuRect.bottom;
+                }
+                
+                // Limpar timeout anterior
+                if (previewTimeout) {
+                    clearTimeout(previewTimeout);
+                    previewTimeout = null;
+                }
+                
+                // Se mouse está dentro da distância configurada da borda esquerda OU sobre o menu
+                if (distanciaBordaEsquerda <= DISTANCIA_PREVIEW_MENU || mouseSobreMenu) {
+                    // Mostrar preview do menu
+                   // mostrarMenuPreview();
+                } else {
+                    // Se mouse saiu da área, aguardar um pouco antes de esconder
+                    previewTimeout = setTimeout(function() {
+                        esconderMenuPreview();
+                    }, 300); // 300ms de delay antes de esconder
+                }
+            });
+
             // Limpar listeners ao destruir
             $scope.$on('$destroy', function() {
                 angular.element(window).off('resize');
                 angular.element(document).off('keyup');
+                angular.element(document).off('mousemove');
+                if (previewTimeout) {
+                    clearTimeout(previewTimeout);
+                }
+                if (menuElement) {
+                    angular.element(menuElement).off('mouseenter');
+                    angular.element(menuElement).off('mouseleave');
+                }
             });
         }
 
@@ -213,13 +332,53 @@
          * Alterna abertura/fechamento do menu
          */
         function toggleMenu() {
-            ml.menuAberto ? fecharMenu() : abrirMenu();
+            // Se está em preview, abrir permanentemente
+            if (ml.menuPreviewAtivo && !ml.menuAberto) {
+                abrirMenu();
+            } else {
+                ml.menuAberto ? fecharMenu() : abrirMenu();
+            }
+        }
+
+        /**
+         * Mostra preview do menu sem alterar estado salvo (temporário)
+         */
+        function mostrarMenuPreview() {
+            if (ml.menuPreviewAtivo || ml.menuAberto) return;
+            
+            ml.menuPreviewAtivo = true;
+            var menu = document.getElementById('menuLateral');
+            var conteudo = document.getElementById('conteudoEstruturaGerencia');
+            
+            if (menu) menu.style.width = '350px';
+            if (conteudo) conteudo.style.marginLeft = '350px';
+            document.body.classList.add('menu-lateral-aberto');
+        }
+
+        /**
+         * Esconde preview do menu (volta ao estado original)
+         */
+        function esconderMenuPreview() {
+            if (!ml.menuPreviewAtivo || ml.menuAberto) return;
+            
+            ml.menuPreviewAtivo = false;
+            var menu = document.getElementById('menuLateral');
+            var conteudo = document.getElementById('conteudoEstruturaGerencia');
+            
+            if (menu) menu.style.width = '0';
+            if (conteudo) conteudo.style.marginLeft = '0';
+            document.body.classList.remove('menu-lateral-aberto');
         }
 
         /**
          * Abre o menu lateral
          */
         function abrirMenu() {
+            // Se estava em preview, desativar preview primeiro
+            if (ml.menuPreviewAtivo) {
+                esconderMenuPreview();
+            }
+            
             ml.menuAberto = true;
             var menu = document.getElementById('menuLateral');
             var conteudo = document.getElementById('conteudoEstruturaGerencia');
@@ -236,14 +395,23 @@
                 criarOverlay();
             }
             
-            // Atualizar ícone do botão
+            // Salvar estado do menu como aberto
+            salvarEstadoMenu(true);
+            
+            // Atualizar ícone e texto do botão
             atualizarIconeBotao(true);
+            atualizarTextoBotao(true);
         }
 
         /**
          * Fecha o menu lateral
          */
         function fecharMenu() {
+            // Se estava em preview, desativar preview primeiro
+            if (ml.menuPreviewAtivo) {
+                esconderMenuPreview();
+            }
+            
             ml.menuAberto = false;
             var menu = document.getElementById('menuLateral');
             var conteudo = document.getElementById('conteudoEstruturaGerencia');
@@ -255,8 +423,12 @@
             document.body.classList.remove('menu-lateral-aberto');
             removerOverlay();
             
-            // Atualizar ícone do botão
+            // Salvar estado do menu como fechado
+            salvarEstadoMenu(false);
+            
+            // Atualizar ícone e texto do botão
             atualizarIconeBotao(false);
+            atualizarTextoBotao(false);
         }
 
         /**
@@ -267,11 +439,16 @@
             if (icone) {
                 icone.className = aberto ? 'fa fa-times' : 'fa fa-bars';
             }
-            
+        }
+
+        /**
+         * Atualiza texto do botão menu
+         */
+        function atualizarTextoBotao(aberto) {
             var botao = document.getElementById('botaoMenu');
             if (botao) {
-                //botao.setAttribute('title', aberto ? 'Ocultar Menu' : 'Mostrar Menu');
-                //botao.textContent = aberto ? 'Ocultar Menu' : 'Mostrar Menu';
+                botao.textContent = aberto ? 'Ocultar Menu' : 'Mostrar Menu';
+                botao.setAttribute('title', aberto ? 'Ocultar Menu' : 'Mostrar Menu');
             }
         }
 
@@ -331,6 +508,9 @@
             if (acao) url += '/' + acao;
             if (subacao) url += '/' + subacao;
             
+            // Fechar menu após navegação (tanto em desktop quanto mobile)
+            fecharMenu();
+            
             // Forçar ciclo de digest para garantir que a navegação funcione mesmo após período de inatividade
             if (!$scope.$$phase && !$scope.$root.$$phase) {
                 $scope.$apply(function() {
@@ -341,11 +521,6 @@
                 $timeout(function() {
                     $location.path(url);
                 }, 0);
-            }
-            
-            // Fechar menu em mobile após navegação
-            if (window.innerWidth < 1000) {
-                fecharMenu();
             }
         }
 

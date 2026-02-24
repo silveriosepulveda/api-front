@@ -28,7 +28,8 @@ directivesPadrao.directive("formularioCadastro", [
                 var html = `<form name="${nomeForm}" id="${nomeForm}" ng-submit="${nomeForm}.$valid ${varVerSub} && ${funcaoSalvar}(${parametros.raizModelo}, ${nomeForm})" 
                         ng-if="tela == 'cadastro'" valida-Formulario novalidate enctype="multipart/form-data" autocomplete="off">                        
                         <input type="search" autocomplete="off" name="hidden" type="text" style="display:none;">                        
-                    <div class="col-xs-12 well" id="formCadastro">                    
+                    <div class="col-xs-12 well" id="formCadastro">               
+                    
                         <!--h1 class="text-center" ng-if="${parametros.raizModelo}.${parametros.campo_chave} == 0">${parametros.textoFormCadastro}</h1>
                         <h1 class="text-center" ng-if="${parametros.raizModelo}.${parametros.campo_chave} > 0">${parametros.textoFormAlteracao}</h1-->`;
 

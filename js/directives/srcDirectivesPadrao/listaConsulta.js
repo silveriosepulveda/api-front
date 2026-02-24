@@ -241,8 +241,9 @@ directivesPadrao
 
                     var textoDetalhes = parametros.textoDetalhesConsulta != undefined ? parametros.textoDetalhesConsulta : "Mais Informações";
                     html += `
-                <div class="col-xs-12 fundoDetalheConsulta" ng-if="item.exibirDetalhes">
+                <div class="col-xs-12 fundoDetalheConsulta" ng-if="item.exibirDetalhes && tela == 'consulta'">
                     <div class="row">
+                    {{tela}}
                         <h4 class="campoItemConsulta text-center fundobranco">${textoDetalhes}</h4>`;
 
                     //html += `<ng-bind-html class="col-xs-12 div2" ng-bind-html="item.htmlDetalhe"></ng-bind-html>`;
@@ -323,6 +324,8 @@ directivesPadrao
                     var watchingUpdate = false; // Flag para evitar loops
 
                     scope.$watch("listaConsulta", function (novaLista, listaAnterior) {
+                        // Não processar quando estiver na tela de cadastro (evita loop ao alternar consulta → cadastro)
+                        if (scope.tela && scope.tela !== "consulta") return;
                         // Evitar processamento durante updates internos
                         if (watchingUpdate) return;
 
@@ -369,6 +372,8 @@ directivesPadrao
 
                     // Função para filtrar itens da lista baseado no filtroResultado
                     scope.aplicarFiltroResultado = function () {
+                        // Não aplicar quando estiver na tela de cadastro (evita loop ao alternar consulta → cadastro)
+                        if (scope.tela && scope.tela !== "consulta") return;
                         // Se listaConsultaCompleta ainda não foi inicializada, usar listaConsulta como fallback
                         if (!scope.listaConsultaCompleta || scope.listaConsultaCompleta.length === 0) {
                             // Se listaConsulta tem dados, usar ela como base e atualizar listaConsultaCompleta
@@ -475,6 +480,8 @@ directivesPadrao
 
                     // Watch para alterações no filtroResultado com debounce
                     scope.$watch("filtroResultado", function (novoFiltro, filtroAnterior) {
+                        // Não processar quando estiver na tela de cadastro (evita loop ao alternar consulta → cadastro)
+                        if (scope.tela && scope.tela !== "consulta") return;
                         // Cancelar timeout anterior se existir
                         if (filtroTimeout) {
                             clearTimeout(filtroTimeout);
@@ -493,6 +500,8 @@ directivesPadrao
                     // Watch adicional sem debounce para detectar mudanças muito rápidas
                     var ultimoFiltroAplicado = "";
                     scope.$watch("filtroResultado", function (novoFiltro) {
+                        // Não processar quando estiver na tela de cadastro (evita loop ao alternar consulta → cadastro)
+                        if (scope.tela && scope.tela !== "consulta") return;
                         // Se o filtro mudou muito rápido e ainda não foi aplicado
                         if (novoFiltro !== ultimoFiltroAplicado && filtroTimeout) {
                             ultimoFiltroAplicado = novoFiltro;
