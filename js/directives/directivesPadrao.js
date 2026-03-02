@@ -1380,7 +1380,7 @@ var directivesPadrao = angular
                 }, 300);
 
                 if (elem.hasClass("imagemZoom")) {
-                    $(elem).mouseover(() => {
+                    $(elem).mouseover(function (e) {
                         let indice = scope.$index;
                         let imagem = config.urlSite + scope.item.arquivosAnexados[indice]["grande"];
                         let larguraDiv = 500;
@@ -1388,12 +1388,12 @@ var directivesPadrao = angular
 
                         let larguraJanela = $(window).width();
                         let larguraImagem = $(elem).width();
-
-                        let alturaJanela = $(window).height();
                         let alturaImagem = $(elem).height();
 
                         let leftImagem = $(elem).offset().left;
                         let topImagem = $(elem).offset().top;
+                        let scrollLeft = $(window).scrollLeft();
+                        let scrollTop = $(window).scrollTop();
 
                         let posicao = larguraJanela / 2 > leftImagem ? "direita" : "esquerda";
                         let leftZoom = posicao == "direita" ? larguraImagem + leftImagem : leftImagem - larguraDiv - 50;
@@ -1401,64 +1401,69 @@ var directivesPadrao = angular
                         let divImagemComZoom = document.createElement("div");
                         $(divImagemComZoom).addClass("divImagemComZoom");
                         let imagemComZoom = document.createElement("img");
-                        //$(imagemComZoom).addClass('imagemComZoom');
                         imagemComZoom.src = imagem;
 
-                        $(divImagemComZoom).css("left", leftZoom);
-                        //$(divImagemComZoom).css('top', topImagem * -1);
+                        $(divImagemComZoom).css({
+                            "position": "absolute",
+                            "left": (leftZoom + scrollLeft) + "px",
+                            "top": (topImagem + scrollTop) + "px",
+                            "z-index": "9999",
+                            "width": larguraDiv + "px",
+                            "height": alturaDiv + "px",
+                            "overflow": "hidden",
+                            "background": "#fff",
+                            "box-shadow": "0 4px 20px rgba(0,0,0,0.25)",
+                            "border-radius": "4px"
+                        });
 
                         imagemComZoom.id = "imagemAmpliada";
+                        $(imagemComZoom).css("position", "absolute");
 
-                        if (!$(".divImagemComZoom").length > 0) {
+                        if ($(".divImagemComZoom").length === 0) {
                             $(divImagemComZoom).append(imagemComZoom);
-                            $(elem).closest(".divListaAnexos").append(divImagemComZoom);
+                            $("body").append(divImagemComZoom);
                         }
 
-                        let larguraImagemZoom = $(imagemComZoom).width();
-                        if (larguraImagem <= larguraDiv && alturaImagem < 500) {
-                            $(imagemComZoom).addClass("width", larguraDiv);
-                        } else {
-                            // POSICAO ABSOLUTA DO CONTEUDO NA TELA
-                            var pos_x = $(elem).offset().left;
-                            var pos_y = $(elem).offset().top;
+                        let $thumb = $(elem);
+                        let posThumb = { left: $thumb.offset().left, top: $thumb.offset().top };
+                        let thumbW = $thumb.width();
+                        let thumbH = $thumb.height();
 
-                            // LARGURA E ALTURA DO CONTAINER
-                            var container_x = $(divImagemComZoom).width();
-                            var container_y = $(divImagemComZoom).height();
+                        function atualizarRegiaoZoom(ev) {
+                            let pageX = (ev && ev.pageX != null) ? ev.pageX : (ev && ev.originalEvent && ev.originalEvent.pageX);
+                            let pageY = (ev && ev.pageY != null) ? ev.pageY : (ev && ev.originalEvent && ev.originalEvent.pageY);
+                            if (pageX == null || pageY == null) return;
 
-                            // LARGURA E ALTURA DO CONTEUDO
-                            var conteudo_x = $(imagemComZoom).width();
-                            var conteudo_y = $(imagemComZoom).height();
+                            let pctX = Math.max(0, Math.min(1, (pageX - posThumb.left) / thumbW));
+                            let pctY = Math.max(0, Math.min(1, (pageY - posThumb.top) / thumbH));
 
-                            // LARGURA E ALTURA DO#thumb
-                            var thumb_x = $(elem).width();
-                            var thumb_y = $(elem).height();
+                            let imgW = $(imagemComZoom).width();
+                            let imgH = $(imagemComZoom).height();
+                            if (!imgW || !imgH) return;
 
-                            // QUANTOS PX DO CONTE�DO FICAM PRA FORA DO CONTAINER
-                            var diferenca_x = conteudo_x - container_x;
-                            var diferenca_y = conteudo_y - container_y;
+                            // Centraliza no zoom o ponto da imagem sob o cursor
+                            let leftPos = (larguraDiv / 2) - (pctX * imgW);
+                            let topPos = (alturaDiv / 2) - (pctY * imgH);
+                            // Limita para não mostrar área vazia
+                            leftPos = Math.max(larguraDiv - imgW, Math.min(0, leftPos));
+                            topPos = Math.max(alturaDiv - imgH, Math.min(0, topPos));
 
-                            // POSICAO INICIAL ( na metade da tela)
-                            var metade_x = -parseInt(diferenca_x / 2);
-                            var metade_y = -parseInt(diferenca_y / 2);
-
-                            // POSICIONANDO CONTEUDO
-                            $(elem).mousemove(function (e) {
-                                porcentagem_x = parseInt(((e.pageX - pos_x) / thumb_x) * 100);
-                                porcentagem_y = parseInt(((e.pageY - pos_y) / thumb_y) * 100);
-                                leftPosition = parseInt(0 - (diferenca_x / 100) * porcentagem_x);
-                                topPosition = parseInt(0 - (diferenca_y / 100) * porcentagem_y);
-
-                                $("#imagemAmpliada").css({
-                                    left: leftPosition,
-                                    top: topPosition,
-                                });
-                            });
+                            $(imagemComZoom).css({ left: leftPos + "px", top: topPos + "px" });
                         }
-                        //*/
+
+                        $(imagemComZoom).on("load", function () {
+                            atualizarRegiaoZoom(e);
+                            $thumb.off("mousemove.imagemZoom").on("mousemove.imagemZoom", atualizarRegiaoZoom);
+                        });
+
+                        if (imagemComZoom.complete && imagemComZoom.naturalWidth) {
+                            atualizarRegiaoZoom(e);
+                            $thumb.off("mousemove.imagemZoom").on("mousemove.imagemZoom", atualizarRegiaoZoom);
+                        }
                     });
 
                     $(elem).mouseleave(() => {
+                        $(elem).off("mousemove.imagemZoom");
                         if ($(".divImagemComZoom").length > 0) {
                             $(".divImagemComZoom").remove();
                         }
