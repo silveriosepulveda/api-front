@@ -175,7 +175,7 @@ app.directive("cabecalhoConsulta", [
                     <!-- <div class="col-xs-3 col-md-1">
                             <input type="checkbox" checked="true" class="input-lg" ng-click="desfixarCabecalho()"> -->
                 </div>
-                <timer-consulta intervalo="{{estrutura.usarTimerConsulta.intervalo}}" ng-if="estrutura.usarTimerConsulta"></timer-consulta>
+                <timer-consulta intervalo="{{estrutura.usarTimerConsulta.intervalo}}" classe="{{classe}}" ng-if="estrutura.usarTimerConsulta"></timer-consulta>
             </div>
         
         `,

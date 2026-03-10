@@ -882,7 +882,7 @@
   .barraProgressoTimer {
     margin-top: 10px !important;
     height: 3px;
-    background-color: rgba(220, 184, 38, 0.2) !important; /* Fundo dourado suave */
+    background-color: rgba(220, 184, 38, 0.7) !important; /* Fundo dourado mais claro */
     border-radius: 2px;
     overflow: hidden;
     position: relative;

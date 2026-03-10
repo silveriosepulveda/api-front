@@ -1284,18 +1284,25 @@ formulario-cadastro .form-group label {
 }
 
 /* Barra de progresso do timer - Estilos base */
+.barraProgressoTimer-container {
+    overflow: hidden;
+    margin-top: 10px;
+    margin-bottom: 1px;
+}
 .barraProgressoTimer {
     height: 3px;
     background-color: var(--color-black);
     width: 100%;
-    margin-top: 10px;
-    margin-bottom: 1px;
+    margin-top: 0;
+    margin-bottom: 0;
+    transition: none;
 }
 
 .animate {
     animation-name: animation;
-    animation-iteration-count: infinite;
+    animation-iteration-count: 1;
     animation-timing-function: linear;
+    animation-fill-mode: forwards;
 }
 
 .pause {

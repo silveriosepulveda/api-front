@@ -1489,236 +1489,204 @@ var directivesPadrao = angular
             template: '<div class="col-xs-12"></div>',
         };
     })
-    .directive("timerConsulta", ($rootScope, $timeout, $compile) => {
+    .factory("timerConsultaService", ($rootScope, $timeout) => {
+        var timers = {};
+        var TICK_MS = 100;
+
+        function getOrCreate(classe, intervalo) {
+            if (!timers[classe]) {
+                var delay = Math.max(1000, (intervalo || 20) * 1000);
+                var intervalId = null;
+                var remaining = delay;
+                var total = delay;
+                var startTime = null;
+                var isPaused = false;
+                var barElements = [];
+
+                function updateBars(percent) {
+                    barElements = barElements.filter(function(el) {
+                        if (el && (el.isConnected !== false) && el.parentNode) {
+                            el.style.width = percent + "%";
+                            return true;
+                        }
+                        return false;
+                    });
+                }
+
+                function fire() {
+                    var escopo = $rootScope.estruturas && $rootScope.estruturas[classe];
+                    if (escopo && escopo.filtrar) {
+                        try {
+                            if (!escopo.$$phase && !escopo.$root.$$phase) {
+                                escopo.$apply(function() {
+                                    escopo.filtrar(1, "timer");
+                                });
+                            } else {
+                                escopo.filtrar(1, "timer");
+                            }
+                        } catch (e) {
+                            console.error("timerConsulta: erro ao executar filtrar", e);
+                        }
+                    }
+                    remaining = delay;
+                    total = delay;
+                    startTime = Date.now();
+                    updateBars(100);
+                }
+
+                function tick() {
+                    if (isPaused) return;
+                    var elapsed = Date.now() - startTime;
+                    remaining = total - elapsed;
+                    var percent = Math.max(0, (remaining / total) * 100);
+                    updateBars(percent);
+                    if (remaining <= 0) {
+                        fire();
+                    }
+                }
+
+                timers[classe] = {
+                    start: function() {
+                        if (intervalId) return;
+                        isPaused = false;
+                        remaining = delay;
+                        total = delay;
+                        startTime = Date.now();
+                        updateBars(100);
+                        intervalId = setInterval(tick, TICK_MS);
+                    },
+                    stop: function() {
+                        if (intervalId) {
+                            clearInterval(intervalId);
+                            intervalId = null;
+                        }
+                        isPaused = false;
+                    },
+                    pause: function() {
+                        isPaused = true;
+                        if (intervalId) {
+                            clearInterval(intervalId);
+                            intervalId = null;
+                        }
+                        remaining = total - (Date.now() - startTime);
+                        if (remaining < 0) remaining = 0;
+                    },
+                    resume: function() {
+                        if (intervalId) return;
+                        isPaused = false;
+                        startTime = Date.now();
+                        total = remaining;
+                        intervalId = setInterval(tick, TICK_MS);
+                    },
+                    registerBar: function(el) {
+                        if (el && barElements.indexOf(el) === -1) {
+                            barElements.push(el);
+                            el.style.width = (remaining / total * 100) + "%";
+                        }
+                    },
+                    unregisterBar: function(el) {
+                        barElements = barElements.filter(function(e) { return e !== el; });
+                    },
+                    reset: function() {
+                        remaining = total;
+                        startTime = Date.now();
+                        updateBars(100);
+                    },
+                    isPaused: function() { return isPaused; },
+                    setPaused: function(val) { isPaused = val; }
+                };
+            }
+            return timers[classe];
+        }
+
+        return {
+            get: getOrCreate,
+            destroy: function(classe) {
+                if (timers[classe]) {
+                    timers[classe].stop();
+                    delete timers[classe];
+                }
+            }
+        };
+    })
+    .directive("timerConsulta", ["$rootScope", "$timeout", "$route", "timerConsultaService", function($rootScope, $timeout, $route, timerConsultaService) {
         return {
             restrict: "E",
             template: `
-                <div class="col-xs-12">                    
+                <div class="col-xs-12">
                     <div class="botoesTimerConsulta" style="position: relative; width: 30px; height: 30px;">
-                        <button type="button" class="btn btn-default btn-xs glyphicon glyphicon-play" 
-                                ng-show="timerPausado" 
+                        <button type="button" class="btn btn-default btn-xs glyphicon glyphicon-play"
+                                ng-show="timerPausado"
                                 ng-click="iniciarTimer()"
                                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></button>
-                        <button type="button" class="btn btn-default btn-xs glyphicon glyphicon-pause" 
-                                ng-show="!timerPausado" 
+                        <button type="button" class="btn btn-default btn-xs glyphicon glyphicon-pause"
+                                ng-show="!timerPausado"
                                 ng-click="pausarTimer()"
-                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></button>                            
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></button>
                     </div>
-                    <div class="barraProgressoTimer" ng-style="{'animation-duration': duracaoAnimacao}"></div>                    
+                    <div class="barraProgressoTimer-container" style="width: 100%; margin-top: 10px;">
+                        <div class="barraProgressoTimer barraProgressoTimerJs" style="width: 100%;"></div>
+                    </div>
                 </div>
             `,
-            link: (scope, elem, attr) => {
-                // Validação e inicialização
+            link: function(scope, elem, attr) {
                 var intervalo = parseInt(attr.intervalo, 10);
                 if (isNaN(intervalo) || intervalo <= 0) {
-                    console.warn('timerConsulta: intervalo inválido, usando padrão de 30 segundos');
-                    intervalo = 30;
-                }
-                
-                var delay = intervalo * 1000;
-                var progress = elem.find('.barraProgressoTimer')[0];
-                
-                if (!progress) {
-                    console.error('timerConsulta: elemento de progresso não encontrado');
-                    return;
+                    intervalo = 20;
                 }
 
-                // Variáveis de controle
-                var initTimeoutId = null;
-                var proximaDataDisparo = null;
-                
-                // Cache do intervalo para evitar parse repetido
-                scope.duracaoAnimacao = delay + "ms";
-                
-                // Inicializar estado do timer
-                scope.timerPausado = false; // Começa rodando
+                var classe = attr.classe || ($route.current && $route.current.classe) || scope.acao || "default";
+                var progress = elem[0].querySelector(".barraProgressoTimerJs");
+                if (!progress) return;
 
-                // Classe Timer otimizada
-                function Timer(callback, delay) {
-                    this.delay = delay;
-                    this.callback = callback;
-                    this.timerId = null;
-                    this.startTime = null;
-                    this.remaining = delay;
-                    this.isPaused = false;
-                }
+                var timer = timerConsultaService.get(classe, intervalo);
+                timer.registerBar(progress);
 
-                Timer.prototype.pause = function() {
-                    if (this.timerId !== null) {
-                        window.clearTimeout(this.timerId);
-                        this.remaining -= Date.now() - this.startTime;
-                        this.timerId = null;
-                    }
-                    this.isPaused = true;
-                };
+                scope.timerPausado = false;
 
-                Timer.prototype.resume = function() {
-                    // Se já está rodando, não fazer nada
-                    if (this.timerId !== null) {
-                        return;
-                    }
-                    
-                    // Se está pausado, não iniciar
-                    if (this.isPaused) {
-                        return;
-                    }
-                    
-                    // Iniciar ou retomar o timer
-                    this.startTime = Date.now();
-                    var self = this;
-                    this.timerId = window.setTimeout(function() {
-                        // Limpar timerId antes de executar callback
-                        self.timerId = null;
-                        self.remaining = self.delay;
-                        
-                        // Executar callback
-                        if (self.callback) {
-                            self.callback();
-                        }
-                        
-                        // Continuar rodando se não estiver pausado
-                        if (!self.isPaused) {
-                            self.resume();
-                        }
-                    }, this.remaining);
-                };
-
-                Timer.prototype.reset = function() {
-                    if (this.timerId !== null) {
-                        window.clearTimeout(this.timerId);
-                        this.timerId = null;
-                    }
-                    this.remaining = this.delay;
-                    this.isPaused = false;
-                    this.startTime = null;
-                };
-
-                Timer.prototype.destroy = function() {
-                    if (this.timerId !== null) {
-                        window.clearTimeout(this.timerId);
-                        this.timerId = null;
-                    }
-                    this.callback = null;
-                };
-
-                // Instância do timer
-                var timer = new Timer(function() {
-                    // Usar Date.now() ao invés de new Date() para melhor performance
-                    var agora = Date.now();
-                    
-                    // Inicializar próxima data de disparo se necessário
-                    if (!proximaDataDisparo) {
-                        proximaDataDisparo = agora + delay;
-                    }
-
-                    // Verificar se é hora de disparar
-                    if (agora >= proximaDataDisparo) {
-                        // Usar $apply apenas se necessário
-                        if (!scope.$$phase && !scope.$root.$$phase) {
-                            scope.$apply(function() {
-                                if (scope.filtrar) {
-                                    scope.filtrar(1, "timer");
-                                }
-                            });
-                        } else {
-                            if (scope.filtrar) {
-                                scope.filtrar(1, "timer");
-                            }
-                        }
-                        
-                        // Atualizar próxima data de disparo
-                        proximaDataDisparo = agora + delay;
-                    }
-                }, delay);
-
-                // Funções do scope (não no $rootScope para evitar conflitos)
                 scope.iniciarTimer = function() {
-                    // Se já está rodando (tem timerId), não fazer nada
-                    if (timer && timer.timerId !== null) {
-                        return;
-                    }
-                    
                     scope.timerPausado = false;
-                    timer.resume();
-                    
-                    if (progress) {
-                        progress.classList.add("animate");
-                        progress.classList.remove("pause");
-                    }
+                    timer.setPaused(false);
+                    timer.start();
                 };
 
                 scope.pausarTimer = function() {
-                    // Se já está pausado, não fazer nada
-                    if (timer && scope.timerPausado) {
-                        return;
-                    }
-                    
                     scope.timerPausado = true;
                     timer.pause();
-                    
-                    if (progress) {
-                        progress.classList.add("pause");
-                    }
                 };
 
                 scope.reiniciarTimer = function() {
                     timer.reset();
-                    proximaDataDisparo = null;
-                    
                     if (progress) {
-                        progress.classList.remove("animate");
-                        // Usar requestAnimationFrame ao invés de void offsetWidth para melhor performance
-                        requestAnimationFrame(function() {
-                            progress.classList.add("animate");
-                        });
+                        progress.style.width = "100%";
                     }
                 };
 
-                // Compatibilidade com $rootScope (manter para código legado)
-                // Usar uma instância única compartilhada
                 if (!$rootScope._timerConsultaInstances) {
                     $rootScope._timerConsultaInstances = [];
                 }
-                
                 var instanceId = $rootScope._timerConsultaInstances.length;
                 $rootScope._timerConsultaInstances.push({
                     iniciarTimer: scope.iniciarTimer,
                     pausarTimer: scope.pausarTimer,
                     reiniciarTimer: scope.reiniciarTimer
                 });
-
-                // Manter compatibilidade com código legado (última instância)
                 $rootScope.iniciarTimer = scope.iniciarTimer;
                 $rootScope.pausarTimer = scope.pausarTimer;
                 $rootScope.reiniciarTimer = scope.reiniciarTimer;
 
-                // Inicialização após um delay (usar $timeout para garantir que o scope está pronto)
-                initTimeoutId = $timeout(function() {
-                    if (scope.iniciarTimer) {
-                        scope.iniciarTimer();
-                    }
-                }, 1000);
+                var initTimeoutId = $timeout(function() {
+                    scope.iniciarTimer();
+                }, 500);
 
-                // Cleanup quando a diretiva é destruída
-                scope.$on('$destroy', function() {
-                    // Limpar timeout de inicialização
+                scope.$on("$destroy", function() {
+                    timer.unregisterBar(progress);
                     if (initTimeoutId) {
                         $timeout.cancel(initTimeoutId);
-                        initTimeoutId = null;
                     }
-                    
-                    // Destruir timer
-                    if (timer) {
-                        timer.destroy();
-                        timer = null;
-                    }
-                    
-                    // Remover instância do array
                     if ($rootScope._timerConsultaInstances && $rootScope._timerConsultaInstances[instanceId]) {
                         $rootScope._timerConsultaInstances[instanceId] = null;
                     }
-                    
-                    // Se não há mais instâncias, limpar referências do rootScope
                     if ($rootScope._timerConsultaInstances && $rootScope._timerConsultaInstances.every(function(i) { return i === null; })) {
                         delete $rootScope.iniciarTimer;
                         delete $rootScope.pausarTimer;
@@ -1726,9 +1694,9 @@ var directivesPadrao = angular
                         $rootScope._timerConsultaInstances = [];
                     }
                 });
-            },
+            }
         };
-    })
+    }])
     .directive("ordenacaoConsulta", ($compile) => {
         return {
             restrict: "E",

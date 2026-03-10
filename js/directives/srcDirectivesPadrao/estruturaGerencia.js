@@ -846,7 +846,7 @@ app.directive("estruturaGerencia", [
                             APIServ.executaFuncaoClasse("classeGeral", "consulta", parametrosEnviarFiltro, escopo.tipoConsulta)
                                 .success(function (data) {
                                     //console.log(data); $rootScope.carregando = false;/*
-                                    console.log(data);
+                              //      console.log(data);
                                     if (usarTimerConsulta) {
                                         $rootScope.reiniciarTimer();
                                     }
@@ -1484,6 +1484,7 @@ app.directive("estruturaGerencia", [
                 if ($rootScope["estruturas"] == undefined) {
                     $rootScope["estruturas"] = {};
                 }
+                escopo.classe = classe;
                 $rootScope["estruturas"][classe] = escopo;
 
                 if (retorno.tipoEstrutura != "personalizado") {
